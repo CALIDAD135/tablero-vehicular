@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablero Ejecutivo · Control Vehicular KPI-AFI-01 2025-2026</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+:root{
+  --bg:#0f1626; --panel:#16203a; --panel2:#1c2747; --line:#27345c;
+  --txt:#e8edf7; --muted:#90a0c0; --accent:#3fa9f5; --gold:#f5c451;
+  --green:#39c08a; --red:#ef5c6e; --orange:#f08a3c; --purple:#9b6dff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;padding:18px 22px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
+h1{font-size:20px;font-weight:700;letter-spacing:.2px}
+.sub{color:var(--muted);font-size:12px;margin-top:4px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;transition:.15s}
+.btn:hover{border-color:var(--accent);color:#fff}
+.btn.gold{background:linear-gradient(135deg,#f5c451,#e0a82e);color:#2a2200;border:none;font-weight:600}
+select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 10px;border-radius:8px;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;position:relative;overflow:hidden}
+.kpi .v{font-size:30px;font-weight:700;line-height:1}
+.kpi .l{color:var(--muted);font-size:11.5px;margin-top:8px;text-transform:uppercase;letter-spacing:.5px}
+.kpi .bar{position:absolute;left:0;top:0;width:4px;height:100%}
+.kpi.b-blue .bar{background:var(--accent)} .kpi.b-red .bar{background:var(--red)}
+.kpi.b-orange .bar{background:var(--orange)} .kpi.b-green .bar{background:var(--green)}
+.kpi.b-gold .bar{background:var(--gold)} .kpi.b-purple .bar{background:var(--purple)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card h3{font-size:13px;font-weight:600;margin-bottom:4px}
+.card .hint{color:var(--muted);font-size:11px;margin-bottom:8px}
+.chart{width:100%;height:300px}
+.col-6{grid-column:span 6} .col-4{grid-column:span 4} .col-12{grid-column:span 12} .col-8{grid-column:span 8}
+@media(max-width:900px){.col-6,.col-4,.col-8{grid-column:span 12}}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:600;cursor:pointer;position:sticky;top:0;background:var(--panel);user-select:none}
+th:hover{color:#fff}
+tbody tr:hover{background:var(--panel2)}
+.tag{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
+.t-circ{background:rgba(57,192,138,.18);color:#5fe0ab}
+.t-resg{background:rgba(155,109,255,.20);color:#bfa3ff}
+.t-tall{background:rgba(245,196,81,.18);color:var(--gold)}
+.t-sin{background:rgba(239,92,110,.18);color:#ff8a98}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.bad{color:var(--red);font-weight:700}.warn{color:var(--orange);font-weight:600}.ok{color:var(--green)}
+.tablewrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.legend-note{color:var(--muted);font-size:11px;margin-top:10px;line-height:1.6}
+#alertBox{background:linear-gradient(135deg,rgba(239,92,110,.12),rgba(240,138,60,.08));border:1px solid rgba(239,92,110,.4);border-radius:12px;padding:14px 18px;margin-bottom:18px}
+#alertBox b{color:var(--red)}
+/* ---- Parque vehicular (mosaico) ---- */
+.fleet-legend{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 12px;font-size:12px;color:var(--muted)}
+.fleet-legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:13px;height:13px;border-radius:4px;display:inline-block}
+.fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.unit{border-radius:9px;padding:10px 8px;cursor:pointer;text-align:center;color:#0c1322;font-weight:700;font-size:12.5px;border:2px solid transparent;transition:.12s;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.unit small{font-weight:600;font-size:10px;opacity:.85;text-transform:uppercase;letter-spacing:.3px}
+.unit:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.unit.sel{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.4)}
+.u-circ{background:#39c08a} .u-tall{background:#f5c451} .u-resg{background:#9b6dff;color:#fff} .u-sin{background:#ef5c6e;color:#fff}
+#fleetDetail{margin-top:14px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:0;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
+#fleetDetail.open{max-height:360px;padding:16px 18px}
+#fleetDetail h4{font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.fd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.fd-item{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.fd-item .lab{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+.fd-item .val{font-size:16px;font-weight:600;margin-top:3px}
+.fd-close{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px}
+.fd-close:hover{color:#fff;border-color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Tablero Ejecutivo · Control Vehicular</h1>
+    <div class="sub">KPI-AFI-01 · Activos Fijos 2025-2026 · Coordinación de Activos Fijos y Control Vehicular</div>
+  </div>
+  <div class="toolbar">
+    <select id="fZona"></select>
+    <select id="fEstatus"></select>
+    <label class="btn gold" for="csvInput">Recargar CSV</label>
+    <input id="csvInput" type="file" accept=".csv" style="display:none">
+    <button class="btn" id="resetBtn">Restablecer</button>
+  </div>
+</header>
+
+<div id="alertBox"></div>
+
+<div class="kpis" id="kpis"></div>
+
+<!-- ====== PARQUE VEHICULAR TOTAL ====== -->
+<div class="card col-12" style="margin-bottom:16px">
+  <h3>Parque Vehicular Total · Estatus Operativo</h3>
+  <div class="hint">Cada recuadro es una unidad coloreada por estatus. Clic en una unidad para desplegar su detalle.</div>
+  <div class="fleet-legend">
+    <span><i class="dot u-circ"></i> Circulación</span>
+    <span><i class="dot u-tall"></i> Taller</span>
+    <span><i class="dot u-resg"></i> Resguardo</span>
+    <span><i class="dot u-sin"></i> Siniestrado</span>
+  </div>
+  <div class="fleet" id="fleet"></div>
+  <div id="fleetDetail"></div>
+</div>
+
+<div class="grid">
+  <div class="card col-4">
+    <h3>Distribución por Zona</h3>
+    <div class="hint">Clic en un segmento para filtrar el tablero</div>
+    <div id="cZona" class="chart" style="height:260px"></div>
+  </div>
+  <div class="card col-4">
+    <h3>Estatus Operativo</h3>
+    <div class="hint">Clic para filtrar · Circulación / Resguardo / Taller / Siniestrado</div>
+    <div id="cEstatus" class="chart" style="height:260px"></div>
+  </div>
+  <div class="card col-4">
+    <h3>Unidades por Departamento</h3>
+    <div class="hint">Clic en una barra para ver el detalle</div>
+    <div id="cDepto" class="chart" style="height:260px"></div>
+  </div>
+
+  <div class="card col-6">
+    <h3>Vencimiento de Pólizas (días)</h3>
+    <div class="hint">Semaforización de riesgo · pase el cursor para el detalle por unidad</div>
+    <div id="cPoliza" class="chart"></div>
+  </div>
+  <div class="card col-6">
+    <h3>Próximo Servicio (km restantes)</h3>
+    <div class="hint">Valores negativos = servicio VENCIDO · ordenado de mayor urgencia</div>
+    <div id="cServicio" class="chart"></div>
+  </div>
+
+  <div class="card col-12">
+    <h3>Detalle de Flotilla <span class="hint" style="font-weight:400">· clic en encabezados para ordenar · usa los filtros superiores</span></h3>
+    <div class="tablewrap">
+      <table id="tbl"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="legend-note">
+      <b>Convenciones:</b> Póliza/Licencia en <i>días</i> hasta vencimiento (negativo = vencido). Servicio en <i>km</i> restantes (negativo = vencido). "PERMANENTE" = licencia sin vencimiento. Celdas vacías de licencia corresponden a unidades en RESGUARDO sin chofer asignado.
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== DATOS BASE (extraídos de KPI-AFI-01) ======
+const CSV_BASE=`ZONA,DEPARTAMENTO,VEHICULO,ESTATUS_OPERATIVO_VEHICULO,CHOFER,KM_PROXIMO_SERVICIO_VEHICULO,POLIZA_DIAS_VENCIMIENTO,LICENCIA_DIAS_VENCIMIENTO
+PLAYA,OYS,AVEO,CIRCULACION,CHI CANUL CELIANO,5327,250,939
+CANCUN,OYS,BEAT 2,CIRCULACION,LUIS MOLINA ANTONIO,1118,113,363
+CANCUN,OYS,BEAT 4,CIRCULACION,BARRADAS JUAN ALDO FIDEL,-676,34,598
+CANCUN,OYS,BEAT 5,CIRCULACION,MAY CANCHE ERICK ERUBEY,-4123,34,268
+PLAYA,OYS,BEAT 6,CIRCULACION,JORGE IVAN BALCAZAR VELAZQUEZ,358,26,657
+PLAYA,OYS,BEAT 7,CIRCULACION,JIMENEZ PROCOPIO FERNANDO ISAIAS,7009,26,-467
+CANCUN,OBRA,BEAT 8,CIRCULACION,EDDY WILSON RAMIREZ,8830,250,415
+CANCUN,OYS,BEAT 9,CIRCULACION,CHI PEREZ JOSE DOLORES,9735,250,22
+PLAYA,OYS,BEAT 10,CIRCULACION,DOMENECH ALVES JUAN CARLOS,5106,250,1261
+CABOS,OYS,DOBLE CABINA 2,CIRCULACION,SALVADOR LOPEZ MOLINA,8934,30,1060
+CANCUN,ALMACEN,ESTACA 2 (NP 300),CIRCULACION,MENDEZ BERMUDEZ IVAN,-2756,42,325
+CANCUN,ALMACEN,ESTACA 3 (NP 300),CIRCULACION,REY GAPAR SANCHEZ CRUZ,-1310,108,672
+CANCUN,PROYECTOS,FRONTIER,CIRCULACION,SANTIAGO USCANGA ARIEL GEOVANNI,-3332,278,723
+CANCUN,OYS,MARCH 1,CIRCULACION,JOSE FLORES SOBERANES,9894,159,1696
+CANCUN,ADMINISTRACION,MARCH 2,RESGUARDO,SIN ASIGNACION,3026,188,
+CANCUN,VENTAS,MARCH 3,RESGUARDO,SIN ASIGNACION,7217,228,
+CANCUN,VENTAS,MARCH 4,CIRCULACION,ROJAS MARTINEZ JOSE GABRIEL,1142,333,12
+CANCUN,VENTAS,MARCH 5,CIRCULACION,CHACON CASTILLO ADRIAN ISRAEL,7521,358,139
+PLAYA,OYS,MIRAGE 1,CIRCULACION,RAMOS LOPEZ EBER FRANCISCO,6947,333,816
+CANCUN,OYS,S10 CREW 1,CIRCULACION,TUT HERRERA WILBERTH ARIEL,5600,971,430
+CABOS,OYS,S10 CREW CAB 2,CIRCULACION,ANGELO ADRIAN BURGUETE GALLEGOS,5987,971,297
+CANCUN,ACTIVOS,SPARK 1,CIRCULACION,JOSE LUIS HERRERA RAMIREZ,6020,77,-38
+CANCUN,OYS,SPARK 2,TALLER,JOSE CONCEPCION REJON KINIL,-2813,42,286
+CANCUN,ACTIVOS,TORNADO (2),CIRCULACION,UROY ZIGGY ACOSTA AUGUST,425,359,67
+CABOS,OYS,STEPWAY,TALLER,MEZA SOSA DARIANA FERNANDA,9977,1727,PERMANENTE
+CANCUN,ALMACEN,TORNADO (1),RESGUARDO,SIN ASIGNACION,-1186,76,
+CANCUN,OYS,TSURU 2 GSIT/M,CIRCULACION,CHAN EDUARDO,5262,343,52
+CANCUN,PROYECTOS,V DRIVE 2,CIRCULACION,HERRERA AGUILAR ALFREDO,8425,36,743
+CANCUN,TDA,V DRIVE 3,CIRCULACION,GONZALEZ RODRIGUEZ OSWALDO DONAI,402,243,699
+CANCUN,OYS,V DRIVE 4,CIRCULACION,TUT HERRERA WILBERTH ARIEL,1437,243,433
+PLAYA,OYS,V DRIVE 5,CIRCULACION,HERNANDEZ ALCUDIA CARLOS ANDRES,4424,339,574
+CANCUN,OYS,V DRIVE 6,RESGUARDO,SIN ASIGNACION,4723,333,
+CANCUN,OYS,V DRIVE 7,CIRCULACION,JUAN CARLOS CASTILLO CUSTODIO,3592,462,
+CANCUN,PROYECTOS,V DRIVE 8,CIRCULACION,ERIK SANTIAGO CHAY PEREZ,8593,462,
+CABOS,OYS,V DRIVE 9,CIRCULACION,ALONSO MEZA,8382,462,
+CABOS,OYS,VENTO,CIRCULACION,DE LA CRUZ CADENA ADRIAN,443,359,-55
+CABOS,OYS,VERSA 1,CIRCULACION,MORENO CASTRO ANDRES RAMIRO,10080,66,940
+CABOS,OYS,VERSA 2,CIRCULACION,HECTOR DANIEL ESTRADA SAUCEDO,6082,66,922
+CABOS,ADMINISTRACION,YARIS,CIRCULACION,SIN ASIGNACION,6216,359,`;
+
+let ALL=[], DATA=[], state={zona:'',estatus:'',depto:'',sortKey:'',sortDir:1,selVeh:''};
+const charts={};
+const C={blue:'#3fa9f5',gold:'#f5c451',green:'#39c08a',red:'#ef5c6e',orange:'#f08a3c',purple:'#9b6dff',muted:'#90a0c0'};
+const STCOLOR={CIRCULACION:C.green,TALLER:C.gold,RESGUARDO:C.purple,SINIESTRADO:C.red};
+const STCLASS={CIRCULACION:'u-circ',TALLER:'u-tall',RESGUARDO:'u-resg',SINIESTRADO:'u-sin'};
+
+function parseCSV(text){
+  const lines=text.trim().split(/\r?\n/);
+  const out=[];
+  for(let i=1;i<lines.length;i++){
+    const c=lines[i].split(',');
+    if(c.length<8) continue;
+    const lic=c[7].trim();
+    out.push({
+      zona:c[0].trim(),depto:c[1].trim(),veh:c[2].trim(),estatus:c[3].trim().toUpperCase(),
+      chofer:c[4].trim(),
+      km:c[5].trim()===''?null:Number(c[5]),
+      pol:c[6].trim()===''?null:Number(c[6]),
+      licRaw:lic,
+      lic:(lic===''||/[A-Za-z]/.test(lic))?null:Number(lic)
+    });
+  }
+  return out;
+}
+
+function applyFilters(){
+  DATA=ALL.filter(r=>(!state.zona||r.zona===state.zona)&&(!state.estatus||r.estatus===state.estatus)&&(!state.depto||r.depto===state.depto));
+  renderAll();
+}
+
+const fmt=n=>n===null?'—':n.toLocaleString('es-MX');
+
+function renderKPIs(){
+  const n=DATA.length;
+  const cnt=s=>DATA.filter(r=>r.estatus===s).length;
+  const servVenc=DATA.filter(r=>r.km!==null&&r.km<0).length;
+  const polCrit=DATA.filter(r=>r.pol!==null&&r.pol<=30).length;
+  const licVenc=DATA.filter(r=>r.lic!==null&&r.lic<0).length;
+  const sinAsig=DATA.filter(r=>r.chofer==='SIN ASIGNACION').length;
+  const cards=[
+    ['b-blue',n,'Unidades totales'],
+    ['b-green',cnt('CIRCULACION'),'En circulación'],
+    ['b-gold',cnt('TALLER'),'En taller'],
+    ['b-purple',cnt('RESGUARDO'),'En resguardo'],
+    ['b-red',cnt('SINIESTRADO'),'Siniestrado'],
+    ['b-red',servVenc,'Servicio vencido'],
+    ['b-orange',polCrit,'Póliza ≤ 30 días'],
+    ['b-orange',licVenc,'Licencia vencida'],
+  ];
+  document.getElementById('kpis').innerHTML=cards.map(c=>
+    `<div class="kpi ${c[0]}"><div class="bar"></div><div class="v">${c[1]}</div><div class="l">${c[2]}</div></div>`).join('');
+}
+
+function renderAlert(){
+  const servVenc=ALL.filter(r=>r.km!==null&&r.km<0);
+  const polCrit=ALL.filter(r=>r.pol!==null&&r.pol<=30).sort((a,b)=>a.pol-b.pol);
+  const licVenc=ALL.filter(r=>r.lic!==null&&r.lic<0);
+  document.getElementById('alertBox').innerHTML=
+    `<b>⚠ Atención de Dirección:</b> ${servVenc.length} unidades con <b>servicio vencido</b> (${servVenc.map(r=>r.veh).join(', ')||'ninguna'}). `+
+    `${polCrit.length} con <b>póliza por vencer ≤30 días</b> (${polCrit.map(r=>r.veh+': '+r.pol+'d').join(', ')||'ninguna'}). `+
+    `${licVenc.length} con <b>licencia vencida</b> (${licVenc.map(r=>r.veh+' / '+r.chofer).join('; ')||'ninguna'}).`;
+}
+
+// ====== Mosaico parque vehicular ======
+function renderFleet(){
+  const orden={CIRCULACION:0,TALLER:1,RESGUARDO:2,SINIESTRADO:3};
+  const d=[...DATA].sort((a,b)=>(orden[a.estatus]??9)-(orden[b.estatus]??9)||a.veh.localeCompare(b.veh));
+  const el=document.getElementById('fleet');
+  el.innerHTML=d.map(r=>{
+    const cls=STCLASS[r.estatus]||'u-circ';
+    const sel=state.selVeh===r.veh?' sel':'';
+    return `<div class="unit ${cls}${sel}" data-veh="${r.veh}"><span>${r.veh}</span><small>${r.estatus.slice(0,4)}</small></div>`;
+  }).join('');
+  el.querySelectorAll('.unit').forEach(u=>u.onclick=()=>showUnit(u.dataset.veh));
+  if(state.selVeh && !d.some(r=>r.veh===state.selVeh)){state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');}
+}
+
+function showUnit(veh){
+  const r=DATA.find(x=>x.veh===veh);if(!r)return;
+  state.selVeh=state.selVeh===veh?'':veh;
+  renderFleet();
+  const det=document.getElementById('fleetDetail');
+  if(!state.selVeh){det.classList.remove('open');return;}
+  const km=r.km===null?'—':(r.km<0?`<span class="bad">VENCIDO (${Math.abs(r.km).toLocaleString('es-MX')} km)</span>`:`${r.km.toLocaleString('es-MX')} km restantes`);
+  det.innerHTML=`<h4><i class="dot ${STCLASS[r.estatus]}"></i> ${r.veh}
+      <span class="tag ${r.estatus==='CIRCULACION'?'t-circ':r.estatus==='TALLER'?'t-tall':r.estatus==='RESGUARDO'?'t-resg':'t-sin'}">${r.estatus}</span>
+      <button class="fd-close" onclick="document.getElementById('fleetDetail').classList.remove('open');">Cerrar</button></h4>
+    <div class="fd-grid">
+      <div class="fd-item"><div class="lab">Departamento</div><div class="val">${r.depto}</div></div>
+      <div class="fd-item"><div class="lab">Chofer</div><div class="val">${r.chofer}</div></div>
+      <div class="fd-item"><div class="lab">Km próximo servicio</div><div class="val">${km}</div></div>
+      <div class="fd-item"><div class="lab">Zona</div><div class="val">${r.zona}</div></div>
+      <div class="fd-item"><div class="lab">Póliza (días)</div><div class="val">${fmt(r.pol)}</div></div>
+      <div class="fd-item"><div class="lab">Licencia (días)</div><div class="val">${r.lic===null?(r.licRaw||'—'):fmt(r.lic)}</div></div>
+    </div>`;
+  det.classList.add('open');
+  det.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function pie(id,counts,key){
+  const el=document.getElementById(id);
+  let ch=charts[id]||(charts[id]=echarts.init(el));
+  const zonaPalette=[C.blue,C.gold,C.purple,C.green];
+  const data=Object.entries(counts).map(([k,v],i)=>({name:k,value:v,
+    itemStyle:{color:(id==='cEstatus')?(STCOLOR[k]||C.blue):zonaPalette[i%4]}}));
+  ch.setOption({
+    tooltip:{trigger:'item',formatter:'{b}: <b>{c}</b> ({d}%)'},
+    legend:{bottom:0,textStyle:{color:C.muted,fontSize:11}},
+    series:[{type:'pie',radius:['45%','72%'],center:['50%','44%'],
+      label:{color:'#e8edf7',fontSize:12,formatter:'{b}\n{c}'},
+      labelLine:{lineStyle:{color:C.muted}},data}]
+  },true);
+  ch.off('click');
+  ch.on('click',p=>{ state[key]=state[key]===p.name?'':p.name; syncSelects(); applyFilters(); });
+}
+
+function barDepto(){
+  const el=document.getElementById('cDepto');
+  let ch=charts.cDepto||(charts.cDepto=echarts.init(el));
+  const counts={};DATA.forEach(r=>counts[r.depto]=(counts[r.depto]||0)+1);
+  const ent=Object.entries(counts).sort((a,b)=>a[1]-b[1]);
+  ch.setOption({
+    grid:{left:90,right:24,top:10,bottom:20},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>`${p[0].name}: <b>${p[0].value}</b> unidades`},
+    xAxis:{type:'value',axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
+    yAxis:{type:'category',data:ent.map(e=>e[0]),axisLabel:{color:'#e8edf7',fontSize:11}},
+    series:[{type:'bar',data:ent.map(e=>e[1]),itemStyle:{color:C.blue,borderRadius:[0,4,4,0]},label:{show:true,position:'right',color:'#e8edf7'}}]
+  },true);
+  ch.off('click');
+  ch.on('click',p=>{state.depto=state.depto===p.name?'':p.name; syncSelects(); applyFilters();});
+}
+
+function barPoliza(){
+  const el=document.getElementById('cPoliza');
+  let ch=charts.cPoliza||(charts.cPoliza=echarts.init(el));
+  const d=DATA.filter(r=>r.pol!==null).sort((a,b)=>a.pol-b.pol);
+  const col=v=>v<=30?C.red:v<=90?C.orange:v<=180?C.gold:C.green;
+  ch.setOption({
+    grid:{left:50,right:24,top:14,bottom:80},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{const r=d[p[0].dataIndex];return `<b>${r.veh}</b><br>${r.zona} · ${r.depto}<br>Chofer: ${r.chofer}<br>Póliza vence en: <b>${r.pol} días</b>`;}},
+    dataZoom:[{type:'slider',bottom:34,height:16,textStyle:{color:C.muted}}],
+    xAxis:{type:'category',data:d.map(r=>r.veh),axisLabel:{color:C.muted,rotate:55,fontSize:10}},
+    yAxis:{type:'value',name:'días',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
+    series:[{type:'bar',data:d.map(r=>({value:r.pol,itemStyle:{color:col(r.pol),borderRadius:[3,3,0,0]}})),
+      markLine:{silent:true,symbol:'none',data:[{yAxis:30,label:{formatter:'30 días',color:C.red,position:'insideEndTop'},lineStyle:{color:C.red,type:'dashed'}}]}}]
+  },true);
+}
+
+function barServicio(){
+  const el=document.getElementById('cServicio');
+  let ch=charts.cServicio||(charts.cServicio=echarts.init(el));
+  const d=DATA.filter(r=>r.km!==null).sort((a,b)=>a.km-b.km);
+  ch.setOption({
+    grid:{left:60,right:24,top:14,bottom:80},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{const r=d[p[0].dataIndex];return `<b>${r.veh}</b><br>${r.zona} · ${r.depto}<br>${r.km<0?'<span style=color:#ef5c6e>VENCIDO</span> por '+Math.abs(r.km).toLocaleString()+' km':r.km.toLocaleString()+' km restantes'}`;}},
+    dataZoom:[{type:'slider',bottom:34,height:16,textStyle:{color:C.muted}}],
+    xAxis:{type:'category',data:d.map(r=>r.veh),axisLabel:{color:C.muted,rotate:55,fontSize:10}},
+    yAxis:{type:'value',name:'km',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
+    series:[{type:'bar',data:d.map(r=>({value:r.km,itemStyle:{color:r.km<0?C.red:r.km<1500?C.orange:C.green,borderRadius:r.km<0?[0,0,3,3]:[3,3,0,0]}}))}]
+  },true);
+}
+
+function renderTable(){
+  const cols=[['veh','VEHÍCULO'],['zona','ZONA'],['depto','DEPARTAMENTO'],['estatus','ESTATUS'],['chofer','CHOFER'],['km','KM SERVICIO'],['pol','PÓLIZA (días)'],['lic','LICENCIA (días)']];
+  document.querySelector('#tbl thead').innerHTML='<tr>'+cols.map(c=>`<th data-k="${c[0]}">${c[1]}</th>`).join('')+'</tr>';
+  let rows=[...DATA];
+  if(state.sortKey){const k=state.sortKey;rows.sort((a,b)=>{let x=a[k],y=b[k];if(x===null)x=Infinity;if(y===null)y=Infinity;if(typeof x==='string')return state.sortDir*x.localeCompare(y);return state.sortDir*(x-y);});}
+  const tag=e=>e==='CIRCULACION'?'<span class="tag t-circ">Circulación</span>':e==='RESGUARDO'?'<span class="tag t-resg">Resguardo</span>':e==='TALLER'?'<span class="tag t-tall">Taller</span>':'<span class="tag t-sin">Siniestrado</span>';
+  const kmC=v=>v===null?'—':`<span class="${v<0?'bad':v<1500?'warn':'ok'}">${fmt(v)}${v<0?' ⚠':''}</span>`;
+  const polC=v=>v===null?'—':`<span class="${v<=30?'bad':v<=90?'warn':''}">${fmt(v)}</span>`;
+  const licC=r=>r.lic===null?(r.licRaw?`<span class="ok">${r.licRaw}</span>`:'—'):`<span class="${r.lic<0?'bad':r.lic<=30?'warn':''}">${fmt(r.lic)}${r.lic<0?' ⚠':''}</span>`;
+  document.querySelector('#tbl tbody').innerHTML=rows.map(r=>
+    `<tr><td><b>${r.veh}</b></td><td>${r.zona}</td><td>${r.depto}</td><td>${tag(r.estatus)}</td><td>${r.chofer}</td><td class="num">${kmC(r.km)}</td><td class="num">${polC(r.pol)}</td><td class="num">${licC(r)}</td></tr>`).join('');
+  document.querySelectorAll('#tbl th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;state.sortDir=state.sortKey===k?-state.sortDir:1;state.sortKey=k;renderTable();});
+}
+
+function renderAll(){
+  renderKPIs();
+  renderFleet();
+  const zc={},ec={};DATA.forEach(r=>{zc[r.zona]=(zc[r.zona]||0)+1;ec[r.estatus]=(ec[r.estatus]||0)+1;});
+  pie('cZona',zc,'zona');
+  pie('cEstatus',ec,'estatus');
+  barDepto();barPoliza();barServicio();renderTable();
+}
+
+function syncSelects(){
+  document.getElementById('fZona').value=state.zona;
+  document.getElementById('fEstatus').value=state.estatus;
+}
+function buildSelects(){
+  const z=[...new Set(ALL.map(r=>r.zona))].sort();
+  const e=[...new Set(ALL.map(r=>r.estatus))].sort();
+  document.getElementById('fZona').innerHTML='<option value="">Todas las zonas</option>'+z.map(v=>`<option>${v}</option>`).join('');
+  document.getElementById('fEstatus').innerHTML='<option value="">Todos los estatus</option>'+e.map(v=>`<option>${v}</option>`).join('');
+}
+
+function load(text){ALL=parseCSV(text);buildSelects();state.zona='';state.estatus='';state.depto='';state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');applyFilters();renderAlert();}
+
+document.getElementById('fZona').onchange=e=>{state.zona=e.target.value;state.depto='';applyFilters();};
+document.getElementById('fEstatus').onchange=e=>{state.estatus=e.target.value;state.depto='';applyFilters();};
+document.getElementById('resetBtn').onclick=()=>{state.zona='';state.estatus='';state.depto='';state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');syncSelects();applyFilters();};
+document.getElementById('csvInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>load(ev.target.result);rd.readAsText(f);};
+window.addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
+
+load(CSV_BASE);
+</script>
+</body>
+</html>
