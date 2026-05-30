@@ -139,7 +139,7 @@ tbody tr:hover{background:var(--panel2)}
       <table id="tbl"><thead></thead><tbody></tbody></table>
     </div>
     <div class="legend-note">
-      <b>Convenciones:</b> Póliza/Licencia en <i>días</i> hasta vencimiento (negativo = vencido). Servicio en <i>km</i> restantes (negativo = vencido). "PERMANENTE" = licencia sin vencimiento. Celdas vacías de licencia corresponden a unidades en RESGUARDO sin chofer asignado.
+      <b>Convenciones:</b> Póliza en <i>días</i> hasta vencimiento (negativo = vencida). Servicio en <i>km</i> restantes (negativo = vencido).
     </div>
   </div>
 </div>
@@ -156,15 +156,12 @@ function parseCSV(text){
   const out=[];
   for(let i=1;i<lines.length;i++){
     const c=lines[i].split(',');
-    if(c.length<8) continue;
-    const lic=c[7].trim();
+    if(c.length<7) continue;
     out.push({
-      zona:c[0].trim(),depto:c[1].trim(),veh:c[2].trim(),estatus:c[3].trim().toUpperCase(),
-      chofer:c[4].trim(),
+      zona:c[0].trim(), depto:c[1].trim(), veh:c[2].trim(),
+      estatus:c[3].trim().toUpperCase(), chofer:c[4].trim(),
       km:c[5].trim()===''?null:Number(c[5]),
-      pol:c[6].trim()===''?null:Number(c[6]),
-      licRaw:lic,
-      lic:(lic===''||/[A-Za-z]/.test(lic))?null:Number(lic)
+      pol:c[6].trim()===''?null:Number(c[6])
     });
   }
   return out;
@@ -182,7 +179,6 @@ function renderKPIs(){
   const cnt=s=>DATA.filter(r=>r.estatus===s).length;
   const servVenc=DATA.filter(r=>r.km!==null&&r.km<0).length;
   const polCrit=DATA.filter(r=>r.pol!==null&&r.pol<=30).length;
-  const licVenc=DATA.filter(r=>r.lic!==null&&r.lic<0).length;
   const cards=[
     ['b-blue',n,'Unidades totales'],
     ['b-green',cnt('CIRCULACION'),'En circulación'],
@@ -191,7 +187,6 @@ function renderKPIs(){
     ['b-red',cnt('SINIESTRADO'),'Siniestrado'],
     ['b-red',servVenc,'Servicio vencido'],
     ['b-orange',polCrit,'Póliza ≤ 30 días'],
-    ['b-orange',licVenc,'Licencia vencida'],
   ];
   document.getElementById('kpis').innerHTML=cards.map(c=>
     `<div class="kpi ${c[0]}"><div class="bar"></div><div class="v">${c[1]}</div><div class="l">${c[2]}</div></div>`).join('');
@@ -200,13 +195,11 @@ function renderKPIs(){
 function renderAlert(){
   const servVenc=ALL.filter(r=>r.km!==null&&r.km<0);
   const polCrit=ALL.filter(r=>r.pol!==null&&r.pol<=30).sort((a,b)=>a.pol-b.pol);
-  const licVenc=ALL.filter(r=>r.lic!==null&&r.lic<0);
   const box=document.getElementById('alertBox');
   box.style.display='';
   box.innerHTML=
     `<b>⚠ Atención de Dirección:</b> ${servVenc.length} unidades con <b>servicio vencido</b> (${servVenc.map(r=>r.veh).join(', ')||'ninguna'}). `+
-    `${polCrit.length} con <b>póliza por vencer ≤30 días</b> (${polCrit.map(r=>r.veh+': '+r.pol+'d').join(', ')||'ninguna'}). `+
-    `${licVenc.length} con <b>licencia vencida</b> (${licVenc.map(r=>r.veh+' / '+r.chofer).join('; ')||'ninguna'}).`;
+    `${polCrit.length} con <b>póliza por vencer ≤30 días</b> (${polCrit.map(r=>r.veh+': '+r.pol+'d').join(', ')||'ninguna'}).`;
 }
 
 function renderFleet(){
@@ -238,7 +231,6 @@ function showUnit(veh){
       <div class="fd-item"><div class="lab">Km próximo servicio</div><div class="val">${km}</div></div>
       <div class="fd-item"><div class="lab">Zona</div><div class="val">${r.zona}</div></div>
       <div class="fd-item"><div class="lab">Póliza (días)</div><div class="val">${fmt(r.pol)}</div></div>
-      <div class="fd-item"><div class="lab">Licencia (días)</div><div class="val">${r.lic===null?(r.licRaw||'—'):fmt(r.lic)}</div></div>
     </div>`;
   det.classList.add('open');
   det.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -308,16 +300,15 @@ function barServicio(){
 }
 
 function renderTable(){
-  const cols=[['veh','VEHÍCULO'],['zona','ZONA'],['depto','DEPARTAMENTO'],['estatus','ESTATUS'],['chofer','CHOFER'],['km','KM SERVICIO'],['pol','PÓLIZA (días)'],['lic','LICENCIA (días)']];
+  const cols=[['veh','VEHÍCULO'],['zona','ZONA'],['depto','DEPARTAMENTO'],['estatus','ESTATUS'],['chofer','CHOFER'],['km','KM SERVICIO'],['pol','PÓLIZA (días)']];
   document.querySelector('#tbl thead').innerHTML='<tr>'+cols.map(c=>`<th data-k="${c[0]}">${c[1]}</th>`).join('')+'</tr>';
   let rows=[...DATA];
   if(state.sortKey){const k=state.sortKey;rows.sort((a,b)=>{let x=a[k],y=b[k];if(x===null)x=Infinity;if(y===null)y=Infinity;if(typeof x==='string')return state.sortDir*x.localeCompare(y);return state.sortDir*(x-y);});}
   const tag=e=>e==='CIRCULACION'?'<span class="tag t-circ">Circulación</span>':e==='RESGUARDO'?'<span class="tag t-resg">Resguardo</span>':e==='TALLER'?'<span class="tag t-tall">Taller</span>':'<span class="tag t-sin">Siniestrado</span>';
   const kmC=v=>v===null?'—':`<span class="${v<0?'bad':v<1500?'warn':'ok'}">${fmt(v)}${v<0?' ⚠':''}</span>`;
   const polC=v=>v===null?'—':`<span class="${v<=30?'bad':v<=90?'warn':''}">${fmt(v)}</span>`;
-  const licC=r=>r.lic===null?(r.licRaw?`<span class="ok">${r.licRaw}</span>`:'—'):`<span class="${r.lic<0?'bad':r.lic<=30?'warn':''}">${fmt(r.lic)}${r.lic<0?' ⚠':''}</span>`;
   document.querySelector('#tbl tbody').innerHTML=rows.map(r=>
-    `<tr><td><b>${r.veh}</b></td><td>${r.zona}</td><td>${r.depto}</td><td>${tag(r.estatus)}</td><td>${r.chofer}</td><td class="num">${kmC(r.km)}</td><td class="num">${polC(r.pol)}</td><td class="num">${licC(r)}</td></tr>`).join('');
+    `<tr><td><b>${r.veh}</b></td><td>${r.zona}</td><td>${r.depto}</td><td>${tag(r.estatus)}</td><td>${r.chofer}</td><td class="num">${kmC(r.km)}</td><td class="num">${polC(r.pol)}</td></tr>`).join('');
   document.querySelectorAll('#tbl th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;state.sortDir=state.sortKey===k?-state.sortDir:1;state.sortKey=k;renderTable();});
 }
 
@@ -356,20 +347,16 @@ document.getElementById('fEstatus').onchange=e=>{state.estatus=e.target.value;st
 document.getElementById('resetBtn').onclick=()=>{state.zona='';state.estatus='';state.depto='';state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');syncSelects();applyFilters();};
 window.addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
 
-// ====== CARGA AUTOMÁTICA DESDE datos.csv ======
 fetch('datos.csv?v=' + Date.now())
-  .then(r => {
-    if (!r.ok) throw new Error('No se pudo cargar datos.csv');
-    return r.text();
-  })
-  .then(text => {
-    const now = new Date();
-    const hoy = now.toLocaleDateString('es-MX', {day:'2-digit',month:'short',year:'numeric'});
-    document.getElementById('updateBadge').textContent = 'Actualizado: ' + hoy;
+  .then(r=>{ if(!r.ok) throw new Error('No se pudo cargar datos.csv'); return r.text(); })
+  .then(text=>{
+    const now=new Date();
+    const hoy=now.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('updateBadge').textContent='Actualizado: '+hoy;
     load(text);
   })
-  .catch(err => {
-    document.getElementById('loadingBox').textContent = '⚠ No se encontró datos.csv en el repositorio. Suba el archivo y recargue la página.';
+  .catch(err=>{
+    document.getElementById('loadingBox').textContent='⚠ No se encontró datos.csv en el repositorio. Suba el archivo y recargue la página.';
     console.error(err);
   });
 </script>
