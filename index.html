@@ -19,7 +19,6 @@ h1{font-size:20px;font-weight:700;letter-spacing:.2px}
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .btn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;transition:.15s}
 .btn:hover{border-color:var(--accent);color:#fff}
-.btn.gold{background:linear-gradient(135deg,#f5c451,#e0a82e);color:#2a2200;border:none;font-weight:600}
 select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 10px;border-radius:8px;font-size:13px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:18px}
 .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;position:relative;overflow:hidden}
@@ -52,7 +51,7 @@ tbody tr:hover{background:var(--panel2)}
 .legend-note{color:var(--muted);font-size:11px;margin-top:10px;line-height:1.6}
 #alertBox{background:linear-gradient(135deg,rgba(239,92,110,.12),rgba(240,138,60,.08));border:1px solid rgba(239,92,110,.4);border-radius:12px;padding:14px 18px;margin-bottom:18px}
 #alertBox b{color:var(--red)}
-/* ---- Parque vehicular (mosaico) ---- */
+#loadingBox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;text-align:center;margin-bottom:18px;color:var(--muted)}
 .fleet-legend{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 12px;font-size:12px;color:var(--muted)}
 .fleet-legend span{display:inline-flex;align-items:center;gap:6px}
 .dot{width:13px;height:13px;border-radius:4px;display:inline-block}
@@ -71,6 +70,7 @@ tbody tr:hover{background:var(--panel2)}
 .fd-item .val{font-size:16px;font-weight:600;margin-top:3px}
 .fd-close{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px}
 .fd-close:hover{color:#fff;border-color:var(--accent)}
+.update-badge{font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
 </style>
 </head>
 <body>
@@ -82,17 +82,16 @@ tbody tr:hover{background:var(--panel2)}
   <div class="toolbar">
     <select id="fZona"></select>
     <select id="fEstatus"></select>
-    <label class="btn gold" for="csvInput">Recargar CSV</label>
-    <input id="csvInput" type="file" accept=".csv" style="display:none">
     <button class="btn" id="resetBtn">Restablecer</button>
+    <span class="update-badge" id="updateBadge">Cargando datos…</span>
   </div>
 </header>
 
-<div id="alertBox"></div>
+<div id="loadingBox">⏳ Cargando datos desde el repositorio…</div>
+<div id="alertBox" style="display:none"></div>
 
 <div class="kpis" id="kpis"></div>
 
-<!-- ====== PARQUE VEHICULAR TOTAL ====== -->
 <div class="card col-12" style="margin-bottom:16px">
   <h3>Parque Vehicular Total · Estatus Operativo</h3>
   <div class="hint">Cada recuadro es una unidad coloreada por estatus. Clic en una unidad para desplegar su detalle.</div>
@@ -146,48 +145,6 @@ tbody tr:hover{background:var(--panel2)}
 </div>
 
 <script>
-// ====== DATOS BASE (extraídos de KPI-AFI-01) ======
-const CSV_BASE=`ZONA,DEPARTAMENTO,VEHICULO,ESTATUS_OPERATIVO_VEHICULO,CHOFER,KM_PROXIMO_SERVICIO_VEHICULO,POLIZA_DIAS_VENCIMIENTO,LICENCIA_DIAS_VENCIMIENTO
-PLAYA,OYS,AVEO,CIRCULACION,CHI CANUL CELIANO,5327,250,939
-CANCUN,OYS,BEAT 2,CIRCULACION,LUIS MOLINA ANTONIO,1118,113,363
-CANCUN,OYS,BEAT 4,CIRCULACION,BARRADAS JUAN ALDO FIDEL,-676,34,598
-CANCUN,OYS,BEAT 5,CIRCULACION,MAY CANCHE ERICK ERUBEY,-4123,34,268
-PLAYA,OYS,BEAT 6,CIRCULACION,JORGE IVAN BALCAZAR VELAZQUEZ,358,26,657
-PLAYA,OYS,BEAT 7,CIRCULACION,JIMENEZ PROCOPIO FERNANDO ISAIAS,7009,26,-467
-CANCUN,OBRA,BEAT 8,CIRCULACION,EDDY WILSON RAMIREZ,8830,250,415
-CANCUN,OYS,BEAT 9,CIRCULACION,CHI PEREZ JOSE DOLORES,9735,250,22
-PLAYA,OYS,BEAT 10,CIRCULACION,DOMENECH ALVES JUAN CARLOS,5106,250,1261
-CABOS,OYS,DOBLE CABINA 2,CIRCULACION,SALVADOR LOPEZ MOLINA,8934,30,1060
-CANCUN,ALMACEN,ESTACA 2 (NP 300),CIRCULACION,MENDEZ BERMUDEZ IVAN,-2756,42,325
-CANCUN,ALMACEN,ESTACA 3 (NP 300),CIRCULACION,REY GAPAR SANCHEZ CRUZ,-1310,108,672
-CANCUN,PROYECTOS,FRONTIER,CIRCULACION,SANTIAGO USCANGA ARIEL GEOVANNI,-3332,278,723
-CANCUN,OYS,MARCH 1,CIRCULACION,JOSE FLORES SOBERANES,9894,159,1696
-CANCUN,ADMINISTRACION,MARCH 2,RESGUARDO,SIN ASIGNACION,3026,188,
-CANCUN,VENTAS,MARCH 3,RESGUARDO,SIN ASIGNACION,7217,228,
-CANCUN,VENTAS,MARCH 4,CIRCULACION,ROJAS MARTINEZ JOSE GABRIEL,1142,333,12
-CANCUN,VENTAS,MARCH 5,CIRCULACION,CHACON CASTILLO ADRIAN ISRAEL,7521,358,139
-PLAYA,OYS,MIRAGE 1,CIRCULACION,RAMOS LOPEZ EBER FRANCISCO,6947,333,816
-CANCUN,OYS,S10 CREW 1,CIRCULACION,TUT HERRERA WILBERTH ARIEL,5600,971,430
-CABOS,OYS,S10 CREW CAB 2,CIRCULACION,ANGELO ADRIAN BURGUETE GALLEGOS,5987,971,297
-CANCUN,ACTIVOS,SPARK 1,CIRCULACION,JOSE LUIS HERRERA RAMIREZ,6020,77,-38
-CANCUN,OYS,SPARK 2,TALLER,JOSE CONCEPCION REJON KINIL,-2813,42,286
-CANCUN,ACTIVOS,TORNADO (2),CIRCULACION,UROY ZIGGY ACOSTA AUGUST,425,359,67
-CABOS,OYS,STEPWAY,TALLER,MEZA SOSA DARIANA FERNANDA,9977,1727,PERMANENTE
-CANCUN,ALMACEN,TORNADO (1),RESGUARDO,SIN ASIGNACION,-1186,76,
-CANCUN,OYS,TSURU 2 GSIT/M,CIRCULACION,CHAN EDUARDO,5262,343,52
-CANCUN,PROYECTOS,V DRIVE 2,CIRCULACION,HERRERA AGUILAR ALFREDO,8425,36,743
-CANCUN,TDA,V DRIVE 3,CIRCULACION,GONZALEZ RODRIGUEZ OSWALDO DONAI,402,243,699
-CANCUN,OYS,V DRIVE 4,CIRCULACION,TUT HERRERA WILBERTH ARIEL,1437,243,433
-PLAYA,OYS,V DRIVE 5,CIRCULACION,HERNANDEZ ALCUDIA CARLOS ANDRES,4424,339,574
-CANCUN,OYS,V DRIVE 6,RESGUARDO,SIN ASIGNACION,4723,333,
-CANCUN,OYS,V DRIVE 7,CIRCULACION,JUAN CARLOS CASTILLO CUSTODIO,3592,462,
-CANCUN,PROYECTOS,V DRIVE 8,CIRCULACION,ERIK SANTIAGO CHAY PEREZ,8593,462,
-CABOS,OYS,V DRIVE 9,CIRCULACION,ALONSO MEZA,8382,462,
-CABOS,OYS,VENTO,CIRCULACION,DE LA CRUZ CADENA ADRIAN,443,359,-55
-CABOS,OYS,VERSA 1,CIRCULACION,MORENO CASTRO ANDRES RAMIRO,10080,66,940
-CABOS,OYS,VERSA 2,CIRCULACION,HECTOR DANIEL ESTRADA SAUCEDO,6082,66,922
-CABOS,ADMINISTRACION,YARIS,CIRCULACION,SIN ASIGNACION,6216,359,`;
-
 let ALL=[], DATA=[], state={zona:'',estatus:'',depto:'',sortKey:'',sortDir:1,selVeh:''};
 const charts={};
 const C={blue:'#3fa9f5',gold:'#f5c451',green:'#39c08a',red:'#ef5c6e',orange:'#f08a3c',purple:'#9b6dff',muted:'#90a0c0'};
@@ -226,7 +183,6 @@ function renderKPIs(){
   const servVenc=DATA.filter(r=>r.km!==null&&r.km<0).length;
   const polCrit=DATA.filter(r=>r.pol!==null&&r.pol<=30).length;
   const licVenc=DATA.filter(r=>r.lic!==null&&r.lic<0).length;
-  const sinAsig=DATA.filter(r=>r.chofer==='SIN ASIGNACION').length;
   const cards=[
     ['b-blue',n,'Unidades totales'],
     ['b-green',cnt('CIRCULACION'),'En circulación'],
@@ -245,13 +201,14 @@ function renderAlert(){
   const servVenc=ALL.filter(r=>r.km!==null&&r.km<0);
   const polCrit=ALL.filter(r=>r.pol!==null&&r.pol<=30).sort((a,b)=>a.pol-b.pol);
   const licVenc=ALL.filter(r=>r.lic!==null&&r.lic<0);
-  document.getElementById('alertBox').innerHTML=
+  const box=document.getElementById('alertBox');
+  box.style.display='';
+  box.innerHTML=
     `<b>⚠ Atención de Dirección:</b> ${servVenc.length} unidades con <b>servicio vencido</b> (${servVenc.map(r=>r.veh).join(', ')||'ninguna'}). `+
     `${polCrit.length} con <b>póliza por vencer ≤30 días</b> (${polCrit.map(r=>r.veh+': '+r.pol+'d').join(', ')||'ninguna'}). `+
     `${licVenc.length} con <b>licencia vencida</b> (${licVenc.map(r=>r.veh+' / '+r.chofer).join('; ')||'ninguna'}).`;
 }
 
-// ====== Mosaico parque vehicular ======
 function renderFleet(){
   const orden={CIRCULACION:0,TALLER:1,RESGUARDO:2,SINIESTRADO:3};
   const d=[...DATA].sort((a,b)=>(orden[a.estatus]??9)-(orden[b.estatus]??9)||a.veh.localeCompare(b.veh));
@@ -384,15 +341,37 @@ function buildSelects(){
   document.getElementById('fEstatus').innerHTML='<option value="">Todos los estatus</option>'+e.map(v=>`<option>${v}</option>`).join('');
 }
 
-function load(text){ALL=parseCSV(text);buildSelects();state.zona='';state.estatus='';state.depto='';state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');applyFilters();renderAlert();}
+function load(text){
+  ALL=parseCSV(text);
+  buildSelects();
+  state.zona='';state.estatus='';state.depto='';state.selVeh='';
+  document.getElementById('fleetDetail').classList.remove('open');
+  applyFilters();
+  renderAlert();
+  document.getElementById('loadingBox').style.display='none';
+}
 
 document.getElementById('fZona').onchange=e=>{state.zona=e.target.value;state.depto='';applyFilters();};
 document.getElementById('fEstatus').onchange=e=>{state.estatus=e.target.value;state.depto='';applyFilters();};
 document.getElementById('resetBtn').onclick=()=>{state.zona='';state.estatus='';state.depto='';state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');syncSelects();applyFilters();};
-document.getElementById('csvInput').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=ev=>load(ev.target.result);rd.readAsText(f);};
 window.addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
 
-load(CSV_BASE);
+// ====== CARGA AUTOMÁTICA DESDE datos.csv ======
+fetch('datos.csv?v=' + Date.now())
+  .then(r => {
+    if (!r.ok) throw new Error('No se pudo cargar datos.csv');
+    return r.text();
+  })
+  .then(text => {
+    const now = new Date();
+    const hoy = now.toLocaleDateString('es-MX', {day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('updateBadge').textContent = 'Actualizado: ' + hoy;
+    load(text);
+  })
+  .catch(err => {
+    document.getElementById('loadingBox').textContent = '⚠ No se encontró datos.csv en el repositorio. Suba el archivo y recargue la página.';
+    console.error(err);
+  });
 </script>
 </body>
 </html>
