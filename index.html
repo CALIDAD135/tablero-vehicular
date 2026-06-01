@@ -33,8 +33,8 @@ select{background:var(--panel2);border:1px solid var(--line);color:var(--txt);pa
 .card h3{font-size:13px;font-weight:600;margin-bottom:4px}
 .card .hint{color:var(--muted);font-size:11px;margin-bottom:8px}
 .chart{width:100%;height:300px}
-.col-6{grid-column:span 6} .col-4{grid-column:span 4} .col-12{grid-column:span 12} .col-8{grid-column:span 8}
-@media(max-width:900px){.col-6,.col-4,.col-8{grid-column:span 12}}
+.col-6{grid-column:span 6} .col-4{grid-column:span 4} .col-12{grid-column:span 12} .col-8{grid-column:span 8} .col-3{grid-column:span 3}
+@media(max-width:900px){.col-6,.col-4,.col-8,.col-3{grid-column:span 12}}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
 th{color:var(--muted);font-weight:600;cursor:pointer;position:sticky;top:0;background:var(--panel);user-select:none}
@@ -82,6 +82,7 @@ tbody tr:hover{background:var(--panel2)}
   <div class="toolbar">
     <select id="fZona"></select>
     <select id="fEstatus"></select>
+    <select id="fDepto"></select>
     <button class="btn" id="resetBtn">Restablecer</button>
     <span class="update-badge" id="updateBadge">Cargando datos…</span>
   </div>
@@ -122,15 +123,10 @@ tbody tr:hover{background:var(--panel2)}
     <div id="cDepto" class="chart" style="height:260px"></div>
   </div>
 
-  <div class="card col-6">
-    <h3>Vencimiento de Pólizas (días)</h3>
-    <div class="hint">Semaforización de riesgo · pase el cursor para el detalle por unidad</div>
-    <div id="cPoliza" class="chart"></div>
-  </div>
-  <div class="card col-6">
+  <div class="card col-12">
     <h3>Próximo Servicio (km restantes)</h3>
-    <div class="hint">Valores negativos = servicio VENCIDO · ordenado de mayor urgencia</div>
-    <div id="cServicio" class="chart"></div>
+    <div class="hint">Valores negativos = servicio VENCIDO · ordenado de mayor urgencia · pase el cursor para el detalle</div>
+    <div id="cServicio" class="chart" style="height:320px"></div>
   </div>
 
   <div class="card col-12">
@@ -139,7 +135,7 @@ tbody tr:hover{background:var(--panel2)}
       <table id="tbl"><thead></thead><tbody></tbody></table>
     </div>
     <div class="legend-note">
-      <b>Convenciones:</b> Póliza en <i>días</i> hasta vencimiento (negativo = vencida). Servicio en <i>km</i> restantes (negativo = vencido).
+      <b>Convenciones:</b> Próximo Servicio en <i>km</i> restantes (negativo = vencido · rojo = urgente · naranja = precaución ≤1,500 km · verde = ok).
     </div>
   </div>
 </div>
@@ -151,6 +147,7 @@ const C={blue:'#3fa9f5',gold:'#f5c451',green:'#39c08a',red:'#ef5c6e',orange:'#f0
 const STCOLOR={CIRCULACION:C.green,TALLER:C.gold,RESGUARDO:C.purple,SINIESTRADO:C.red};
 const STCLASS={CIRCULACION:'u-circ',TALLER:'u-tall',RESGUARDO:'u-resg',SINIESTRADO:'u-sin'};
 
+// CSV column order: ZONA, VEHICULO, DEPARTAMENTO, ESTATUS_OPERATIVO_VEHICULO, CHOFER, PLACAS, PROXIMO_SERVICIO
 function parseCSV(text){
   const lines=text.trim().split(/\r?\n/);
   const out=[];
@@ -158,17 +155,24 @@ function parseCSV(text){
     const c=lines[i].split(',');
     if(c.length<7) continue;
     out.push({
-      zona:c[0].trim(), depto:c[1].trim(), veh:c[2].trim(),
-      estatus:c[3].trim().toUpperCase(), chofer:c[4].trim(),
-      km:c[5].trim()===''?null:Number(c[5]),
-      pol:c[6].trim()===''?null:Number(c[6])
+      zona:     c[0].trim(),
+      veh:      c[1].trim(),
+      depto:    c[2].trim(),
+      estatus:  c[3].trim().toUpperCase(),
+      chofer:   c[4].trim(),
+      placas:   c[5].trim(),
+      km:       c[6].trim()===''?null:Number(c[6])
     });
   }
   return out;
 }
 
 function applyFilters(){
-  DATA=ALL.filter(r=>(!state.zona||r.zona===state.zona)&&(!state.estatus||r.estatus===state.estatus)&&(!state.depto||r.depto===state.depto));
+  DATA=ALL.filter(r=>
+    (!state.zona   || r.zona===state.zona)   &&
+    (!state.estatus|| r.estatus===state.estatus) &&
+    (!state.depto  || r.depto===state.depto)
+  );
   renderAll();
 }
 
@@ -178,15 +182,15 @@ function renderKPIs(){
   const n=DATA.length;
   const cnt=s=>DATA.filter(r=>r.estatus===s).length;
   const servVenc=DATA.filter(r=>r.km!==null&&r.km<0).length;
-  const polCrit=DATA.filter(r=>r.pol!==null&&r.pol<=30).length;
+  const servWarn=DATA.filter(r=>r.km!==null&&r.km>=0&&r.km<=1500).length;
   const cards=[
-    ['b-blue',n,'Unidades totales'],
-    ['b-green',cnt('CIRCULACION'),'En circulación'],
-    ['b-gold',cnt('TALLER'),'En taller'],
-    ['b-purple',cnt('RESGUARDO'),'En resguardo'],
-    ['b-red',cnt('SINIESTRADO'),'Siniestrado'],
-    ['b-red',servVenc,'Servicio vencido'],
-    ['b-orange',polCrit,'Póliza ≤ 30 días'],
+    ['b-blue',   n,            'Unidades totales'],
+    ['b-green',  cnt('CIRCULACION'), 'En circulación'],
+    ['b-gold',   cnt('TALLER'),      'En taller'],
+    ['b-purple', cnt('RESGUARDO'),   'En resguardo'],
+    ['b-red',    cnt('SINIESTRADO'), 'Siniestrado'],
+    ['b-red',    servVenc,    'Servicio vencido'],
+    ['b-orange', servWarn,    'Serv. ≤ 1,500 km'],
   ];
   document.getElementById('kpis').innerHTML=cards.map(c=>
     `<div class="kpi ${c[0]}"><div class="bar"></div><div class="v">${c[1]}</div><div class="l">${c[2]}</div></div>`).join('');
@@ -194,12 +198,16 @@ function renderKPIs(){
 
 function renderAlert(){
   const servVenc=ALL.filter(r=>r.km!==null&&r.km<0);
-  const polCrit=ALL.filter(r=>r.pol!==null&&r.pol<=30).sort((a,b)=>a.pol-b.pol);
+  const servWarn=ALL.filter(r=>r.km!==null&&r.km>=0&&r.km<=1500).sort((a,b)=>a.km-b.km);
   const box=document.getElementById('alertBox');
+  if(servVenc.length===0&&servWarn.length===0){box.style.display='none';return;}
   box.style.display='';
-  box.innerHTML=
-    `<b>⚠ Atención de Dirección:</b> ${servVenc.length} unidades con <b>servicio vencido</b> (${servVenc.map(r=>r.veh).join(', ')||'ninguna'}). `+
-    `${polCrit.length} con <b>póliza por vencer ≤30 días</b> (${polCrit.map(r=>r.veh+': '+r.pol+'d').join(', ')||'ninguna'}).`;
+  let html='<b>⚠ Atención de Dirección:</b> ';
+  if(servVenc.length>0)
+    html+=`${servVenc.length} unidad(es) con <b style="color:var(--red)">servicio vencido</b> (${servVenc.map(r=>r.veh).join(', ')}). `;
+  if(servWarn.length>0)
+    html+=`${servWarn.length} unidad(es) con <b style="color:var(--orange)">servicio próximo ≤1,500 km</b> (${servWarn.map(r=>r.veh+': '+r.km.toLocaleString('es-MX')+' km').join(', ')}).`;
+  box.innerHTML=html;
 }
 
 function renderFleet(){
@@ -212,7 +220,9 @@ function renderFleet(){
     return `<div class="unit ${cls}${sel}" data-veh="${r.veh}"><span>${r.veh}</span><small>${r.estatus.slice(0,4)}</small></div>`;
   }).join('');
   el.querySelectorAll('.unit').forEach(u=>u.onclick=()=>showUnit(u.dataset.veh));
-  if(state.selVeh && !d.some(r=>r.veh===state.selVeh)){state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');}
+  if(state.selVeh && !d.some(r=>r.veh===state.selVeh)){
+    state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');
+  }
 }
 
 function showUnit(veh){
@@ -221,16 +231,23 @@ function showUnit(veh){
   renderFleet();
   const det=document.getElementById('fleetDetail');
   if(!state.selVeh){det.classList.remove('open');return;}
-  const km=r.km===null?'—':(r.km<0?`<span class="bad">VENCIDO (${Math.abs(r.km).toLocaleString('es-MX')} km)</span>`:`${r.km.toLocaleString('es-MX')} km restantes`);
-  det.innerHTML=`<h4><i class="dot ${STCLASS[r.estatus]}"></i> ${r.veh}
-      <span class="tag ${r.estatus==='CIRCULACION'?'t-circ':r.estatus==='TALLER'?'t-tall':r.estatus==='RESGUARDO'?'t-resg':'t-sin'}">${r.estatus}</span>
-      <button class="fd-close" onclick="document.getElementById('fleetDetail').classList.remove('open');">Cerrar</button></h4>
+  const km=r.km===null?'—':(r.km<0
+    ?`<span class="bad">VENCIDO (${Math.abs(r.km).toLocaleString('es-MX')} km)</span>`
+    :(r.km<=1500
+      ?`<span class="warn">${r.km.toLocaleString('es-MX')} km restantes ⚠</span>`
+      :`<span class="ok">${r.km.toLocaleString('es-MX')} km restantes</span>`));
+  const tagCls=r.estatus==='CIRCULACION'?'t-circ':r.estatus==='TALLER'?'t-tall':r.estatus==='RESGUARDO'?'t-resg':'t-sin';
+  det.innerHTML=`
+    <h4><i class="dot ${STCLASS[r.estatus]}"></i> ${r.veh}
+      <span class="tag ${tagCls}">${r.estatus}</span>
+      <button class="fd-close" onclick="document.getElementById('fleetDetail').classList.remove('open');">Cerrar</button>
+    </h4>
     <div class="fd-grid">
+      <div class="fd-item"><div class="lab">Zona</div><div class="val">${r.zona}</div></div>
       <div class="fd-item"><div class="lab">Departamento</div><div class="val">${r.depto}</div></div>
       <div class="fd-item"><div class="lab">Chofer</div><div class="val">${r.chofer}</div></div>
-      <div class="fd-item"><div class="lab">Km próximo servicio</div><div class="val">${km}</div></div>
-      <div class="fd-item"><div class="lab">Zona</div><div class="val">${r.zona}</div></div>
-      <div class="fd-item"><div class="lab">Póliza (días)</div><div class="val">${fmt(r.pol)}</div></div>
+      <div class="fd-item"><div class="lab">Placas</div><div class="val">${r.placas}</div></div>
+      <div class="fd-item"><div class="lab">Próximo Servicio</div><div class="val">${km}</div></div>
     </div>`;
   det.classList.add('open');
   det.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -259,7 +276,7 @@ function barDepto(){
   const counts={};DATA.forEach(r=>counts[r.depto]=(counts[r.depto]||0)+1);
   const ent=Object.entries(counts).sort((a,b)=>a[1]-b[1]);
   ch.setOption({
-    grid:{left:90,right:24,top:10,bottom:20},
+    grid:{left:100,right:24,top:10,bottom:20},
     tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>`${p[0].name}: <b>${p[0].value}</b> unidades`},
     xAxis:{type:'value',axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
     yAxis:{type:'category',data:ent.map(e=>e[0]),axisLabel:{color:'#e8edf7',fontSize:11}},
@@ -269,67 +286,90 @@ function barDepto(){
   ch.on('click',p=>{state.depto=state.depto===p.name?'':p.name; syncSelects(); applyFilters();});
 }
 
-function barPoliza(){
-  const el=document.getElementById('cPoliza');
-  let ch=charts.cPoliza||(charts.cPoliza=echarts.init(el));
-  const d=DATA.filter(r=>r.pol!==null).sort((a,b)=>a.pol-b.pol);
-  const col=v=>v<=30?C.red:v<=90?C.orange:v<=180?C.gold:C.green;
-  ch.setOption({
-    grid:{left:50,right:24,top:14,bottom:80},
-    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{const r=d[p[0].dataIndex];return `<b>${r.veh}</b><br>${r.zona} · ${r.depto}<br>Chofer: ${r.chofer}<br>Póliza vence en: <b>${r.pol} días</b>`;}},
-    dataZoom:[{type:'slider',bottom:34,height:16,textStyle:{color:C.muted}}],
-    xAxis:{type:'category',data:d.map(r=>r.veh),axisLabel:{color:C.muted,rotate:55,fontSize:10}},
-    yAxis:{type:'value',name:'días',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
-    series:[{type:'bar',data:d.map(r=>({value:r.pol,itemStyle:{color:col(r.pol),borderRadius:[3,3,0,0]}})),
-      markLine:{silent:true,symbol:'none',data:[{yAxis:30,label:{formatter:'30 días',color:C.red,position:'insideEndTop'},lineStyle:{color:C.red,type:'dashed'}}]}}]
-  },true);
-}
-
 function barServicio(){
   const el=document.getElementById('cServicio');
   let ch=charts.cServicio||(charts.cServicio=echarts.init(el));
   const d=DATA.filter(r=>r.km!==null).sort((a,b)=>a.km-b.km);
   ch.setOption({
-    grid:{left:60,right:24,top:14,bottom:80},
-    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{const r=d[p[0].dataIndex];return `<b>${r.veh}</b><br>${r.zona} · ${r.depto}<br>${r.km<0?'<span style=color:#ef5c6e>VENCIDO</span> por '+Math.abs(r.km).toLocaleString()+' km':r.km.toLocaleString()+' km restantes'}`;}},
+    grid:{left:60,right:24,top:14,bottom:90},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{
+      const r=d[p[0].dataIndex];
+      const placas=r.placas?` · <b>${r.placas}</b>`:'';
+      return `<b>${r.veh}</b>${placas}<br>${r.zona} · ${r.depto}<br>Chofer: ${r.chofer}<br>${r.km<0
+        ?'<span style=color:#ef5c6e>VENCIDO</span> por '+Math.abs(r.km).toLocaleString('es-MX')+' km'
+        :r.km.toLocaleString('es-MX')+' km restantes'}`;
+    }},
     dataZoom:[{type:'slider',bottom:34,height:16,textStyle:{color:C.muted}}],
     xAxis:{type:'category',data:d.map(r=>r.veh),axisLabel:{color:C.muted,rotate:55,fontSize:10}},
     yAxis:{type:'value',name:'km',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
-    series:[{type:'bar',data:d.map(r=>({value:r.km,itemStyle:{color:r.km<0?C.red:r.km<1500?C.orange:C.green,borderRadius:r.km<0?[0,0,3,3]:[3,3,0,0]}}))}]
+    series:[{type:'bar',data:d.map(r=>({value:r.km,itemStyle:{
+      color:r.km<0?C.red:r.km<=1500?C.orange:C.green,
+      borderRadius:r.km<0?[0,0,3,3]:[3,3,0,0]
+    }}))}]
   },true);
 }
 
 function renderTable(){
-  const cols=[['veh','VEHÍCULO'],['zona','ZONA'],['depto','DEPARTAMENTO'],['estatus','ESTATUS'],['chofer','CHOFER'],['km','KM SERVICIO'],['pol','PÓLIZA (días)']];
+  const cols=[
+    ['veh','VEHÍCULO'],['zona','ZONA'],['depto','DEPARTAMENTO'],
+    ['estatus','ESTATUS'],['chofer','CHOFER'],['placas','PLACAS'],['km','KM SERVICIO']
+  ];
   document.querySelector('#tbl thead').innerHTML='<tr>'+cols.map(c=>`<th data-k="${c[0]}">${c[1]}</th>`).join('')+'</tr>';
   let rows=[...DATA];
-  if(state.sortKey){const k=state.sortKey;rows.sort((a,b)=>{let x=a[k],y=b[k];if(x===null)x=Infinity;if(y===null)y=Infinity;if(typeof x==='string')return state.sortDir*x.localeCompare(y);return state.sortDir*(x-y);});}
-  const tag=e=>e==='CIRCULACION'?'<span class="tag t-circ">Circulación</span>':e==='RESGUARDO'?'<span class="tag t-resg">Resguardo</span>':e==='TALLER'?'<span class="tag t-tall">Taller</span>':'<span class="tag t-sin">Siniestrado</span>';
-  const kmC=v=>v===null?'—':`<span class="${v<0?'bad':v<1500?'warn':'ok'}">${fmt(v)}${v<0?' ⚠':''}</span>`;
-  const polC=v=>v===null?'—':`<span class="${v<=30?'bad':v<=90?'warn':''}">${fmt(v)}</span>`;
+  if(state.sortKey){
+    const k=state.sortKey;
+    rows.sort((a,b)=>{
+      let x=a[k],y=b[k];
+      if(x===null)x=Infinity;if(y===null)y=Infinity;
+      if(typeof x==='string')return state.sortDir*x.localeCompare(y);
+      return state.sortDir*(x-y);
+    });
+  }
+  const tag=e=>e==='CIRCULACION'?'<span class="tag t-circ">Circulación</span>':
+                 e==='RESGUARDO' ?'<span class="tag t-resg">Resguardo</span>':
+                 e==='TALLER'   ?'<span class="tag t-tall">Taller</span>':
+                                  '<span class="tag t-sin">Siniestrado</span>';
+  const kmC=v=>v===null?'—':`<span class="${v<0?'bad':v<=1500?'warn':'ok'}">${fmt(v)}${v<0?' ⚠':v<=1500?' ⚡':''}</span>`;
   document.querySelector('#tbl tbody').innerHTML=rows.map(r=>
-    `<tr><td><b>${r.veh}</b></td><td>${r.zona}</td><td>${r.depto}</td><td>${tag(r.estatus)}</td><td>${r.chofer}</td><td class="num">${kmC(r.km)}</td><td class="num">${polC(r.pol)}</td></tr>`).join('');
-  document.querySelectorAll('#tbl th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;state.sortDir=state.sortKey===k?-state.sortDir:1;state.sortKey=k;renderTable();});
+    `<tr>
+      <td><b>${r.veh}</b></td>
+      <td>${r.zona}</td>
+      <td>${r.depto}</td>
+      <td>${tag(r.estatus)}</td>
+      <td>${r.chofer}</td>
+      <td>${r.placas}</td>
+      <td class="num">${kmC(r.km)}</td>
+    </tr>`).join('');
+  document.querySelectorAll('#tbl th').forEach(th=>th.onclick=()=>{
+    const k=th.dataset.k;
+    state.sortDir=state.sortKey===k?-state.sortDir:1;
+    state.sortKey=k;renderTable();
+  });
 }
 
 function renderAll(){
   renderKPIs();
   renderFleet();
-  const zc={},ec={};DATA.forEach(r=>{zc[r.zona]=(zc[r.zona]||0)+1;ec[r.estatus]=(ec[r.estatus]||0)+1;});
+  const zc={},ec={};
+  DATA.forEach(r=>{zc[r.zona]=(zc[r.zona]||0)+1;ec[r.estatus]=(ec[r.estatus]||0)+1;});
   pie('cZona',zc,'zona');
   pie('cEstatus',ec,'estatus');
-  barDepto();barPoliza();barServicio();renderTable();
+  barDepto();barServicio();renderTable();
 }
 
 function syncSelects(){
   document.getElementById('fZona').value=state.zona;
   document.getElementById('fEstatus').value=state.estatus;
+  document.getElementById('fDepto').value=state.depto;
 }
+
 function buildSelects(){
   const z=[...new Set(ALL.map(r=>r.zona))].sort();
   const e=[...new Set(ALL.map(r=>r.estatus))].sort();
+  const d=[...new Set(ALL.map(r=>r.depto))].sort();
   document.getElementById('fZona').innerHTML='<option value="">Todas las zonas</option>'+z.map(v=>`<option>${v}</option>`).join('');
   document.getElementById('fEstatus').innerHTML='<option value="">Todos los estatus</option>'+e.map(v=>`<option>${v}</option>`).join('');
+  document.getElementById('fDepto').innerHTML='<option value="">Todos los departamentos</option>'+d.map(v=>`<option>${v}</option>`).join('');
 }
 
 function load(text){
@@ -342,9 +382,14 @@ function load(text){
   document.getElementById('loadingBox').style.display='none';
 }
 
-document.getElementById('fZona').onchange=e=>{state.zona=e.target.value;state.depto='';applyFilters();};
-document.getElementById('fEstatus').onchange=e=>{state.estatus=e.target.value;state.depto='';applyFilters();};
-document.getElementById('resetBtn').onclick=()=>{state.zona='';state.estatus='';state.depto='';state.selVeh='';document.getElementById('fleetDetail').classList.remove('open');syncSelects();applyFilters();};
+document.getElementById('fZona').onchange=e=>{state.zona=e.target.value;state.depto='';syncSelects();applyFilters();};
+document.getElementById('fEstatus').onchange=e=>{state.estatus=e.target.value;state.depto='';syncSelects();applyFilters();};
+document.getElementById('fDepto').onchange=e=>{state.depto=e.target.value;syncSelects();applyFilters();};
+document.getElementById('resetBtn').onclick=()=>{
+  state.zona='';state.estatus='';state.depto='';state.selVeh='';
+  document.getElementById('fleetDetail').classList.remove('open');
+  syncSelects();applyFilters();
+};
 window.addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
 
 fetch('datos.csv?v=' + Date.now())
