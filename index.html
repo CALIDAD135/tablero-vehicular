@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tablero Ejecutivo · Control Vehicular · KPI-AFI-01 v2.1</title>
+<title>Tablero Ejecutivo · Control Vehicular · KPI-AFI-01 v2.2</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#0f1626; --panel:#16203a; --panel2:#1c2747; --line:#27345c;
@@ -76,8 +77,14 @@ tbody tr:hover{background:var(--panel2)}
 .bad{color:var(--red);font-weight:700}.warn{color:var(--orange);font-weight:600}.ok{color:var(--green)}
 .tablewrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px}
 .legend-note{color:var(--muted);font-size:11px;margin-top:10px;line-height:1.6}
-#alertBox{background:linear-gradient(135deg,rgba(239,92,110,.12),rgba(240,138,60,.08));border:1px solid rgba(239,92,110,.4);border-radius:12px;padding:14px 18px;margin-bottom:18px}
-#alertBox b{color:var(--red)}
+.comb-empty{text-align:center;color:var(--muted);padding:34px 20px;font-size:13px}
+.comb-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.comb-sel{min-width:200px;max-width:260px}
+.per-tag{background:rgba(63,169,245,.15);color:var(--accent);border:1px solid rgba(63,169,245,.4);padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.mini-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0 14px}
+.mini-kpi{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.mini-kpi .l{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px}
+.mini-kpi .v{font-size:19px;font-weight:700;margin-top:3px}
 #seedBox{background:linear-gradient(135deg,rgba(63,169,245,.12),rgba(57,192,138,.08));border:1px solid rgba(63,169,245,.4);border-radius:12px;padding:18px 20px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
 .fleet-legend{display:flex;gap:18px;flex-wrap:wrap;margin:4px 0 12px;font-size:12px;color:var(--muted)}
 .fleet-legend span{display:inline-flex;align-items:center;gap:6px}
@@ -192,7 +199,9 @@ tbody tr:hover{background:var(--panel2)}
     <select id="fEstatus"></select>
     <select id="fDepto"></select>
     <button class="btn" id="resetBtn">Restablecer</button>
-    <button class="btn btn-primary hidden" id="btnActualizar">↻ Actualizar</button>
+    <button class="btn btn-primary" id="btnActualizar">↻ Actualizar</button>
+    <button class="btn" id="btnPDF" title="Descargar reporte en PDF">↓ PDF</button>
+    <button class="btn" id="btnXLS" title="Descargar reporte en Excel">↓ Excel</button>
     <button class="btn hidden" id="btnConfig" title="Configuración">⚙</button>
     <button class="btn btn-ghost" id="btnLogout" title="Cerrar sesión">Salir</button>
     <span class="update-badge" id="updateBadge">—</span>
@@ -207,9 +216,6 @@ tbody tr:hover{background:var(--panel2)}
   </div>
   <button class="btn btn-primary" id="btnSeed">Cargar datos iniciales</button>
 </div>
-
-<!-- ============ ALERTA ============ -->
-<div id="alertBox" style="display:none"></div>
 
 <!-- ============ KPIs ============ -->
 <div class="kpis" id="kpis"></div>
@@ -269,6 +275,23 @@ tbody tr:hover{background:var(--panel2)}
   </div>
   <div class="tablewrap" style="max-height:340px">
     <table id="tblInc"><thead></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<!-- ============ COMBUSTIBLES ============ -->
+<div class="card col-12">
+  <h3>Control de Combustibles
+    <span class="hint" style="font-weight:400">· consumo por período y unidad</span>
+  </h3>
+  <div class="comb-head">
+    <div class="comb-sel">
+      <select id="combUnidad"><option value="">— Seleccione una unidad —</option></select>
+    </div>
+    <button class="btn btn-success hidden" id="btnNuevoPeriodo" style="font-size:12px;padding:6px 13px">+ Nuevo período</button>
+    <span class="hint" style="margin:0" id="combHint">Elija una unidad para ver o capturar sus períodos de consumo.</span>
+  </div>
+  <div id="combBody">
+    <div class="comb-empty">Sin unidad seleccionada.</div>
   </div>
 </div>
 
@@ -432,6 +455,63 @@ tbody tr:hover{background:var(--panel2)}
   </div>
 </div>
 
+<!-- ============ MODAL: PERÍODO DE COMBUSTIBLE ============ -->
+<div class="modal-overlay" id="modalComb">
+  <div class="modal">
+    <h3 id="mCombTitle">Nuevo período de consumo</h3>
+    <div class="modal-sub">Capture el período y los consumos. El total de días se calcula automáticamente.</div>
+    <div class="form-grid">
+      <div>
+        <label>Unidad</label>
+        <input type="text" id="cUnidad" readonly style="opacity:.7">
+      </div>
+      <div>
+        <label>Total de días (automático)</label>
+        <input type="text" id="cDias" readonly style="opacity:.7" value="—">
+      </div>
+      <div>
+        <label>Fecha inicial</label>
+        <input type="date" id="cFechaIni">
+        <div class="field-msg" id="e_cFechaIni"></div>
+      </div>
+      <div>
+        <label>Fecha de corte</label>
+        <input type="date" id="cFechaFin">
+        <div class="field-msg" id="e_cFechaFin"></div>
+      </div>
+      <div>
+        <label>Kilómetros recorridos</label>
+        <input type="number" id="cKm" min="0" max="999999" step="1" placeholder="Ej. 2450">
+        <div class="field-msg" id="e_cKm"></div>
+      </div>
+      <div>
+        <label>Litros consumidos</label>
+        <input type="number" id="cLitros" min="0" max="99999" step="0.01" placeholder="Ej. 210.50">
+        <div class="field-msg" id="e_cLitros"></div>
+      </div>
+      <div>
+        <label>Descuento por uso personal (MXN)</label>
+        <input type="number" id="cDescuento" min="0" max="9999999" step="0.01" placeholder="Ej. 850.00">
+        <div class="field-msg" id="e_cDescuento"></div>
+      </div>
+      <div>
+        <label>Rendimiento (km/L · automático)</label>
+        <input type="text" id="cRend" readonly style="opacity:.7" value="—">
+      </div>
+      <div class="full">
+        <label>Observaciones (opcional)</label>
+        <textarea id="cNotas" rows="2" maxlength="300" placeholder="Notas del período"></textarea>
+        <div class="field-msg" id="e_cNotas"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger hidden" id="btnEliminarComb">Eliminar</button>
+      <button class="btn" data-close-modal="modalComb">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarComb">Guardar período</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ MODAL: CONFIGURACIÓN (solo admin) ============ -->
 <div class="modal-overlay" id="modalConfig">
   <div class="modal">
@@ -445,6 +525,7 @@ tbody tr:hover{background:var(--panel2)}
       <div class="status-line"><span>Estado de conexión</span><span id="s_conn">—</span></div>
       <div class="status-line"><span>Unidades sincronizadas</span><span id="s_units">—</span></div>
       <div class="status-line"><span>Incidencias sincronizadas</span><span id="s_incs">—</span></div>
+      <div class="status-line"><span>Períodos de combustible</span><span id="s_comb">—</span></div>
       <div class="status-line"><span>Última actualización</span><span id="s_updated">—</span></div>
     </div>
 
@@ -473,7 +554,7 @@ tbody tr:hover{background:var(--panel2)}
 
 <script>
 /* ==================================================================
-   TABLERO EJECUTIVO · CONTROL VEHICULAR · v2.1
+   TABLERO EJECUTIVO · CONTROL VEHICULAR · v2.2
    Coordinación de Activos Fijos y Control Vehicular
    Backend: Firebase Realtime Database (sincronización en tiempo real)
    ================================================================== */
@@ -499,9 +580,9 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.1 } };
+let STORE = { unidades:[], incidencias:[], combustibles:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.2 } };
 let ALL=[], DATA=[];
-let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null };
+let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'' };
 let session = { rol:null, loggedAt:null };
 let editingVeh = null;
 let editingIncId = null;
@@ -593,6 +674,7 @@ function fbInit(){
       const d = snap.val() || {};
       STORE.unidades   = d.unidades ? Object.values(d.unidades) : [];
       STORE.incidencias = d.incidencias ? Object.values(d.incidencias) : [];
+      STORE.combustibles = d.combustibles ? Object.values(d.combustibles) : [];
       STORE.bitacora   = d.bitacora ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
       STORE.meta       = d.meta || STORE.meta;
       fbInitialLoad = true;
@@ -653,7 +735,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.1 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.2 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -715,7 +797,7 @@ async function seedFromCSV(){
       };
       cargadas++;
     }
-    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.1 };
+    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.2 };
     // Bitácora
     const bit = { id:uid(), ts:nowISO(), unidad:'—', accion:'SEED', campo:'inicialización', antes:'', despues:`${cargadas} unidades`, usuario:session.rol, rol:session.rol };
     updates[`${FB_ROOT}/bitacora/${bit.id}`] = bit;
@@ -776,7 +858,6 @@ function aplicarPermisos(){
   badge.textContent = rol==='admin'?'Administrador':rol==='auxiliar'?'Auxiliar':'Gerencia';
   const esEditor = (rol==='admin'||rol==='auxiliar');
   const esAdmin = rol==='admin';
-  $('#btnActualizar').classList.toggle('hidden', !esEditor);
   $('#btnNuevaUnidad').classList.toggle('hidden', !esAdmin);
   $('#btnConfig').classList.toggle('hidden', !esAdmin);
   $('#cardBitacora').classList.toggle('hidden', !esAdmin);
@@ -802,21 +883,6 @@ function renderKPIs(){
   ).join('');
 }
 
-/* ============ RENDER: ALERTA ============ */
-function renderAlert(){
-  const venc = ALL.filter(r=>{const k=kmRestantes(r); return k!==null && k<0;});
-  const warn = ALL.filter(r=>{const k=kmRestantes(r); return k!==null && k>=0 && k<=1500;}).sort((a,b)=>kmRestantes(a)-kmRestantes(b));
-  const box = $('#alertBox');
-  if(venc.length===0 && warn.length===0){ box.style.display='none'; return; }
-  box.style.display='';
-  let html = '<b>⚠ Atención de Dirección:</b> ';
-  if(venc.length>0)
-    html += `${venc.length} unidad(es) con <b style="color:var(--red)">servicio vencido</b> (${venc.map(r=>r.veh).join(', ')}). `;
-  if(warn.length>0)
-    html += `${warn.length} unidad(es) con <b style="color:var(--orange)">servicio próximo ≤1,500 km</b> (${warn.map(r=>r.veh+': '+kmRestantes(r).toLocaleString('es-MX')+' km').join(', ')}).`;
-  box.innerHTML = html;
-}
-
 /* ============ RENDER: FLOTILLA ============ */
 function renderFleet(){
   const orden = {CIRCULACION:0,TALLER:1,RESGUARDO:2,SINIESTRADO:3};
@@ -836,12 +902,25 @@ function renderFleet(){
 }
 
 /* ============ DETALLE UNIDAD ============ */
+/* mostrarUnidad = manejador del clic (alterna). renderFleetDetail = render puro,
+   se invoca en CADA refresco para que el panel abierto nunca quede con datos viejos. */
 function mostrarUnidad(veh){
-  const r = DATA.find(x=>x.veh===veh); if(!r) return;
   state.selVeh = state.selVeh===veh?'':veh;
   renderFleet();
+  renderFleetDetail();
+  if(state.selVeh) $('#fleetDetail').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+window.cerrarDetalle = function(){
+  state.selVeh='';
+  renderFleet();
+  renderFleetDetail();
+};
+
+function renderFleetDetail(){
   const det = $('#fleetDetail');
-  if(!state.selVeh){ det.classList.remove('open'); return; }
+  if(!state.selVeh){ det.classList.remove('open'); det.innerHTML=''; return; }
+  const r = DATA.find(x=>x.veh===state.selVeh);
+  if(!r){ det.classList.remove('open'); det.innerHTML=''; state.selVeh=''; return; }
 
   const km = kmRestantes(r);
   const kmDisplay = km===null?'<span class="hint">Sin captura</span>'
@@ -851,6 +930,7 @@ function mostrarUnidad(veh){
   const tagCls = r.estatus==='CIRCULACION'?'t-circ':r.estatus==='TALLER'?'t-tall':r.estatus==='RESGUARDO'?'t-resg':'t-sin';
   const incsUnidad = STORE.incidencias.filter(i=>i.unidad===r.veh);
   const pendUnidad = incsUnidad.filter(i=>i.estatus!=='Resuelto').length;
+  const combUnidad = STORE.combustibles.filter(c=>c.unidad===r.veh);
 
   const esEditor = session.rol==='admin' || session.rol==='auxiliar';
 
@@ -858,7 +938,7 @@ function mostrarUnidad(veh){
     <h4><i class="dot ${STCLASS[r.estatus]}"></i> ${r.veh}
       <span class="tag ${tagCls}">${r.estatus}</span>
       ${pendUnidad>0?`<span class="tag t-pend">${pendUnidad} pendiente(s)</span>`:''}
-      <button class="fd-close" onclick="document.getElementById('fleetDetail').classList.remove('open');document.querySelectorAll('.unit').forEach(u=>u.classList.remove('sel'));">Cerrar</button>
+      <button class="fd-close" onclick="cerrarDetalle()">Cerrar</button>
     </h4>
     <div class="fd-grid">
       <div class="fd-item"><div class="lab">Zona</div><div class="val">${r.zona}</div></div>
@@ -869,14 +949,15 @@ function mostrarUnidad(veh){
       <div class="fd-item"><div class="lab">Próx. servicio (objetivo)</div><div class="val">${fmt(r.kmProximoServicio)}</div></div>
       <div class="fd-item"><div class="lab">Km restantes</div><div class="val">${kmDisplay}</div></div>
       <div class="fd-item"><div class="lab">Incidencias totales</div><div class="val">${incsUnidad.length}</div></div>
+      <div class="fd-item"><div class="lab">Períodos de combustible</div><div class="val">${combUnidad.length}</div></div>
     </div>
     <div class="fd-actions">
       ${esEditor?`<button class="btn btn-primary" onclick="abrirModalUnidad('${r.veh}')">✎ Editar unidad</button>`:''}
       ${esEditor?`<button class="btn btn-success" onclick="abrirModalIncidencia('${r.veh}')">+ Incidencia vehicular</button>`:''}
+      <button class="btn" onclick="verCombustibles('${r.veh}')">⛽ Combustibles${combUnidad.length?` (${combUnidad.length})`:''}</button>
       ${incsUnidad.length>0?`<button class="btn" onclick="filtrarIncidenciasPor('${r.veh}')">Ver ${incsUnidad.length} incidencia(s)</button>`:''}
     </div>`;
   det.classList.add('open');
-  det.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 /* ============ GRÁFICAS ============ */
@@ -1055,6 +1136,452 @@ function renderBitacora(){
   }).join('');
 }
 
+/* ============ COMBUSTIBLES ============ */
+const money = n => n==null||isNaN(n)?'—':'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+const dec = (n,d=2) => n==null||isNaN(n)?'—':Number(n).toLocaleString('es-MX',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+function diasEntre(ini, fin){
+  const a = new Date(ini+'T00:00:00'), b = new Date(fin+'T00:00:00');
+  if(isNaN(a)||isNaN(b)) return null;
+  const d = Math.round((b-a)/86400000)+1;   // inclusivo: ambos extremos cuentan
+  return d;
+}
+/* Períodos de una unidad, ordenados cronológicamente y numerados Período 1..N */
+function periodosDe(veh){
+  return STORE.combustibles
+    .filter(c=>c.unidad===veh)
+    .sort((a,b)=> (a.fechaIni||'').localeCompare(b.fechaIni||''))
+    .map((c,i)=>({...c, nPeriodo:i+1, etiqueta:'Período '+(i+1)}));
+}
+
+function buildCombSelect(){
+  const sel = $('#combUnidad');
+  const actual = state.combVeh;
+  const vehs = [...new Set(STORE.unidades.map(u=>u.veh))].sort();
+  sel.innerHTML = '<option value="">— Seleccione una unidad —</option>' +
+    vehs.map(v=>{
+      const n = STORE.combustibles.filter(c=>c.unidad===v).length;
+      return `<option value="${v}">${v}${n?` (${n})`:''}</option>`;
+    }).join('');
+  sel.value = actual;
+}
+
+window.verCombustibles = function(veh){
+  state.combVeh = veh;
+  buildCombSelect();
+  renderCombustibles();
+  document.getElementById('combUnidad').scrollIntoView({behavior:'smooth',block:'center'});
+};
+
+function renderCombustibles(){
+  buildCombSelect();
+  const veh = state.combVeh;
+  const esEditor = session.rol==='admin' || session.rol==='auxiliar';
+  $('#btnNuevoPeriodo').classList.toggle('hidden', !veh || !esEditor);
+  const body = $('#combBody');
+
+  if(!veh){
+    $('#combHint').textContent = 'Elija una unidad para ver o capturar sus períodos de consumo.';
+    body.innerHTML = '<div class="comb-empty">Sin unidad seleccionada.</div>';
+    return;
+  }
+  const per = periodosDe(veh);
+  $('#combHint').textContent = per.length
+    ? `${per.length} período(s) registrado(s) para ${veh}.`
+    : `${veh} aún no tiene períodos capturados.`;
+
+  if(per.length===0){
+    body.innerHTML = `<div class="comb-empty">Sin períodos capturados para <b>${veh}</b>.${esEditor?' Use “+ Nuevo período” para comenzar.':''}</div>`;
+    ['cbDesc','cbComp'].forEach(id=>{ if(charts[id]){ charts[id].dispose(); delete charts[id]; } });
+    return;
+  }
+
+  // KPIs resumen
+  const totKm   = per.reduce((s,c)=>s+(c.km||0),0);
+  const totLt   = per.reduce((s,c)=>s+(c.litros||0),0);
+  const totDesc = per.reduce((s,c)=>s+(c.descuento||0),0);
+  const totDias = per.reduce((s,c)=>s+(c.dias||0),0);
+  const rendProm = totLt>0 ? totKm/totLt : null;
+
+  const rows = per.map(c=>{
+    const rend = (c.litros>0) ? c.km/c.litros : null;
+    return `<tr>
+      <td><span class="per-tag">${c.etiqueta}</span></td>
+      <td>${c.fechaIni||'—'}</td>
+      <td>${c.fechaFin||'—'}</td>
+      <td class="num">${c.dias??'—'}</td>
+      <td class="num">${fmt(c.km)}</td>
+      <td class="num">${dec(c.litros)}</td>
+      <td class="num">${rend===null?'—':dec(rend)}</td>
+      <td class="num">${money(c.descuento)}</td>
+      <td title="${(c.notas||'').replace(/"/g,'&quot;')}">${(c.notas||'').slice(0,40)||'—'}</td>
+      <td>${esEditor?`<button class="btn" style="padding:3px 8px;font-size:11px" onclick="editarPeriodo('${c.id}')">Editar</button>`:''}</td>
+    </tr>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="mini-kpis">
+      <div class="mini-kpi"><div class="l">Períodos</div><div class="v">${per.length}</div></div>
+      <div class="mini-kpi"><div class="l">Días acumulados</div><div class="v">${fmt(totDias)}</div></div>
+      <div class="mini-kpi"><div class="l">Km recorridos</div><div class="v">${fmt(totKm)}</div></div>
+      <div class="mini-kpi"><div class="l">Litros consumidos</div><div class="v">${dec(totLt)}</div></div>
+      <div class="mini-kpi"><div class="l">Rendimiento prom.</div><div class="v">${rendProm===null?'—':dec(rendProm)+' km/L'}</div></div>
+      <div class="mini-kpi"><div class="l">Descuento acumulado</div><div class="v" style="color:var(--gold)">${money(totDesc)}</div></div>
+    </div>
+    <div class="grid">
+      <div class="col-6">
+        <div style="font-size:12.5px;font-weight:600;margin-bottom:2px">Descuento por uso personal · comparativo de períodos</div>
+        <div class="hint">Verde = período más bajo · Rojo = período más alto</div>
+        <div id="cbDesc" style="height:290px"></div>
+      </div>
+      <div class="col-6">
+        <div style="font-size:12.5px;font-weight:600;margin-bottom:2px">Km recorridos · Litros · Descuento por período</div>
+        <div class="hint">Tres ejes independientes para comparar magnitudes distintas</div>
+        <div id="cbComp" style="height:290px"></div>
+      </div>
+    </div>
+    <div class="tablewrap" style="max-height:300px;margin-top:14px">
+      <table>
+        <thead><tr>
+          <th>PERÍODO</th><th>DESDE</th><th>HASTA</th><th>DÍAS</th>
+          <th>KM REC.</th><th>LITROS</th><th>KM/L</th><th>DESCUENTO</th><th>OBSERVACIONES</th><th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  chartDescuento(per);
+  chartComparativo(per);
+}
+
+function chartDescuento(per){
+  const el = document.getElementById('cbDesc'); if(!el) return;
+  if(charts.cbDesc){ charts.cbDesc.dispose(); }
+  const ch = charts.cbDesc = echarts.init(el);
+  const vals = per.map(c=>c.descuento||0);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  ch.setOption({
+    grid:{left:70,right:20,top:16,bottom:48},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{
+      const c = per[p[0].dataIndex];
+      return `<b>${c.etiqueta}</b><br>${c.fechaIni} → ${c.fechaFin}<br>Descuento: <b>${money(c.descuento)}</b><br>${c.dias} días · ${fmt(c.km)} km`;
+    }},
+    xAxis:{type:'category',data:per.map(c=>'P'+c.nPeriodo),axisLabel:{color:C.muted,fontSize:11}},
+    yAxis:{type:'value',name:'MXN',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted,formatter:v=>'$'+v.toLocaleString('es-MX')},splitLine:{lineStyle:{color:'#27345c'}}},
+    series:[{
+      type:'bar', barMaxWidth:52,
+      data: vals.map(v=>({ value:v, itemStyle:{
+        color: (vals.length>1 && v===max) ? C.red : (vals.length>1 && v===min) ? C.green : C.blue,
+        borderRadius:[4,4,0,0]
+      }})),
+      label:{show:true,position:'top',color:'#e8edf7',fontSize:10,formatter:p=>'$'+Number(p.value).toLocaleString('es-MX',{maximumFractionDigits:0})}
+    }]
+  }, true);
+}
+
+function chartComparativo(per){
+  const el = document.getElementById('cbComp'); if(!el) return;
+  if(charts.cbComp){ charts.cbComp.dispose(); }
+  const ch = charts.cbComp = echarts.init(el);
+  ch.setOption({
+    grid:{left:60,right:96,top:34,bottom:48},
+    legend:{top:0,textStyle:{color:C.muted,fontSize:11},data:['Km recorridos','Litros','Descuento MXN']},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{
+      const c = per[p[0].dataIndex];
+      const rend = c.litros>0?dec(c.km/c.litros):'—';
+      return `<b>${c.etiqueta}</b><br>${c.fechaIni} → ${c.fechaFin} (${c.dias} días)<br>`+
+             `Km: <b>${fmt(c.km)}</b><br>Litros: <b>${dec(c.litros)}</b><br>`+
+             `Rendimiento: <b>${rend} km/L</b><br>Descuento: <b>${money(c.descuento)}</b>`;
+    }},
+    xAxis:{type:'category',data:per.map(c=>'P'+c.nPeriodo),axisLabel:{color:C.muted,fontSize:11}},
+    yAxis:[
+      {type:'value',name:'km',position:'left',nameTextStyle:{color:C.blue},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
+      {type:'value',name:'L',position:'right',nameTextStyle:{color:C.gold},axisLabel:{color:C.muted},splitLine:{show:false}},
+      {type:'value',name:'MXN',position:'right',offset:56,nameTextStyle:{color:C.purple},axisLabel:{color:C.muted,formatter:v=>'$'+v},splitLine:{show:false}}
+    ],
+    series:[
+      {name:'Km recorridos',type:'bar',yAxisIndex:0,barMaxWidth:26,itemStyle:{color:C.blue,borderRadius:[3,3,0,0]},data:per.map(c=>c.km||0)},
+      {name:'Litros',type:'bar',yAxisIndex:1,barMaxWidth:26,itemStyle:{color:C.gold,borderRadius:[3,3,0,0]},data:per.map(c=>c.litros||0)},
+      {name:'Descuento MXN',type:'line',yAxisIndex:2,smooth:true,symbolSize:8,lineStyle:{width:3,color:C.purple},itemStyle:{color:C.purple},data:per.map(c=>c.descuento||0)}
+    ]
+  }, true);
+}
+
+/* --- CRUD de períodos --- */
+let editingCombId = null;
+
+function calcCombPreview(){
+  const ini = $('#cFechaIni').value, fin = $('#cFechaFin').value;
+  const d = (ini && fin) ? diasEntre(ini, fin) : null;
+  $('#cDias').value = (d===null||d<1) ? '—' : d + (d===1?' día':' días');
+  const km = parseFloat($('#cKm').value), lt = parseFloat($('#cLitros').value);
+  $('#cRend').value = (!isNaN(km) && !isNaN(lt) && lt>0) ? dec(km/lt)+' km/L' : '—';
+}
+
+window.abrirModalCombustible = function(veh){
+  clearErrs();
+  editingCombId = null;
+  $('#mCombTitle').textContent = 'Nuevo período · '+veh;
+  $('#cUnidad').value = veh;
+  $('#cFechaIni').value = ''; $('#cFechaFin').value = '';
+  $('#cKm').value=''; $('#cLitros').value=''; $('#cDescuento').value=''; $('#cNotas').value='';
+  $('#cDias').value='—'; $('#cRend').value='—';
+  $('#btnEliminarComb').classList.add('hidden');
+  $('#modalComb').classList.add('open');
+};
+
+window.editarPeriodo = function(id){
+  clearErrs();
+  const c = STORE.combustibles.find(x=>x.id===id); if(!c) return;
+  editingCombId = id;
+  const per = periodosDe(c.unidad).find(p=>p.id===id);
+  $('#mCombTitle').textContent = `Editar ${per?per.etiqueta:'período'} · ${c.unidad}`;
+  $('#cUnidad').value = c.unidad;
+  $('#cFechaIni').value = c.fechaIni||'';
+  $('#cFechaFin').value = c.fechaFin||'';
+  $('#cKm').value = c.km??'';
+  $('#cLitros').value = c.litros??'';
+  $('#cDescuento').value = c.descuento??'';
+  $('#cNotas').value = c.notas||'';
+  calcCombPreview();
+  $('#btnEliminarComb').classList.toggle('hidden', session.rol!=='admin');
+  $('#modalComb').classList.add('open');
+};
+
+function validaCombustible(c){
+  const errs = {};
+  if(!c.fechaIni) errs.cFechaIni = 'Seleccione la fecha inicial.';
+  if(!c.fechaFin) errs.cFechaFin = 'Seleccione la fecha de corte.';
+  if(c.fechaIni && c.fechaFin){
+    const d = diasEntre(c.fechaIni, c.fechaFin);
+    if(d===null) errs.cFechaFin = 'Fechas inválidas.';
+    else if(d < 1) errs.cFechaFin = 'La fecha de corte debe ser igual o posterior a la inicial.';
+    else if(d > 400) errs.cFechaFin = 'El período no puede exceder 400 días.';
+  }
+  if(c.km===null || isNaN(c.km)) errs.cKm = 'Capture un número válido.';
+  else if(c.km < 0 || c.km > 999999) errs.cKm = 'Rango válido: 0 a 999,999.';
+  if(c.litros===null || isNaN(c.litros)) errs.cLitros = 'Capture un número válido.';
+  else if(c.litros < 0 || c.litros > 99999) errs.cLitros = 'Rango válido: 0 a 99,999.';
+  if(c.descuento===null || isNaN(c.descuento)) errs.cDescuento = 'Capture un monto válido (0 si no aplica).';
+  else if(c.descuento < 0 || c.descuento > 9999999) errs.cDescuento = 'Rango válido: 0 a 9,999,999.';
+  if(c.notas && !RX.notas.test(c.notas)) errs.cNotas = 'No se permiten los caracteres < ni >.';
+  // Traslape con otros períodos de la misma unidad
+  if(!errs.cFechaIni && !errs.cFechaFin){
+    const otros = STORE.combustibles.filter(x=>x.unidad===c.unidad && x.id!==editingCombId);
+    const solapa = otros.find(o => o.fechaIni && o.fechaFin && !(c.fechaFin < o.fechaIni || c.fechaIni > o.fechaFin));
+    if(solapa) errs.cFechaIni = `Se traslapa con un período existente (${solapa.fechaIni} → ${solapa.fechaFin}).`;
+  }
+  return errs;
+}
+
+async function fbWriteCombustible(c){
+  try{ await fbDb.ref(`${FB_ROOT}/combustibles/${c.id}`).set(c); await fbUpdateMeta(); return true; }
+  catch(e){ toast('Error al guardar período: '+e.message,'err'); return false; }
+}
+async function fbDeleteCombustible(id){
+  try{ await fbDb.ref(`${FB_ROOT}/combustibles/${id}`).remove(); await fbUpdateMeta(); return true; }
+  catch(e){ toast('Error al eliminar período: '+e.message,'err'); return false; }
+}
+
+async function guardarCombustible(){
+  clearErrs();
+  const c = {
+    unidad: $('#cUnidad').value,
+    fechaIni: $('#cFechaIni').value,
+    fechaFin: $('#cFechaFin').value,
+    km:        $('#cKm').value===''?null:parseFloat($('#cKm').value),
+    litros:    $('#cLitros').value===''?null:parseFloat($('#cLitros').value),
+    descuento: $('#cDescuento').value===''?null:parseFloat($('#cDescuento').value),
+    notas: $('#cNotas').value.trim()
+  };
+  const errs = validaCombustible(c);
+  if(Object.keys(errs).length){
+    Object.entries(errs).forEach(([k,v])=>setErr(k,v));
+    toast('Corrija los campos marcados.','err');
+    return;
+  }
+  c.dias = diasEntre(c.fechaIni, c.fechaFin);
+
+  if(editingCombId){
+    const orig = STORE.combustibles.find(x=>x.id===editingCombId);
+    if(!orig) return;
+    const merged = {...orig, ...c, updatedAt:nowISO()};
+    const ok = await fbWriteCombustible(merged);
+    if(ok){
+      const diffs = [];
+      ['fechaIni','fechaFin','dias','km','litros','descuento','notas'].forEach(k=>{
+        if(String(orig[k]??'')!==String(merged[k]??'')) diffs.push({k,antes:orig[k],despues:merged[k]});
+      });
+      for(const d of diffs) await logChange(c.unidad,'EDIT_COMB','comb.'+d.k,d.antes,d.despues);
+      toast('Período actualizado.');
+    }
+  } else {
+    const nuevo = {id:uid(), ...c, createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO()};
+    const ok = await fbWriteCombustible(nuevo);
+    if(ok){
+      await logChange(c.unidad,'ALTA_COMB','período',`${c.fechaIni} → ${c.fechaFin}`,`${c.km} km · ${c.litros} L · ${money(c.descuento)}`);
+      toast(`Período registrado para ${c.unidad}.`);
+    }
+  }
+  state.combVeh = c.unidad;
+  cerrarModal('modalComb');
+}
+
+async function eliminarCombustible(){
+  if(!editingCombId || session.rol!=='admin') return;
+  if(!confirm('¿Eliminar este período de consumo? Esta acción no se puede deshacer.')) return;
+  const c = STORE.combustibles.find(x=>x.id===editingCombId);
+  const ok = await fbDeleteCombustible(editingCombId);
+  if(ok && c){ await logChange(c.unidad,'BAJA_COMB','período',`${c.fechaIni} → ${c.fechaFin}`,''); toast('Período eliminado.','warn'); }
+  cerrarModal('modalComb');
+}
+
+/* ============ EXPORTACIÓN ============ */
+const TITULO_REPORTE = 'Reporte General de Tablero Vehicular';
+
+function datosReporte(){
+  const flot = DATA.map(r=>({
+    'VEHÍCULO': r.veh, 'ZONA': r.zona, 'DEPARTAMENTO': r.depto, 'ESTATUS': r.estatus,
+    'CHOFER': r.chofer, 'PLACAS': r.placas,
+    'KM ACTUAL': r.kmActual ?? '', 'KM PRÓX. SERVICIO': r.kmProximoServicio ?? '',
+    'KM RESTANTES': kmRestantes(r) ?? ''
+  }));
+  const inc = [...STORE.incidencias].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(i=>({
+    'FECHA': i.fecha, 'UNIDAD': i.unidad, 'TIPO': i.tipo, 'ESTATUS': i.estatus,
+    'CHOFER': i.chofer||'', 'DEPARTAMENTO': i.depto||'',
+    'PLATAFORMA': i.tipoLiga||'', 'ID / LIGA': i.idLiga||'', 'NOTAS': i.notas||''
+  }));
+  const comb = [];
+  [...new Set(STORE.combustibles.map(c=>c.unidad))].sort().forEach(v=>{
+    periodosDe(v).forEach(c=>comb.push({
+      'UNIDAD': c.unidad, 'PERÍODO': c.etiqueta, 'DESDE': c.fechaIni, 'HASTA': c.fechaFin,
+      'DÍAS': c.dias ?? '', 'KM RECORRIDOS': c.km ?? '', 'LITROS': c.litros ?? '',
+      'KM/L': (c.litros>0)? Number((c.km/c.litros).toFixed(2)) : '',
+      'DESCUENTO USO PERSONAL (MXN)': c.descuento ?? '', 'OBSERVACIONES': c.notas||''
+    }));
+  });
+  const bit = STORE.bitacora.slice(0,400).map(b=>({
+    'FECHA': fechaCorta(b.ts), 'UNIDAD': b.unidad, 'ACCIÓN': b.accion,
+    'CAMPO': b.campo, 'ANTES': b.antes, 'DESPUÉS': b.despues, 'ROL': b.rol
+  }));
+  return {flot, inc, comb, bit};
+}
+
+function exportarExcel(){
+  try{
+    if(typeof XLSX==='undefined'){ toast('La librería de Excel no cargó. Verifique su conexión.','err'); return; }
+    const {flot, inc, comb, bit} = datosReporte();
+    const wb = XLSX.utils.book_new();
+    const stamp = new Date().toLocaleString('es-MX');
+
+    const addSheet = (nombre, subtitulo, rows) => {
+      const ws = XLSX.utils.aoa_to_sheet([[TITULO_REPORTE],[subtitulo],['Generado: '+stamp+'  ·  Rol: '+(session.rol||'—')],[]]);
+      if(rows.length) XLSX.utils.sheet_add_json(ws, rows, {origin:'A5'});
+      else XLSX.utils.sheet_add_aoa(ws, [['Sin registros.']], {origin:'A5'});
+      const cols = rows.length?Object.keys(rows[0]):['A'];
+      ws['!cols'] = cols.map(k=>({wch: Math.min(38, Math.max(12, k.length+4))}));
+      ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:Math.max(1,cols.length-1)}}];
+      XLSX.utils.book_append_sheet(wb, ws, nombre);
+    };
+
+    addSheet('Flotilla',     'Detalle de flotilla · estatus y servicio', flot);
+    addSheet('Incidencias',  'Incidencias vehiculares registradas',      inc);
+    addSheet('Combustibles', 'Consumo de combustible por período',       comb);
+    if(session.rol==='admin') addSheet('Bitácora','Trazabilidad de cambios (últimos 400)', bit);
+
+    XLSX.writeFile(wb, `Reporte-Tablero-Vehicular-${new Date().toISOString().slice(0,10)}.xlsx`);
+    toast('Reporte Excel descargado.');
+  }catch(e){ toast('Error al exportar: '+e.message,'err'); }
+}
+
+function exportarPDF(){
+  const {flot, inc, comb, bit} = datosReporte();
+  const stamp = new Date().toLocaleString('es-MX');
+  const esc = v => String(v??'').replace(/[<>&]/g, m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+
+  const tabla = (titulo, rows, nota) => {
+    if(!rows.length) return `<h2>${titulo}</h2><p class="vacio">Sin registros.</p>`;
+    const cols = Object.keys(rows[0]);
+    return `<h2>${titulo} <span class="cnt">${rows.length} registro(s)</span></h2>
+      ${nota?`<p class="nota">${nota}</p>`:''}
+      <table>
+        <thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r=>`<tr>${cols.map(c=>{
+          const v = r[c];
+          const num = typeof v==='number';
+          return `<td class="${num?'n':''}">${num?v.toLocaleString('es-MX'):esc(v)}</td>`;
+        }).join('')}</tr>`).join('')}</tbody>
+      </table>`;
+  };
+
+  const filtros = [
+    state.zona?`Zona: ${state.zona}`:null,
+    state.estatus?`Estatus: ${state.estatus}`:null,
+    state.depto?`Departamento: ${state.depto}`:null
+  ].filter(Boolean).join(' · ') || 'Sin filtros aplicados';
+
+  const cnt = s => DATA.filter(r=>r.estatus===s).length;
+  const pendInc = STORE.incidencias.filter(i=>i.estatus!=='Resuelto').length;
+
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>${TITULO_REPORTE}</title>
+<style>
+@page{size:A4 landscape;margin:12mm 10mm}
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;color:#1a2233;font-size:9.5pt;margin:0;padding:0}
+.hdr{border-bottom:3px solid #1f4e79;padding-bottom:8px;margin-bottom:14px}
+h1{font-size:17pt;color:#1f4e79;margin:0 0 3px}
+.meta{font-size:8.5pt;color:#5a6a85;line-height:1.5}
+.resumen{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+.rk{border:1px solid #c8d2e0;border-radius:5px;padding:7px 13px;min-width:96px;background:#f5f8fc}
+.rk .l{font-size:7.5pt;color:#5a6a85;text-transform:uppercase;letter-spacing:.4px}
+.rk .v{font-size:15pt;font-weight:700;color:#1f4e79;margin-top:2px}
+h2{font-size:11.5pt;color:#1f4e79;margin:20px 0 7px;padding-bottom:4px;border-bottom:1px solid #c8d2e0;page-break-after:avoid}
+h2 .cnt{font-size:8pt;font-weight:400;color:#5a6a85}
+.nota{font-size:8pt;color:#5a6a85;margin:0 0 6px}
+.vacio{font-size:9pt;color:#8a97ab;font-style:italic}
+table{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:8pt;page-break-inside:auto}
+thead{display:table-header-group}
+tr{page-break-inside:avoid}
+th{background:#1f4e79;color:#fff;padding:5px 6px;text-align:left;font-weight:600;font-size:7.5pt;text-transform:uppercase;letter-spacing:.3px}
+td{padding:4px 6px;border-bottom:1px solid #dfe6f0}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:nth-child(even){background:#f7fafd}
+.pie{margin-top:18px;padding-top:8px;border-top:1px solid #c8d2e0;font-size:7.5pt;color:#5a6a85;text-align:center}
+@media print{.noprint{display:none}}
+.noprint{position:fixed;top:10px;right:10px;background:#1f4e79;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:11pt;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+</style></head><body>
+<button class="noprint" onclick="window.print()">Imprimir / Guardar como PDF</button>
+<div class="hdr">
+  <h1>${TITULO_REPORTE}</h1>
+  <div class="meta">
+    KPI-AFI-01 · Coordinación de Activos Fijos y Control Vehicular<br>
+    Generado: ${stamp} · Perfil: ${(session.rol||'—').toUpperCase()} · ${filtros}
+  </div>
+</div>
+<div class="resumen">
+  <div class="rk"><div class="l">Unidades</div><div class="v">${DATA.length}</div></div>
+  <div class="rk"><div class="l">Circulación</div><div class="v">${cnt('CIRCULACION')}</div></div>
+  <div class="rk"><div class="l">Taller</div><div class="v">${cnt('TALLER')}</div></div>
+  <div class="rk"><div class="l">Resguardo</div><div class="v">${cnt('RESGUARDO')}</div></div>
+  <div class="rk"><div class="l">Siniestrado</div><div class="v">${cnt('SINIESTRADO')}</div></div>
+  <div class="rk"><div class="l">Incid. abiertas</div><div class="v">${pendInc}</div></div>
+</div>
+${tabla('Detalle de Flotilla', flot)}
+${tabla('Incidencias Vehiculares', inc)}
+${tabla('Consumo de Combustible por Período', comb, 'KM/L = Kilómetros recorridos ÷ Litros consumidos.')}
+${session.rol==='admin'?tabla('Bitácora de Cambios', bit, 'Últimos 400 movimientos registrados.'):''}
+<div class="pie">Documento generado automáticamente por el Tablero Ejecutivo de Control Vehicular · Uso interno</div>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  if(!w){ toast('El navegador bloqueó la ventana emergente. Habilite pop-ups para este sitio.','err'); return; }
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 700);
+  toast('Reporte abierto. Use “Guardar como PDF” en el diálogo de impresión.');
+}
+
 /* ============ FILTROS ============ */
 function applyFilters(){
   DATA = ALL.filter(r =>
@@ -1095,7 +1622,7 @@ function refrescarTodo(rebuild=true){
   pie('cZona', zc, 'zona');
   pie('cEstatus', ec, 'estatus');
   barDepto(); barServicio(); renderTable();
-  renderIncidencias(); renderBitacora(); renderAlert();
+  renderIncidencias(); renderBitacora(); renderFleetDetail(); renderCombustibles();
   const upd = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : hoyStr();
   $('#updateBadge').textContent = 'Actualizado: '+upd;
 }
@@ -1286,6 +1813,7 @@ function abrirConfig(){
   $('#s_conn').innerHTML = fbConnected?'<span style="color:var(--green)">● En línea</span>':'<span style="color:var(--red)">● Desconectado</span>';
   $('#s_units').textContent = STORE.unidades.length;
   $('#s_incs').textContent = STORE.incidencias.length;
+  $('#s_comb').textContent = STORE.combustibles.length;
   $('#s_updated').textContent = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : '—';
   $('#modalConfig').classList.add('open');
 }
@@ -1309,9 +1837,11 @@ async function importarJSON(file){
       const updates = {};
       updates[`${FB_ROOT}/unidades`] = null;
       updates[`${FB_ROOT}/incidencias`] = null;
+      updates[`${FB_ROOT}/combustibles`] = null;
       d.unidades.forEach(u=>{ if(u.id) updates[`${FB_ROOT}/unidades/${u.id}`] = u; });
       (d.incidencias||[]).forEach(i=>{ if(i.id) updates[`${FB_ROOT}/incidencias/${i.id}`] = i; });
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.1 };
+      (d.combustibles||[]).forEach(c=>{ if(c.id) updates[`${FB_ROOT}/combustibles/${c.id}`] = c; });
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.2 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
@@ -1328,7 +1858,7 @@ async function purgarBitacora(){
 }
 async function resetTodo(){
   if(!confirm('⚠ ¿BORRAR TODAS las unidades, incidencias y bitácora en Firebase? Esta acción no se puede deshacer.')) return;
-  if(!confirm('Confirmación final: se borrarán '+STORE.unidades.length+' unidades y '+STORE.incidencias.length+' incidencias. ¿Continuar?')) return;
+  if(!confirm('Confirmación final: se borrarán '+STORE.unidades.length+' unidades, '+STORE.incidencias.length+' incidencias y '+STORE.combustibles.length+' períodos de combustible. ¿Continuar?')) return;
   await fbDb.ref(FB_ROOT).remove();
   toast('Base de datos vacía. Use "Cargar datos iniciales" para reiniciar.', 'warn');
   cerrarModal('modalConfig');
@@ -1362,8 +1892,42 @@ $('#resetBtn').onclick  = ()=>{
   syncSelects(); applyFilters();
 };
 
-// Actualizar (fuerza re-render; los datos ya llegan por listener)
-$('#btnActualizar').onclick = ()=>{ refrescarTodo(); toast('Tablero actualizado.'); };
+// Actualizar: relee la base COMPLETA desde Firebase y re-renderiza todo (seguro de recarga)
+$('#btnActualizar').onclick = async ()=>{
+  const b = $('#btnActualizar');
+  const txt = b.textContent;
+  b.disabled = true; b.textContent = 'Actualizando…';
+  try{
+    const snap = await fbDb.ref(FB_ROOT).get();
+    const d = snap.val() || {};
+    STORE.unidades    = d.unidades    ? Object.values(d.unidades)    : [];
+    STORE.incidencias = d.incidencias ? Object.values(d.incidencias) : [];
+    STORE.combustibles= d.combustibles? Object.values(d.combustibles): [];
+    STORE.bitacora    = d.bitacora    ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
+    STORE.meta        = d.meta || STORE.meta;
+    refrescarTodo();
+    checkSeedBox();
+    toast(`Tablero actualizado · ${STORE.unidades.length} unidades · ${STORE.incidencias.length} incidencias · ${STORE.combustibles.length} períodos.`);
+  }catch(e){
+    toast('No se pudo recargar desde Firebase: '+e.message,'err');
+  }finally{
+    b.disabled = false; b.textContent = txt;
+  }
+};
+
+// Exportación
+$('#btnPDF').onclick = exportarPDF;
+$('#btnXLS').onclick = exportarExcel;
+
+// Combustibles
+$('#combUnidad').onchange = e=>{ state.combVeh = e.target.value; renderCombustibles(); };
+$('#btnNuevoPeriodo').onclick = ()=>{ if(state.combVeh) abrirModalCombustible(state.combVeh); };
+$('#btnGuardarComb').onclick = guardarCombustible;
+$('#btnEliminarComb').onclick = eliminarCombustible;
+['cFechaIni','cFechaFin','cKm','cLitros'].forEach(id=>{
+  document.addEventListener('input', e=>{ if(e.target.id===id) calcCombPreview(); });
+  document.addEventListener('change', e=>{ if(e.target.id===id) calcCombPreview(); });
+});
 
 // Nueva unidad
 $('#btnNuevaUnidad').onclick = ()=>abrirModalUnidad(null);
