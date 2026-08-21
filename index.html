@@ -77,6 +77,65 @@ tbody tr:hover{background:var(--panel2)}
 .bad{color:var(--red);font-weight:700}.warn{color:var(--orange);font-weight:600}.ok{color:var(--green)}
 .tablewrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px}
 .legend-note{color:var(--muted);font-size:11px;margin-top:10px;line-height:1.6}
+/* ===== TAREAS ===== */
+.tasks-wrap{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel2)}
+.tasks-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.tasks-head .cnt{font-size:11px;color:var(--muted)}
+.task-row{display:grid;grid-template-columns:auto 1fr 150px auto;gap:8px;align-items:center;margin-bottom:7px}
+@media(max-width:620px){.task-row{grid-template-columns:auto 1fr;grid-auto-rows:auto}.task-row .t-date,.task-row .t-del{grid-column:2}}
+.task-row input[type="text"],.task-row input[type="date"]{padding:6px 9px;font-size:12.5px}
+.task-row.done input[type="text"]{text-decoration:line-through;opacity:.55}
+.chk{width:19px;height:19px;border-radius:5px;border:2px solid var(--line);background:var(--panel);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:.15s;padding:0}
+.chk:hover{border-color:var(--green)}
+.chk.on{background:var(--green);border-color:var(--green);color:#062018;font-weight:800;font-size:12px}
+.t-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:5px;line-height:1}
+.t-del:hover{color:var(--red);background:rgba(239,92,110,.12)}
+.tasks-empty{color:var(--muted);font-size:12px;padding:10px 0;text-align:center}
+.task-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(63,169,245,.14);border:1px solid rgba(63,169,245,.35);color:#9ed0f9;padding:1px 7px;border-radius:5px;font-size:10.5px;margin:1px 0}
+.task-chip.done{background:rgba(57,192,138,.14);border-color:rgba(57,192,138,.35);color:#7fe0b6;text-decoration:line-through;opacity:.75}
+.task-chip.late{background:rgba(239,92,110,.14);border-color:rgba(239,92,110,.4);color:#ff9aa6}
+
+/* ===== CALENDARIO ===== */
+.cal-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.cal-title{font-size:14px;font-weight:700;min-width:190px}
+.cal-nav{display:flex;gap:4px}
+.cal-nav button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);width:32px;height:32px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1}
+.cal-nav button:hover{border-color:var(--accent);color:#fff}
+.cal-switch{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.cal-switch button{background:var(--panel2);border:none;color:var(--muted);padding:7px 15px;cursor:pointer;font-size:12.5px;font-weight:600}
+.cal-switch button.active{background:var(--accent);color:#fff}
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-left:auto}
+.cal-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:middle}
+
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+@media(max-width:900px){.cal-week{grid-template-columns:1fr}}
+.wk-day{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:150px;display:flex;flex-direction:column}
+.wk-day.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.wk-day .dh{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:2px}
+.wk-day .dn{font-size:20px;font-weight:700;line-height:1;margin-bottom:9px}
+.wk-day.today .dn{color:var(--accent)}
+.wk-task{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:7px;padding:7px 8px;margin-bottom:6px;font-size:11.5px;cursor:pointer;transition:.12s}
+.wk-task:hover{border-color:var(--accent);transform:translateX(2px)}
+.wk-task.done{border-left-color:var(--green);opacity:.68}
+.wk-task.done .wt-txt{text-decoration:line-through}
+.wk-task.late{border-left-color:var(--red)}
+.wt-top{display:flex;align-items:flex-start;gap:6px;margin-bottom:3px}
+.wt-txt{flex:1;line-height:1.35;word-break:break-word;white-space:normal}
+.wt-meta{font-size:10px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.wt-unit{font-weight:700;color:#9ed0f9}
+
+.cal-month{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.mo-head{text-align:center;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700;padding:6px 0}
+.mo-day{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px;min-height:96px;display:flex;flex-direction:column;overflow:hidden}
+.mo-day.out{opacity:.32}
+.mo-day.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.mo-day .dn{font-size:12px;font-weight:700;margin-bottom:4px;color:var(--muted)}
+.mo-day.today .dn{color:var(--accent)}
+.mo-more{font-size:10px;color:var(--muted);margin-top:2px;cursor:pointer}
+.mo-more:hover{color:var(--accent)}
+.cal-empty{text-align:center;color:var(--muted);padding:30px;font-size:13px}
+.cal-sinfecha{margin-top:14px;padding:11px 14px;background:rgba(240,138,60,.08);border:1px solid rgba(240,138,60,.3);border-radius:9px;font-size:12px}
+
 .comb-empty{text-align:center;color:var(--muted);padding:34px 20px;font-size:13px}
 .comb-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .comb-sel{min-width:200px;max-width:260px}
@@ -278,6 +337,33 @@ tbody tr:hover{background:var(--panel2)}
   </div>
 </div>
 
+<!-- ============ CALENDARIO DE TAREAS (admin + auxiliar) ============ -->
+<div class="card col-12 hidden" id="cardCalendario">
+  <h3>Calendario de Tareas
+    <span class="hint" style="font-weight:400">· seguimiento de tareas derivadas de incidencias vehiculares</span>
+    <span id="calBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
+  </h3>
+  <div class="cal-toolbar">
+    <div class="cal-switch">
+      <button data-cal="semana" class="active">Semanal</button>
+      <button data-cal="mes">Mensual</button>
+    </div>
+    <div class="cal-nav">
+      <button id="calPrev" title="Anterior">‹</button>
+      <button id="calHoy" title="Hoy" style="width:auto;padding:0 12px;font-size:12px">Hoy</button>
+      <button id="calNext" title="Siguiente">›</button>
+    </div>
+    <div class="cal-title" id="calTitle">—</div>
+    <div class="cal-legend">
+      <span><i style="background:var(--accent)"></i>Pendiente</span>
+      <span><i style="background:var(--red)"></i>Vencida</span>
+      <span><i style="background:var(--green)"></i>Cumplida</span>
+    </div>
+  </div>
+  <div id="calBody"></div>
+  <div id="calSinFecha"></div>
+</div>
+
 <!-- ============ COMBUSTIBLES ============ -->
 <div class="card col-12">
   <h3>Control de Combustibles
@@ -446,6 +532,18 @@ tbody tr:hover{background:var(--panel2)}
         <textarea id="iNotas" rows="3" maxlength="500" placeholder="Descripción breve de la incidencia"></textarea>
         <div class="field-msg" id="e_iNotas"></div>
       </div>
+      <div class="full">
+        <label>Tareas de seguimiento</label>
+        <div class="tasks-wrap">
+          <div class="tasks-head">
+            <span class="cnt" id="tCount">0 de 10 tareas</span>
+            <button class="btn btn-success" id="btnAddTask" style="font-size:12px;padding:5px 12px">+ Agregar tarea</button>
+          </div>
+          <div id="taskList"></div>
+          <div class="field-msg" id="e_tareas"></div>
+          <div class="hint" style="margin:6px 0 0">Marque la casilla al cumplir. Las tareas con fecha aparecen en el calendario interno.</div>
+        </div>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-danger hidden" id="btnEliminarInc">Eliminar</button>
@@ -561,9 +659,9 @@ tbody tr:hover{background:var(--panel2)}
 
 /* ============ CONFIGURACIÓN — MODIFIQUE SUS CÓDIGOS AQUÍ ============ */
 const AUTH_CODES = {
-  admin:    '0386',    // <-- Código del Administrador (Lic. Marcos)
-  auxiliar: '0387', // <-- Código del Auxiliar
-  gerencia: '0388' // <-- Código de Gerencia (solo lectura)
+  admin:    'MAXC-2026',    // <-- Código del Administrador (Lic. Marcos)
+  auxiliar: 'AUX-VEH-2026', // <-- Código del Auxiliar
+  gerencia: 'GER-VIEW-2026' // <-- Código de Gerencia (solo lectura)
 };
 
 const firebaseConfig = {
@@ -861,6 +959,7 @@ function aplicarPermisos(){
   $('#btnNuevaUnidad').classList.toggle('hidden', !esAdmin);
   $('#btnConfig').classList.toggle('hidden', !esAdmin);
   $('#cardBitacora').classList.toggle('hidden', !esAdmin);
+  $('#cardCalendario').classList.toggle('hidden', !esEditor);
 }
 
 /* ============ RENDER: KPIs ============ */
@@ -1064,7 +1163,7 @@ function renderTable(){
 
 /* ============ INCIDENCIAS ============ */
 function renderIncidencias(){
-  const cols = ['FECHA','UNIDAD','TIPO','ESTATUS','CHOFER','DEPTO','ID/LIGA','NOTAS',''];
+  const cols = ['FECHA','UNIDAD','TIPO','ESTATUS','TAREAS','CHOFER','DEPTO','ID/LIGA','NOTAS',''];
   $('#tblInc thead').innerHTML = '<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
   let incs = [...STORE.incidencias];
   if(state.incTab==='pend') incs = incs.filter(i=>i.estatus==='Pendiente');
@@ -1094,6 +1193,10 @@ function renderIncidencias(){
       <td><b>${i.unidad}</b></td>
       <td><span class="tag ${tCls}">${i.tipo}</span></td>
       <td><span class="tag ${sCls}">${i.estatus}</span></td>
+      <td>${(()=>{ const ts=tareasDe(i); if(!ts.length) return '<span style="color:var(--muted)">—</span>';
+        const ok=ts.filter(t=>t.hecha).length, late=ts.filter(esVencida).length;
+        const col = ok===ts.length?'var(--green)':late?'var(--red)':'var(--accent)';
+        return `<b style="color:${col}">${ok}/${ts.length}</b>${late?` <span style="color:var(--red);font-size:10px">${late} venc.</span>`:''}`; })()}</td>
       <td>${i.chofer||'—'}</td>
       <td>${i.depto||'—'}</td>
       <td>${liga}</td>
@@ -1135,6 +1238,204 @@ function renderBitacora(){
     </tr>`;
   }).join('');
 }
+
+/* ============ TAREAS DE INCIDENCIA ============ */
+const MAX_TAREAS = 10;
+let taskDraft = [];   // borrador de tareas en el modal abierto
+
+/* Firebase devuelve arrays densos como arrays y dispersos como objetos: normalizamos siempre */
+function tareasDe(inc){
+  if(!inc || !inc.tareas) return [];
+  const t = Array.isArray(inc.tareas) ? inc.tareas : Object.values(inc.tareas);
+  return t.filter(x=>x && x.texto);
+}
+/* Todas las tareas del sistema, aplanadas con su contexto de incidencia */
+function todasLasTareas(){
+  const out = [];
+  STORE.incidencias.forEach(inc=>{
+    tareasDe(inc).forEach(t=>out.push({
+      ...t,
+      incId: inc.id, unidad: inc.unidad, tipo: inc.tipo,
+      chofer: inc.chofer, depto: inc.depto, incEstatus: inc.estatus
+    }));
+  });
+  return out;
+}
+const hoyISO = () => { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const esVencida = t => !t.hecha && t.fecha && t.fecha < hoyISO();
+
+function renderTaskDraft(){
+  const cont = $('#taskList');
+  $('#tCount').textContent = `${taskDraft.length} de ${MAX_TAREAS} tareas`;
+  $('#btnAddTask').disabled = taskDraft.length >= MAX_TAREAS;
+  if(taskDraft.length===0){
+    cont.innerHTML = '<div class="tasks-empty">Sin tareas. Use “+ Agregar tarea” para registrar acciones de seguimiento.</div>';
+    return;
+  }
+  cont.innerHTML = taskDraft.map((t,i)=>`
+    <div class="task-row ${t.hecha?'done':''}" data-i="${i}">
+      <button type="button" class="chk ${t.hecha?'on':''}" data-chk="${i}" title="${t.hecha?'Marcar pendiente':'Marcar cumplida'}">${t.hecha?'✓':''}</button>
+      <input type="text" data-txt="${i}" maxlength="140" placeholder="Descripción de la tarea" value="${(t.texto||'').replace(/"/g,'&quot;')}">
+      <input type="date" class="t-date" data-fch="${i}" value="${t.fecha||''}" title="Fecha compromiso (opcional)">
+      <button type="button" class="t-del" data-del="${i}" title="Eliminar tarea">×</button>
+    </div>`).join('');
+
+  cont.querySelectorAll('[data-chk]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.chk;
+    taskDraft[i].hecha = !taskDraft[i].hecha;
+    taskDraft[i].completadoPor = taskDraft[i].hecha ? session.rol : null;
+    taskDraft[i].completadoAt  = taskDraft[i].hecha ? nowISO() : null;
+    renderTaskDraft();
+  });
+  cont.querySelectorAll('[data-txt]').forEach(inp=>inp.oninput=()=>{ taskDraft[+inp.dataset.txt].texto = inp.value; });
+  cont.querySelectorAll('[data-fch]').forEach(inp=>inp.onchange=()=>{ taskDraft[+inp.dataset.fch].fecha = inp.value || null; });
+  cont.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.del;
+    if(taskDraft[i].texto && !confirm('¿Eliminar esta tarea?')) return;
+    taskDraft.splice(i,1); renderTaskDraft();
+  });
+}
+
+function addTaskDraft(){
+  if(taskDraft.length >= MAX_TAREAS){ toast(`Máximo ${MAX_TAREAS} tareas por incidencia.`,'warn'); return; }
+  taskDraft.push({ id:uid(), texto:'', hecha:false, fecha:null, creadoPor:session.rol, creadoAt:nowISO(), completadoPor:null, completadoAt:null });
+  renderTaskDraft();
+  setTimeout(()=>{ const ins=$('#taskList').querySelectorAll('[data-txt]'); if(ins.length) ins[ins.length-1].focus(); },40);
+}
+
+function validaTareas(){
+  const limpias = taskDraft.filter(t=>(t.texto||'').trim());
+  if(limpias.length > MAX_TAREAS) return {msg:`Máximo ${MAX_TAREAS} tareas por incidencia.`};
+  for(const t of limpias){
+    if(!RX.notas.test(t.texto)) return {msg:'Las tareas no permiten los caracteres < ni >.'};
+    if(t.texto.trim().length < 3) return {msg:'Cada tarea debe tener al menos 3 caracteres.'};
+    if(t.fecha && isNaN(new Date(t.fecha+'T00:00:00').getTime())) return {msg:'Una de las tareas tiene una fecha inválida.'};
+  }
+  return null;
+}
+
+/* Alternar cumplimiento desde el calendario — escribe directo a Firebase */
+window.toggleTareaCal = async function(incId, tareaId, ev){
+  if(ev) ev.stopPropagation();
+  const inc = STORE.incidencias.find(x=>x.id===incId); if(!inc) return;
+  const arr = tareasDe(inc);
+  const t = arr.find(x=>x.id===tareaId); if(!t) return;
+  t.hecha = !t.hecha;
+  t.completadoPor = t.hecha ? session.rol : null;
+  t.completadoAt  = t.hecha ? nowISO() : null;
+  const ok = await fbWriteIncidencia({...inc, tareas:arr, updatedAt:nowISO()});
+  if(ok){
+    await logChange(inc.unidad, t.hecha?'TAREA_OK':'TAREA_REABIERTA', 'tarea', t.hecha?'pendiente':'cumplida', t.texto.slice(0,80));
+    toast(t.hecha?'Tarea marcada como cumplida.':'Tarea reabierta.');
+  }
+};
+window.abrirIncDesdeCal = function(incId){ editarIncidencia(incId); };
+
+/* ============ CALENDARIO INTERNO ============ */
+let calRef = new Date();          // fecha ancla de navegación
+let calVista = 'semana';
+const DIAS_L = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const DIAS_C = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const MESES   = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+const toISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function lunesDe(d){
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dow = (x.getDay()+6)%7;          // 0=lunes … 6=domingo
+  x.setDate(x.getDate()-dow);
+  return x;
+}
+const escapa = v => String(v??'').replace(/[<>&"]/g, m=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[m]));
+
+function renderCalendario(){
+  const card = $('#cardCalendario');
+  const puede = session.rol==='admin' || session.rol==='auxiliar';
+  card.classList.toggle('hidden', !puede);
+  if(!puede) return;
+
+  const tareas = todasLasTareas();
+  const conFecha = tareas.filter(t=>t.fecha);
+  const sinFecha = tareas.filter(t=>!t.fecha && !t.hecha);
+  const pend = tareas.filter(t=>!t.hecha).length;
+  const venc = tareas.filter(esVencida).length;
+  const hechas = tareas.filter(t=>t.hecha).length;
+  $('#calBadge').innerHTML = `<b style="color:var(--accent)">${pend}</b> pendientes · <b style="color:var(--red)">${venc}</b> vencidas · <b style="color:var(--green)">${hechas}</b> cumplidas`;
+
+  if(calVista==='semana') renderSemana(conFecha); else renderMes(conFecha);
+
+  const sf = $('#calSinFecha');
+  sf.innerHTML = sinFecha.length
+    ? `<div class="cal-sinfecha"><b style="color:var(--orange)">${sinFecha.length} tarea(s) pendiente(s) sin fecha asignada:</b> ${
+        sinFecha.slice(0,8).map(t=>`<span class="task-chip" style="cursor:pointer" onclick="abrirIncDesdeCal('${t.incId}')">${escapa(t.unidad)} · ${escapa(t.texto.slice(0,45))}</span>`).join(' ')
+      }${sinFecha.length>8?` <span style="color:var(--muted)">y ${sinFecha.length-8} más…</span>`:''}</div>`
+    : '';
+}
+
+function renderSemana(tareas){
+  const ini = lunesDe(calRef);
+  const fin = new Date(ini); fin.setDate(fin.getDate()+6);
+  $('#calTitle').textContent = ini.getMonth()===fin.getMonth()
+    ? `${ini.getDate()} – ${fin.getDate()} ${MESES[fin.getMonth()]} ${fin.getFullYear()}`
+    : `${ini.getDate()} ${MESES[ini.getMonth()].slice(0,3)} – ${fin.getDate()} ${MESES[fin.getMonth()].slice(0,3)} ${fin.getFullYear()}`;
+
+  const hoy = hoyISO();
+  let html = '<div class="cal-week">';
+  for(let i=0;i<7;i++){
+    const d = new Date(ini); d.setDate(d.getDate()+i);
+    const iso = toISO(d);
+    const delDia = tareas.filter(t=>t.fecha===iso)
+      .sort((a,b)=>(a.hecha?1:0)-(b.hecha?1:0) || a.unidad.localeCompare(b.unidad));
+    html += `<div class="wk-day ${iso===hoy?'today':''}">
+      <div class="dh">${DIAS_L[i]}</div>
+      <div class="dn">${d.getDate()}</div>
+      ${delDia.length===0?'<div style="color:var(--muted);font-size:11px">Sin tareas</div>':delDia.map(t=>`
+        <div class="wk-task ${t.hecha?'done':esVencida(t)?'late':''}" onclick="abrirIncDesdeCal('${t.incId}')" title="Clic para abrir la incidencia">
+          <div class="wt-top">
+            <button type="button" class="chk ${t.hecha?'on':''}" style="width:16px;height:16px;font-size:10px"
+              onclick="toggleTareaCal('${t.incId}','${t.id}',event)" title="${t.hecha?'Marcar pendiente':'Marcar cumplida'}">${t.hecha?'✓':''}</button>
+            <span class="wt-txt">${escapa(t.texto)}</span>
+          </div>
+          <div class="wt-meta"><span class="wt-unit">${escapa(t.unidad)}</span><span>${escapa(t.tipo)}</span>${esVencida(t)?'<span style="color:var(--red);font-weight:700">VENCIDA</span>':''}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+  $('#calBody').innerHTML = html + '</div>';
+}
+
+function renderMes(tareas){
+  const y = calRef.getFullYear(), m = calRef.getMonth();
+  $('#calTitle').textContent = `${MESES[m]} ${y}`;
+  const primero = new Date(y,m,1);
+  const ini = lunesDe(primero);
+  const hoy = hoyISO();
+
+  let html = '<div class="cal-month">' + DIAS_C.map(d=>`<div class="mo-head">${d}</div>`).join('');
+  const cur = new Date(ini);
+  for(let c=0;c<42;c++){
+    const iso = toISO(cur);
+    const fuera = cur.getMonth()!==m;
+    const delDia = tareas.filter(t=>t.fecha===iso)
+      .sort((a,b)=>(a.hecha?1:0)-(b.hecha?1:0));
+    const vis = delDia.slice(0,3), resto = delDia.length-vis.length;
+    html += `<div class="mo-day ${fuera?'out':''} ${iso===hoy?'today':''}">
+      <div class="dn">${cur.getDate()}</div>
+      ${vis.map(t=>`<span class="task-chip ${t.hecha?'done':esVencida(t)?'late':''}" style="cursor:pointer"
+          onclick="abrirIncDesdeCal('${t.incId}')" title="${escapa(t.unidad)} · ${escapa(t.texto)}">${escapa(t.unidad)}: ${escapa(t.texto.slice(0,16))}${t.texto.length>16?'…':''}</span>`).join('')}
+      ${resto>0?`<div class="mo-more" onclick="irASemana('${iso}')">+${resto} más</div>`:''}
+    </div>`;
+    cur.setDate(cur.getDate()+1);
+    // Cerrar solo al terminar una semana completa, una vez superado el mes
+    if(c%7===6 && cur.getMonth()!==m && c>=27) break;
+  }
+  $('#calBody').innerHTML = html + '</div>';
+}
+
+window.irASemana = function(iso){
+  calRef = new Date(iso+'T00:00:00');
+  calVista = 'semana';
+  $$('[data-cal]').forEach(b=>b.classList.toggle('active', b.dataset.cal==='semana'));
+  renderCalendario();
+};
 
 /* ============ COMBUSTIBLES ============ */
 const money = n => n==null||isNaN(n)?'—':'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -1449,8 +1750,17 @@ function datosReporte(){
   const inc = [...STORE.incidencias].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).map(i=>({
     'FECHA': i.fecha, 'UNIDAD': i.unidad, 'TIPO': i.tipo, 'ESTATUS': i.estatus,
     'CHOFER': i.chofer||'', 'DEPARTAMENTO': i.depto||'',
-    'PLATAFORMA': i.tipoLiga||'', 'ID / LIGA': i.idLiga||'', 'NOTAS': i.notas||''
+    'PLATAFORMA': i.tipoLiga||'', 'ID / LIGA': i.idLiga||'', 'NOTAS': i.notas||'',
+    'TAREAS': (()=>{ const t=tareasDe(i); return t.length?`${t.filter(x=>x.hecha).length}/${t.length} cumplidas`:''; })()
   }));
+  const tar = todasLasTareas()
+    .sort((a,b)=>(a.fecha||'9999').localeCompare(b.fecha||'9999'))
+    .map(t=>({
+      'FECHA COMPROMISO': t.fecha||'Sin fecha', 'UNIDAD': t.unidad, 'TAREA': t.texto,
+      'ESTADO': t.hecha?'Cumplida':(esVencida(t)?'VENCIDA':'Pendiente'),
+      'TIPO INCIDENCIA': t.tipo, 'DEPARTAMENTO': t.depto||'',
+      'CUMPLIDA POR': t.completadoPor||'', 'CREADA POR': t.creadoPor||''
+    }));
   const comb = [];
   [...new Set(STORE.combustibles.map(c=>c.unidad))].sort().forEach(v=>{
     periodosDe(v).forEach(c=>comb.push({
@@ -1464,13 +1774,13 @@ function datosReporte(){
     'FECHA': fechaCorta(b.ts), 'UNIDAD': b.unidad, 'ACCIÓN': b.accion,
     'CAMPO': b.campo, 'ANTES': b.antes, 'DESPUÉS': b.despues, 'ROL': b.rol
   }));
-  return {flot, inc, comb, bit};
+  return {flot, inc, comb, bit, tar};
 }
 
 function exportarExcel(){
   try{
     if(typeof XLSX==='undefined'){ toast('La librería de Excel no cargó. Verifique su conexión.','err'); return; }
-    const {flot, inc, comb, bit} = datosReporte();
+    const {flot, inc, comb, bit, tar} = datosReporte();
     const wb = XLSX.utils.book_new();
     const stamp = new Date().toLocaleString('es-MX');
 
@@ -1487,6 +1797,7 @@ function exportarExcel(){
     addSheet('Flotilla',     'Detalle de flotilla · estatus y servicio', flot);
     addSheet('Incidencias',  'Incidencias vehiculares registradas',      inc);
     addSheet('Combustibles', 'Consumo de combustible por período',       comb);
+    if(session.rol!=='gerencia') addSheet('Tareas','Tareas de seguimiento por incidencia', tar);
     if(session.rol==='admin') addSheet('Bitácora','Trazabilidad de cambios (últimos 400)', bit);
 
     XLSX.writeFile(wb, `Reporte-Tablero-Vehicular-${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -1495,7 +1806,7 @@ function exportarExcel(){
 }
 
 function exportarPDF(){
-  const {flot, inc, comb, bit} = datosReporte();
+  const {flot, inc, comb, bit, tar} = datosReporte();
   const stamp = new Date().toLocaleString('es-MX');
   const esc = v => String(v??'').replace(/[<>&]/g, m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
 
@@ -1570,6 +1881,7 @@ tbody tr:nth-child(even){background:#f7fafd}
 ${tabla('Detalle de Flotilla', flot)}
 ${tabla('Incidencias Vehiculares', inc)}
 ${tabla('Consumo de Combustible por Período', comb, 'KM/L = Kilómetros recorridos ÷ Litros consumidos.')}
+${session.rol!=='gerencia'?tabla('Tareas de Seguimiento', tar, 'Ordenadas por fecha compromiso. Las tareas sin fecha aparecen al final.'):''}
 ${session.rol==='admin'?tabla('Bitácora de Cambios', bit, 'Últimos 400 movimientos registrados.'):''}
 <div class="pie">Documento generado automáticamente por el Tablero Ejecutivo de Control Vehicular · Uso interno</div>
 </body></html>`;
@@ -1622,7 +1934,7 @@ function refrescarTodo(rebuild=true){
   pie('cZona', zc, 'zona');
   pie('cEstatus', ec, 'estatus');
   barDepto(); barServicio(); renderTable();
-  renderIncidencias(); renderBitacora(); renderFleetDetail(); renderCombustibles();
+  renderIncidencias(); renderBitacora(); renderFleetDetail(); renderCombustibles(); renderCalendario();
   const upd = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : hoyStr();
   $('#updateBadge').textContent = 'Actualizado: '+upd;
 }
@@ -1730,6 +2042,9 @@ window.abrirModalIncidencia = function(veh){
   $('#iTipoLiga').value = '';
   $('#iIdLiga').value = '';
   $('#iNotas').value = '';
+  taskDraft = [];
+  renderTaskDraft();
+  $('#e_tareas').textContent = '';
   $('#btnEliminarInc').classList.add('hidden');
   $('#modalInc').classList.add('open');
 };
@@ -1749,6 +2064,9 @@ window.editarIncidencia = function(id){
   $('#iTipoLiga').value = i.tipoLiga||'';
   $('#iIdLiga').value = i.idLiga||'';
   $('#iNotas').value = i.notas||'';
+  taskDraft = tareasDe(i).map(t=>({...t}));
+  renderTaskDraft();
+  $('#e_tareas').textContent = '';
   $('#btnEliminarInc').classList.toggle('hidden', session.rol!=='admin');
   $('#modalInc').classList.add('open');
 };
@@ -1772,6 +2090,18 @@ async function guardarIncidencia(){
     toast('Corrija los campos marcados.', 'err');
     return;
   }
+  const errT = validaTareas();
+  if(errT){ $('#e_tareas').textContent = errT.msg; toast(errT.msg,'err'); return; }
+  inc.tareas = taskDraft.filter(t=>(t.texto||'').trim()).map(t=>({
+    id: t.id||uid(),
+    texto: t.texto.trim(),
+    hecha: !!t.hecha,
+    fecha: t.fecha||null,
+    creadoPor: t.creadoPor||session.rol,
+    creadoAt: t.creadoAt||nowISO(),
+    completadoPor: t.hecha?(t.completadoPor||session.rol):null,
+    completadoAt: t.hecha?(t.completadoAt||nowISO()):null
+  }));
   if(editingIncId){
     const orig = STORE.incidencias.find(x=>x.id===editingIncId);
     if(!orig) return;
@@ -1780,15 +2110,26 @@ async function guardarIncidencia(){
     if(ok){
       const diffs = [];
       Object.keys(inc).forEach(k=>{
+        if(k==='tareas') return;
         if(String(orig[k]??'') !== String(inc[k]??'')) diffs.push({k, antes:orig[k], despues:inc[k]});
       });
       for(const d of diffs) await logChange(orig.unidad,'EDIT_INC', 'inc.'+d.k, d.antes, d.despues);
-      toast('Incidencia actualizada.');
+      const antesT = tareasDe(orig), despT = inc.tareas;
+      if(antesT.length!==despT.length || JSON.stringify(antesT.map(t=>[t.id,t.texto,t.hecha,t.fecha]))!==JSON.stringify(despT.map(t=>[t.id,t.texto,t.hecha,t.fecha]))){
+        await logChange(orig.unidad,'EDIT_TAREAS','tareas',
+          `${antesT.length} tarea(s) · ${antesT.filter(t=>t.hecha).length} cumplidas`,
+          `${despT.length} tarea(s) · ${despT.filter(t=>t.hecha).length} cumplidas`);
+      }
+      toast(`Incidencia actualizada${despT.length?` · ${despT.filter(t=>t.hecha).length}/${despT.length} tareas cumplidas`:''}.`);
     }
   } else {
     const nueva = { id:uid(), ...inc, createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO() };
     const ok = await fbWriteIncidencia(nueva);
-    if(ok){ await logChange(inc.unidad, 'ALTA_INC', inc.tipo, '', inc.notas.slice(0,80)); toast('Incidencia registrada para '+inc.unidad); }
+    if(ok){
+      await logChange(inc.unidad, 'ALTA_INC', inc.tipo, '', inc.notas.slice(0,80));
+      if(inc.tareas.length) await logChange(inc.unidad,'ALTA_TAREAS','tareas','',`${inc.tareas.length} tarea(s) creada(s)`);
+      toast(`Incidencia registrada para ${inc.unidad}${inc.tareas.length?` con ${inc.tareas.length} tarea(s)`:''}.`);
+    }
   }
   cerrarModal('modalInc');
 }
@@ -1918,6 +2259,28 @@ $('#btnActualizar').onclick = async ()=>{
 // Exportación
 $('#btnPDF').onclick = exportarPDF;
 $('#btnXLS').onclick = exportarExcel;
+
+// Tareas
+$('#btnAddTask').onclick = addTaskDraft;
+
+// Calendario
+$$('[data-cal]').forEach(b=>b.onclick=()=>{
+  $$('[data-cal]').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  calVista = b.dataset.cal;
+  renderCalendario();
+});
+$('#calPrev').onclick = ()=>{
+  if(calVista==='semana') calRef.setDate(calRef.getDate()-7);
+  else calRef = new Date(calRef.getFullYear(), calRef.getMonth()-1, 1);
+  renderCalendario();
+};
+$('#calNext').onclick = ()=>{
+  if(calVista==='semana') calRef.setDate(calRef.getDate()+7);
+  else calRef = new Date(calRef.getFullYear(), calRef.getMonth()+1, 1);
+  renderCalendario();
+};
+$('#calHoy').onclick = ()=>{ calRef = new Date(); renderCalendario(); };
 
 // Combustibles
 $('#combUnidad').onchange = e=>{ state.combVeh = e.target.value; renderCombustibles(); };
