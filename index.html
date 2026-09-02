@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tablero Ejecutivo · Control Vehicular · KPI-AFI-01 v2.2</title>
+<title>Control Vehicular · KPI-AFI-01 v2.4</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -77,6 +77,40 @@ tbody tr:hover{background:var(--panel2)}
 .bad{color:var(--red);font-weight:700}.warn{color:var(--orange);font-weight:600}.ok{color:var(--green)}
 .tablewrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px}
 .legend-note{color:var(--muted);font-size:11px;margin-top:10px;line-height:1.6}
+
+/* ===== ASIGNACIÓN / CHECKLIST ===== */
+.modal.wide{max-width:860px}
+.sec-title{font-size:12.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;
+  margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px}
+.sec-title:first-of-type{margin-top:4px}
+.sec-title .n{background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;
+  align-items:center;justify-content:center;font-size:11px;flex:0 0 auto}
+.sec-title .sub{margin-left:auto;font-size:10.5px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+.asig-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:6px;flex-wrap:wrap}
+.asig-tabs .tab{padding:7px 13px;font-size:12px}
+.sec-pane{display:none}
+.sec-pane.active{display:block}
+.ok-badge{background:rgba(57,192,138,.16);color:#5fe0ab;border:1px solid rgba(57,192,138,.4)}
+.no-badge{background:rgba(239,92,110,.16);color:#ff8a98;border:1px solid rgba(239,92,110,.4)}
+.sel-ok{border-color:rgba(57,192,138,.55)!important}
+.sel-warn{border-color:rgba(245,196,81,.55)!important}
+.sel-bad{border-color:rgba(239,92,110,.55)!important}
+.foto-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px}
+.foto-item{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 11px}
+.foto-item label{font-size:10.5px}
+.foto-item input{font-size:12px;padding:6px 8px}
+.foto-item .prev{margin-top:7px;font-size:10.5px}
+.foto-item .prev a{color:var(--accent);word-break:break-all}
+.km-alert{border-radius:8px;padding:9px 12px;margin-top:6px;font-size:12px;border:1px solid var(--line);background:var(--panel2)}
+.km-alert.ok{border-color:rgba(57,192,138,.45);color:#7fe0b6}
+.km-alert.warn{border-color:rgba(245,196,81,.45);color:var(--gold)}
+.km-alert.bad{border-color:rgba(239,92,110,.45);color:#ff9aa6}
+.asig-state{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.st-abierta{background:rgba(63,169,245,.16);color:#7cc4f8}
+.st-cerrada{background:rgba(57,192,138,.16);color:#5fe0ab}
+.confirm-box{background:rgba(63,169,245,.08);border:1px solid rgba(63,169,245,.35);border-radius:9px;padding:11px 13px;margin-top:8px;font-size:12px;line-height:1.55}
+.confirm-box label{display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:0;font-size:12.5px;color:var(--txt);margin:8px 0 0;cursor:pointer;font-weight:500}
+
 /* ===== TAREAS ===== */
 .tasks-wrap{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel2)}
 .tasks-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
@@ -228,7 +262,7 @@ tbody tr:hover{background:var(--panel2)}
 <!-- ============ LOGIN OVERLAY ============ -->
 <div class="overlay" id="loginOverlay">
   <div class="login-box">
-    <h2>Acceso al Tablero de Control Vehicular</h2>
+    <h2>Acceso a Control Vehicular</h2>
     <div class="sub">KPI-AFI-01 · Coordinación de Activos Fijos y Control Vehicular</div>
     <div class="login-role-btns">
       <button class="role-btn" data-r="admin">Administrador<small>Lic. Marcos</small></button>
@@ -248,7 +282,7 @@ tbody tr:hover{background:var(--panel2)}
 <!-- ============ HEADER ============ -->
 <header>
   <div>
-    <h1>Tablero Ejecutivo · Control Vehicular</h1>
+    <h1>Control Vehicular</h1>
     <div class="sub">KPI-AFI-01 · Activos Fijos 2025-2026 · Coordinación de Activos Fijos y Control Vehicular</div>
   </div>
   <div class="toolbar">
@@ -610,6 +644,287 @@ tbody tr:hover{background:var(--panel2)}
   </div>
 </div>
 
+<!-- ============ MODAL: ASIGNACIÓN / DEVOLUCIÓN (CHECKLIST PHVA) ============ -->
+<div class="modal-overlay" id="modalAsignacion">
+  <div class="modal wide">
+    <h3 id="mAsigTitle">Asignación / Checklist</h3>
+    <div class="modal-sub" id="mAsigSub">Checklist de entrega y devolución de unidad. Las secciones se recorren con las pestañas.</div>
+
+    <div class="asig-tabs">
+      <div class="tab active" data-sec="s1">1 · Asignación</div>
+      <div class="tab" data-sec="s2">2 · Mantenimiento</div>
+      <div class="tab" data-sec="s3">3 · Documentos</div>
+      <div class="tab" data-sec="s4">4 · Parámetros</div>
+      <div class="tab" data-sec="s5">5 · Evidencia</div>
+      <div class="tab" data-sec="s6">6 · Conformidad</div>
+      <div class="tab" data-sec="s7">7 · Devolución</div>
+    </div>
+
+    <!-- ===== SECCIÓN 1 ===== -->
+    <div class="sec-pane active" id="pane_s1">
+      <div class="sec-title"><span class="n">1</span> Acerca de la Asignación</div>
+      <div class="form-grid">
+        <div>
+          <label>Fecha de entrega</label>
+          <input type="date" id="aFechaEntrega">
+          <div class="field-msg" id="e_aFechaEntrega"></div>
+        </div>
+        <div>
+          <label>Vehículo</label>
+          <input type="text" id="aVehiculo" readonly style="opacity:.7">
+        </div>
+        <div>
+          <label>Chofer asignado</label>
+          <input type="text" id="aChofer" maxlength="60" placeholder="Nombre completo">
+          <div class="field-msg" id="e_aChofer"></div>
+        </div>
+        <div>
+          <label>Bitácora de préstamo (ID o enlace)</label>
+          <input type="text" id="aBitacora" maxlength="200" placeholder="Folio interno o URL de Asana / AppSheet">
+          <div class="field-msg" id="e_aBitacora"></div>
+        </div>
+        <div>
+          <label>Estado de la unidad</label>
+          <select id="aEstado">
+            <option value="Bueno">Bueno</option>
+            <option value="Regular">Regular</option>
+            <option value="Malo">Malo</option>
+          </select>
+        </div>
+        <div>
+          <label>Nivel de tanque</label>
+          <select id="aTanque">
+            <option value="Lleno">Lleno (4/4)</option>
+            <option value="3/4">3/4</option>
+            <option value="1/2">1/2</option>
+            <option value="1/4">1/4</option>
+            <option value="Reserva">Reserva</option>
+          </select>
+        </div>
+        <div>
+          <label>KM inicial</label>
+          <input type="number" id="aKmInicial" min="0" max="9999999" step="1" placeholder="Ej. 220040">
+          <div class="field-msg" id="e_aKmInicial"></div>
+        </div>
+        <div>
+          <label>Destino</label>
+          <input type="text" id="aDestino" maxlength="120" placeholder="Ej. Cancún → Playa del Carmen">
+          <div class="field-msg" id="e_aDestino"></div>
+        </div>
+        <div>
+          <label>Entregado por</label>
+          <input type="text" id="aEntregadoPor" maxlength="60" placeholder="Nombre de quien entrega">
+          <div class="field-msg" id="e_aEntregadoPor"></div>
+        </div>
+        <div>
+          <label>Foto KM inicial (URL)</label>
+          <input type="text" id="aFotoKmIni" maxlength="400" placeholder="https://… o ruta del archivo">
+          <div class="field-msg" id="e_aFotoKmIni"></div>
+        </div>
+        <div class="full">
+          <label>Comentarios de entrega</label>
+          <textarea id="aComentarios" rows="2" maxlength="500" placeholder="Observaciones al momento de la entrega"></textarea>
+          <div class="field-msg" id="e_aComentarios"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN 2 ===== -->
+    <div class="sec-pane" id="pane_s2">
+      <div class="sec-title"><span class="n">2</span> Control de Mantenimiento e Historial
+        <span class="sub">Datos tomados de la ficha del vehículo</span></div>
+      <div class="form-grid">
+        <div>
+          <label>Kilometraje de último servicio</label>
+          <input type="text" id="aKmUltServ" readonly style="opacity:.7">
+        </div>
+        <div>
+          <label>KM actual registrado</label>
+          <input type="text" id="aKmActualRef" readonly style="opacity:.7">
+        </div>
+        <div>
+          <label>Próximo servicio programado (KM)</label>
+          <input type="number" id="aProxServKm" min="0" max="9999999" step="1" placeholder="Ej. 225640">
+          <div class="field-msg" id="e_aProxServKm"></div>
+        </div>
+        <div>
+          <label>Próximo servicio programado (fecha)</label>
+          <input type="date" id="aProxServFecha">
+          <div class="field-msg" id="e_aProxServFecha"></div>
+        </div>
+        <div class="full">
+          <div id="aKmAlerta" class="km-alert">Capture el KM inicial para evaluar la proximidad del servicio.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN 3 ===== -->
+    <div class="sec-pane" id="pane_s3">
+      <div class="sec-title"><span class="n">3</span> Inventario de Documentos y Placas</div>
+      <div class="form-grid">
+        <div>
+          <label>Póliza de seguro</label>
+          <select id="aPoliza" data-tn><option value="Tiene">Tiene</option><option value="No tiene">No tiene</option></select>
+        </div>
+        <div>
+          <label>Tarjeta de circulación</label>
+          <select id="aTarjCirc" data-tn><option value="Tiene">Tiene</option><option value="No tiene">No tiene</option></select>
+        </div>
+        <div>
+          <label>Tarjeta de combustible</label>
+          <select id="aTarjComb" data-tn><option value="Tiene">Tiene</option><option value="No tiene">No tiene</option></select>
+        </div>
+        <div>
+          <label>Placa delantera</label>
+          <select id="aPlacaDel" data-tn><option value="Tiene">Tiene</option><option value="No tiene">No tiene</option></select>
+        </div>
+        <div>
+          <label>Placa trasera</label>
+          <select id="aPlacaTra" data-tn><option value="Tiene">Tiene</option><option value="No tiene">No tiene</option></select>
+        </div>
+        <div>
+          <label>Faltantes detectados</label>
+          <input type="text" id="aDocResumen" readonly style="opacity:.75" value="Sin faltantes">
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN 4 ===== -->
+    <div class="sec-pane" id="pane_s4">
+      <div class="sec-title"><span class="n">4</span> Parámetros Básicos</div>
+      <div class="form-grid">
+        <div>
+          <label>Nivel de aceite</label>
+          <select id="aAceite" data-brm><option value="Bueno">Bueno</option><option value="Regular">Regular</option><option value="Malo">Malo</option></select>
+        </div>
+        <div>
+          <label>Nivel de anticongelante</label>
+          <select id="aAnticong" data-brm><option value="Bueno">Bueno</option><option value="Regular">Regular</option><option value="Malo">Malo</option></select>
+        </div>
+        <div>
+          <label>Nivel de frenos</label>
+          <select id="aFrenos" data-brm><option value="Bueno">Bueno</option><option value="Regular">Regular</option><option value="Malo">Malo</option></select>
+        </div>
+        <div>
+          <label>Nivel líquido limpiaparabrisas</label>
+          <select id="aLimpia" data-brm><option value="Bueno">Bueno</option><option value="Regular">Regular</option><option value="Malo">Malo</option></select>
+        </div>
+        <div class="full">
+          <div id="aParamAlerta" class="km-alert ok">Todos los parámetros en estado Bueno.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN 5 ===== -->
+    <div class="sec-pane" id="pane_s5">
+      <div class="sec-title"><span class="n">5</span> Evidencia Fotográfica
+        <span class="sub">Capture la URL de cada toma</span></div>
+      <div class="foto-grid" id="fotoGrid"></div>
+      <div class="field-msg" id="e_fotos"></div>
+    </div>
+
+    <!-- ===== SECCIÓN 6 ===== -->
+    <div class="sec-pane" id="pane_s6">
+      <div class="sec-title"><span class="n">6</span> Conformidad</div>
+      <div class="form-grid">
+        <div>
+          <label>Firma de recepción (nombre de conformidad)</label>
+          <input type="text" id="aFirmaRecepcion" maxlength="60" placeholder="Nombre de quien recibe la unidad">
+          <div class="field-msg" id="e_aFirmaRecepcion"></div>
+        </div>
+        <div>
+          <label>Fecha y hora de conformidad</label>
+          <input type="text" id="aFirmaSello" readonly style="opacity:.7" value="—">
+        </div>
+        <div class="full">
+          <div class="confirm-box">
+            El chofer manifiesta haber recibido la unidad en las condiciones descritas en las secciones 1 a 5, con los
+            documentos y accesorios inventariados, y se compromete a devolverla en las mismas condiciones salvo el
+            desgaste normal de uso.
+            <label><input type="checkbox" id="aAceptaCond" style="width:auto;flex:0 0 auto"> Se registra la conformidad del chofer</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN 7 ===== -->
+    <div class="sec-pane" id="pane_s7">
+      <div class="sec-title"><span class="n">7</span> Acerca de la Devolución
+        <span class="sub">Complete al reingresar la unidad</span></div>
+      <div class="form-grid">
+        <div>
+          <label>Fecha de devolución</label>
+          <input type="date" id="dFecha">
+          <div class="field-msg" id="e_dFecha"></div>
+        </div>
+        <div>
+          <label>Vehículo</label>
+          <input type="text" id="dVehiculo" readonly style="opacity:.7">
+        </div>
+        <div>
+          <label>Chofer que devuelve</label>
+          <input type="text" id="dChofer" maxlength="60" placeholder="Nombre completo">
+          <div class="field-msg" id="e_dChofer"></div>
+        </div>
+        <div>
+          <label>Estado de la unidad</label>
+          <select id="dEstado">
+            <option value="">— Sin devolver —</option>
+            <option value="Bueno">Bueno</option>
+            <option value="Regular">Regular</option>
+            <option value="Malo">Malo</option>
+          </select>
+        </div>
+        <div>
+          <label>Nivel de tanque</label>
+          <select id="dTanque">
+            <option value="">— Sin devolver —</option>
+            <option value="Lleno">Lleno (4/4)</option>
+            <option value="3/4">3/4</option>
+            <option value="1/2">1/2</option>
+            <option value="1/4">1/4</option>
+            <option value="Reserva">Reserva</option>
+          </select>
+        </div>
+        <div>
+          <label>KM final</label>
+          <input type="number" id="dKmFinal" min="0" max="9999999" step="1" placeholder="Ej. 221380">
+          <div class="field-msg" id="e_dKmFinal"></div>
+        </div>
+        <div>
+          <label>Recibido por</label>
+          <input type="text" id="dEntregadoPor" maxlength="60" placeholder="Nombre de quien recibe">
+          <div class="field-msg" id="e_dEntregadoPor"></div>
+        </div>
+        <div>
+          <label>Kilómetros del recorrido</label>
+          <input type="text" id="dKmRecorrido" readonly style="opacity:.7" value="—">
+        </div>
+        <div class="full">
+          <label>Comentarios de devolución</label>
+          <textarea id="dComentarios" rows="2" maxlength="500" placeholder="Observaciones al reingreso de la unidad"></textarea>
+          <div class="field-msg" id="e_dComentarios"></div>
+        </div>
+        <div class="full">
+          <div class="confirm-box" id="dSyncBox">
+            <b style="color:var(--accent)">Actualización cruzada de kilometraje</b><br>
+            Al confirmar, el KM final capturado reemplazará el <b>KM actual</b> del vehículo en la ficha principal,
+            recalculando automáticamente los kilómetros restantes para su próximo servicio.
+            <label><input type="checkbox" id="dActualizarKm" style="width:auto;flex:0 0 auto" checked> Actualizar el KM actual del vehículo al guardar</label>
+            <div id="dSyncPreview" style="margin-top:7px;color:var(--muted)">Capture el KM final para ver el efecto.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger hidden" id="btnEliminarAsig">Eliminar</button>
+      <button class="btn" data-close-modal="modalAsignacion">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarAsig">Guardar checklist</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ MODAL: CONFIGURACIÓN (solo admin) ============ -->
 <div class="modal-overlay" id="modalConfig">
   <div class="modal">
@@ -624,6 +939,7 @@ tbody tr:hover{background:var(--panel2)}
       <div class="status-line"><span>Unidades sincronizadas</span><span id="s_units">—</span></div>
       <div class="status-line"><span>Incidencias sincronizadas</span><span id="s_incs">—</span></div>
       <div class="status-line"><span>Períodos de combustible</span><span id="s_comb">—</span></div>
+      <div class="status-line"><span>Checklists de asignación</span><span id="s_asig">—</span></div>
       <div class="status-line"><span>Última actualización</span><span id="s_updated">—</span></div>
     </div>
 
@@ -678,7 +994,7 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], combustibles:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.2 } };
+let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.4 } };
 let ALL=[], DATA=[];
 let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'' };
 let session = { rol:null, loggedAt:null };
@@ -773,6 +1089,7 @@ function fbInit(){
       STORE.unidades   = d.unidades ? Object.values(d.unidades) : [];
       STORE.incidencias = d.incidencias ? Object.values(d.incidencias) : [];
       STORE.combustibles = d.combustibles ? Object.values(d.combustibles) : [];
+      STORE.asignaciones = d.asignaciones ? Object.values(d.asignaciones) : [];
       STORE.bitacora   = d.bitacora ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
       STORE.meta       = d.meta || STORE.meta;
       fbInitialLoad = true;
@@ -833,7 +1150,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.2 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.4 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -895,7 +1212,7 @@ async function seedFromCSV(){
       };
       cargadas++;
     }
-    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.2 };
+    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.4 };
     // Bitácora
     const bit = { id:uid(), ts:nowISO(), unidad:'—', accion:'SEED', campo:'inicialización', antes:'', despues:`${cargadas} unidades`, usuario:session.rol, rol:session.rol };
     updates[`${FB_ROOT}/bitacora/${bit.id}`] = bit;
@@ -1030,6 +1347,8 @@ function renderFleetDetail(){
   const incsUnidad = STORE.incidencias.filter(i=>i.unidad===r.veh);
   const pendUnidad = incsUnidad.filter(i=>i.estatus!=='Resuelto').length;
   const combUnidad = STORE.combustibles.filter(c=>c.unidad===r.veh);
+  const asigUnidad = asignacionesDe(r.veh);
+  const asigAbierta = asigUnidad.find(a=>a.estadoRegistro==='Abierta');
 
   const esEditor = session.rol==='admin' || session.rol==='auxiliar';
 
@@ -1049,11 +1368,18 @@ function renderFleetDetail(){
       <div class="fd-item"><div class="lab">Km restantes</div><div class="val">${kmDisplay}</div></div>
       <div class="fd-item"><div class="lab">Incidencias totales</div><div class="val">${incsUnidad.length}</div></div>
       <div class="fd-item"><div class="lab">Períodos de combustible</div><div class="val">${combUnidad.length}</div></div>
+      <div class="fd-item"><div class="lab">Asignación vigente</div><div class="val">${
+        asigAbierta
+          ? `<span class="asig-state st-abierta">ABIERTA</span><div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${asigAbierta.chofer||'—'} · desde ${asigAbierta.fechaEntrega||'—'}</div>`
+          : `<span style="font-size:13px;color:var(--muted)">Sin asignación activa</span>${asigUnidad.length?`<div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${asigUnidad.length} checklist(s) en historial</div>`:''}`
+      }</div></div>
     </div>
     <div class="fd-actions">
       ${esEditor?`<button class="btn btn-primary" onclick="abrirModalUnidad('${r.veh}')">✎ Editar unidad</button>`:''}
       ${esEditor?`<button class="btn btn-success" onclick="abrirModalIncidencia('${r.veh}')">+ Incidencia vehicular</button>`:''}
       <button class="btn" onclick="verCombustibles('${r.veh}')">⛽ Combustibles${combUnidad.length?` (${combUnidad.length})`:''}</button>
+      ${esEditor?`<button class="btn ${asigAbierta?'btn-success':''}" onclick="abrirModalAsignacion('${r.veh}')">📋 Asignación / Checklist${asigAbierta?' · abierta':''}</button>`:''}
+      ${asigUnidad.length>0?`<button class="btn" onclick="verHistorialAsig('${r.veh}')">Historial (${asigUnidad.length})</button>`:''}
       ${incsUnidad.length>0?`<button class="btn" onclick="filtrarIncidenciasPor('${r.veh}')">Ver ${incsUnidad.length} incidencia(s)</button>`:''}
     </div>`;
   det.classList.add('open');
@@ -1237,6 +1563,366 @@ function renderBitacora(){
       <td><span class="role-badge ${rolCls}" style="font-size:10px">${b.rol}</span></td>
     </tr>`;
   }).join('');
+}
+
+/* ============ ASIGNACIÓN / DEVOLUCIÓN (CHECKLIST PHVA) ============ */
+const FOTOS_DEF = [
+  {k:'frontal',    lab:'Vista frontal'},
+  {k:'latIzq',     lab:'Lateral izquierda'},
+  {k:'latDet',     lab:'Detalle lateral'},
+  {k:'diagTra',    lab:'Diagonal trasera'},
+  {k:'diagTraOp',  lab:'Diagonal trasera opuesta'},
+  {k:'trasera',    lab:'Trasera'}
+];
+let editingAsigId = null;
+
+/* --- Acceso a Firebase (nodo independiente: no satura la ficha del vehículo) --- */
+async function fbWriteAsignacion(a){
+  try{ await fbDb.ref(`${FB_ROOT}/asignaciones/${a.id}`).set(a); await fbUpdateMeta(); return true; }
+  catch(e){ toast('Error al guardar el checklist: '+e.message,'err'); return false; }
+}
+async function fbDeleteAsignacion(id){
+  try{ await fbDb.ref(`${FB_ROOT}/asignaciones/${id}`).remove(); await fbUpdateMeta(); return true; }
+  catch(e){ toast('Error al eliminar el checklist: '+e.message,'err'); return false; }
+}
+
+/* --- Consultas --- */
+const asignacionesDe = veh => STORE.asignaciones
+  .filter(a=>a.vehiculo===veh)
+  .sort((a,b)=>(b.fechaEntrega||'').localeCompare(a.fechaEntrega||''));
+const asignacionAbierta = veh => asignacionesDe(veh).find(a=>a.estadoRegistro==='Abierta');
+
+/* --- Pestañas de sección --- */
+function setSeccion(id){
+  $$('#modalAsignacion .asig-tabs .tab').forEach(t=>t.classList.toggle('active', t.dataset.sec===id));
+  $$('#modalAsignacion .sec-pane').forEach(p=>p.classList.toggle('active', p.id==='pane_'+id));
+}
+
+/* --- Sección 5: construcción de los 6 campos de evidencia --- */
+function buildFotoGrid(valores){
+  $('#fotoGrid').innerHTML = FOTOS_DEF.map(f=>`
+    <div class="foto-item">
+      <label>${f.lab}</label>
+      <input type="text" id="foto_${f.k}" maxlength="400" placeholder="https://… o ruta"
+             value="${(valores&&valores[f.k]?valores[f.k]:'').replace(/"/g,'&quot;')}">
+      <div class="prev" id="prev_${f.k}"></div>
+    </div>`).join('');
+  FOTOS_DEF.forEach(f=>{
+    const inp = $('#foto_'+f.k);
+    inp.oninput = ()=>pintaPrevFoto(f.k);
+    pintaPrevFoto(f.k);
+  });
+}
+function pintaPrevFoto(k){
+  const v = ($('#foto_'+k).value||'').trim();
+  const el = $('#prev_'+k);
+  if(!v){ el.innerHTML = '<span style="color:var(--muted)">Sin evidencia</span>'; return; }
+  el.innerHTML = RX.url.test(v)
+    ? `<a href="${v}" target="_blank" rel="noopener">Abrir evidencia ↗</a>`
+    : `<span style="color:var(--gold)">Ruta registrada (no es URL navegable)</span>`;
+}
+function leerFotos(){
+  const o = {};
+  FOTOS_DEF.forEach(f=>{ const v=($('#foto_'+f.k).value||'').trim(); if(v) o[f.k]=v; });
+  return o;
+}
+
+/* --- Semáforos visuales de las secciones 3 y 4 --- */
+function pintaSelects(){
+  $$('#modalAsignacion select[data-tn]').forEach(sel=>{
+    sel.classList.remove('sel-ok','sel-bad');
+    sel.classList.add(sel.value==='Tiene'?'sel-ok':'sel-bad');
+  });
+  $$('#modalAsignacion select[data-brm]').forEach(sel=>{
+    sel.classList.remove('sel-ok','sel-warn','sel-bad');
+    sel.classList.add(sel.value==='Bueno'?'sel-ok':sel.value==='Regular'?'sel-warn':'sel-bad');
+  });
+  // Resumen de documentos faltantes
+  const docs = [['aPoliza','Póliza'],['aTarjCirc','T. circulación'],['aTarjComb','T. combustible'],
+                ['aPlacaDel','Placa del.'],['aPlacaTra','Placa tras.']];
+  const falt = docs.filter(([id])=>$('#'+id).value!=='Tiene').map(([,lab])=>lab);
+  const res = $('#aDocResumen');
+  res.value = falt.length ? falt.join(', ') : 'Sin faltantes';
+  res.style.color = falt.length ? 'var(--red)' : 'var(--green)';
+  // Alerta de parámetros
+  const par = [['aAceite','Aceite'],['aAnticong','Anticongelante'],['aFrenos','Frenos'],['aLimpia','Limpiaparabrisas']];
+  const malos = par.filter(([id])=>$('#'+id).value==='Malo').map(([,l])=>l);
+  const regs  = par.filter(([id])=>$('#'+id).value==='Regular').map(([,l])=>l);
+  const box = $('#aParamAlerta');
+  if(malos.length){ box.className='km-alert bad'; box.innerHTML=`<b>Atención:</b> nivel MALO en ${malos.join(', ')}. Atienda antes de liberar la unidad.`; }
+  else if(regs.length){ box.className='km-alert warn'; box.innerHTML=`Nivel REGULAR en ${regs.join(', ')}. Programe revisión.`; }
+  else { box.className='km-alert ok'; box.textContent='Todos los parámetros en estado Bueno.'; }
+}
+
+/* --- Sección 2: alerta de proximidad de servicio --- */
+function calcAlertaServicio(){
+  const kmIni  = parseInt($('#aKmInicial').value);
+  const proxKm = parseInt($('#aProxServKm').value);
+  const box = $('#aKmAlerta');
+  if(isNaN(kmIni) || isNaN(proxKm)){
+    box.className='km-alert';
+    box.textContent='Capture el KM inicial y el próximo servicio programado para evaluar la proximidad.';
+    return;
+  }
+  const rest = proxKm - kmIni;
+  if(rest < 0){ box.className='km-alert bad'; box.innerHTML=`<b>SERVICIO VENCIDO</b> por ${Math.abs(rest).toLocaleString('es-MX')} km. No se recomienda asignar la unidad sin atender el mantenimiento.`; }
+  else if(rest <= 1500){ box.className='km-alert warn'; box.innerHTML=`<b>Servicio próximo:</b> restan ${rest.toLocaleString('es-MX')} km. Considere el recorrido previsto antes de autorizar.`; }
+  else { box.className='km-alert ok'; box.innerHTML=`Servicio en orden: restan <b>${rest.toLocaleString('es-MX')} km</b>.`; }
+}
+
+/* --- Sección 7: recorrido y vista previa de la actualización cruzada --- */
+function calcDevolucion(){
+  const ini = parseInt($('#aKmInicial').value), fin = parseInt($('#dKmFinal').value);
+  const rec = $('#dKmRecorrido');
+  if(isNaN(ini)||isNaN(fin)){ rec.value='—'; rec.style.color=''; }
+  else {
+    const d = fin - ini;
+    rec.value = d.toLocaleString('es-MX')+' km';
+    rec.style.color = d<0 ? 'var(--red)' : '';
+  }
+  const prev = $('#dSyncPreview');
+  const u = STORE.unidades.find(x=>x.veh===$('#aVehiculo').value);
+  if(isNaN(fin) || !u){ prev.innerHTML='Capture el KM final para ver el efecto.'; return; }
+  const proxObj = u.kmProximoServicio;
+  const nuevoRest = (proxObj!=null) ? proxObj - fin : null;
+  prev.innerHTML = `KM actual: <b>${fmt(u.kmActual)}</b> → <b style="color:var(--accent)">${fmt(fin)}</b>` +
+    (nuevoRest===null ? ' · sin objetivo de servicio capturado'
+      : ` · km restantes: <b style="color:${nuevoRest<0?'var(--red)':nuevoRest<=1500?'var(--orange)':'var(--green)'}">${nuevoRest.toLocaleString('es-MX')}</b>`);
+}
+
+/* --- Apertura del modal --- */
+window.verHistorialAsig = function(veh){
+  const lista = asignacionesDe(veh);
+  if(!lista.length){ toast('Sin checklists registrados para '+veh+'.','warn'); return; }
+  const txt = lista.map((a,i)=>{
+    const est = a.estadoRegistro==='Cerrada'
+      ? `cerrada el ${a.devFecha} · ${a.kmRecorrido!=null?a.kmRecorrido.toLocaleString('es-MX')+' km':'—'}`
+      : 'ABIERTA';
+    return `${i+1}. ${a.fechaEntrega||'—'} · ${a.chofer||'—'} · ${a.destino||'—'} · ${est}`;
+  }).join('\n');
+  const sel = prompt(`Historial de asignaciones · ${veh}\n\n${txt}\n\nEscriba el número del checklist a abrir (o cancele):`);
+  const n = parseInt(sel);
+  if(!isNaN(n) && n>=1 && n<=lista.length) abrirModalAsignacion(veh, lista[n-1].id);
+};
+
+window.abrirModalAsignacion = function(veh, asigId){
+  clearErrs();
+  const u = STORE.unidades.find(x=>x.veh===veh);
+  if(!u){ toast('Unidad no encontrada.','err'); return; }
+
+  // Si no se indica un registro, se retoma el abierto o se crea uno nuevo
+  const abierta = asigId ? STORE.asignaciones.find(a=>a.id===asigId) : asignacionAbierta(veh);
+  editingAsigId = abierta ? abierta.id : null;
+  const a = abierta || {};
+
+  $('#mAsigTitle').textContent = abierta
+    ? `Checklist ${abierta.estadoRegistro==='Cerrada'?'cerrado':'abierto'} · ${veh}`
+    : `Nuevo checklist de asignación · ${veh}`;
+  $('#mAsigSub').innerHTML = abierta
+    ? `Registro del ${abierta.fechaEntrega||'—'} · <span class="asig-state ${abierta.estadoRegistro==='Cerrada'?'st-cerrada':'st-abierta'}">${abierta.estadoRegistro}</span>`
+    : 'Checklist de entrega y devolución de unidad. Las secciones se recorren con las pestañas.';
+
+  // Sección 1
+  $('#aVehiculo').value      = veh;
+  $('#aFechaEntrega').value  = a.fechaEntrega || new Date().toISOString().slice(0,10);
+  $('#aChofer').value        = a.chofer ?? u.chofer ?? '';
+  $('#aBitacora').value      = a.bitacora || '';
+  $('#aEstado').value        = a.estado || 'Bueno';
+  $('#aTanque').value        = a.tanque || 'Lleno';
+  $('#aKmInicial').value     = a.kmInicial ?? (u.kmActual ?? '');
+  $('#aDestino').value       = a.destino || '';
+  $('#aEntregadoPor').value  = a.entregadoPor || '';
+  $('#aFotoKmIni').value     = a.fotoKmInicial || '';
+  $('#aComentarios').value   = a.comentarios || '';
+
+  // Sección 2
+  $('#aKmUltServ').value     = a.kmUltimoServicio!=null ? fmt(a.kmUltimoServicio) : (u.kmUltimoServicio!=null ? fmt(u.kmUltimoServicio) : 'Sin registro');
+  $('#aKmActualRef').value   = fmt(u.kmActual);
+  $('#aProxServKm').value    = a.proxServKm ?? (u.kmProximoServicio ?? '');
+  $('#aProxServFecha').value = a.proxServFecha || '';
+
+  // Sección 3
+  $('#aPoliza').value   = a.docPoliza   || 'Tiene';
+  $('#aTarjCirc').value = a.docTarjCirc || 'Tiene';
+  $('#aTarjComb').value = a.docTarjComb || 'Tiene';
+  $('#aPlacaDel').value = a.docPlacaDel || 'Tiene';
+  $('#aPlacaTra').value = a.docPlacaTra || 'Tiene';
+
+  // Sección 4
+  $('#aAceite').value   = a.parAceite   || 'Bueno';
+  $('#aAnticong').value = a.parAnticong || 'Bueno';
+  $('#aFrenos').value   = a.parFrenos   || 'Bueno';
+  $('#aLimpia').value   = a.parLimpia   || 'Bueno';
+
+  // Sección 5
+  buildFotoGrid(a.fotos || {});
+
+  // Sección 6
+  $('#aFirmaRecepcion').value = a.firmaRecepcion || '';
+  $('#aAceptaCond').checked   = !!a.aceptaCondiciones;
+  $('#aFirmaSello').value     = a.firmaAt ? fechaCorta(a.firmaAt) : '—';
+
+  // Sección 7
+  $('#dVehiculo').value      = veh;
+  $('#dFecha').value         = a.devFecha || '';
+  $('#dChofer').value        = a.devChofer || '';
+  $('#dEstado').value        = a.devEstado || '';
+  $('#dTanque').value        = a.devTanque || '';
+  $('#dKmFinal').value       = a.devKmFinal ?? '';
+  $('#dEntregadoPor').value  = a.devRecibidoPor || '';
+  $('#dComentarios').value   = a.devComentarios || '';
+  $('#dActualizarKm').checked = true;
+
+  $('#btnEliminarAsig').classList.toggle('hidden', !editingAsigId || session.rol!=='admin');
+  setSeccion('s1');
+  pintaSelects(); calcAlertaServicio(); calcDevolucion();
+  $('#modalAsignacion').classList.add('open');
+};
+
+/* --- Validación --- */
+function validaAsignacion(a){
+  const errs = {};
+  if(!a.fechaEntrega) errs.aFechaEntrega = 'Seleccione la fecha de entrega.';
+  if(!a.chofer || !RX.chofer.test(a.chofer)) errs.aChofer = 'Solo letras, espacios y acentos (2-60 caracteres).';
+  if(!a.entregadoPor || !RX.chofer.test(a.entregadoPor)) errs.aEntregadoPor = 'Capture quién entrega la unidad.';
+  if(a.kmInicial===null || isNaN(a.kmInicial)) errs.aKmInicial = 'Capture el kilometraje inicial.';
+  else if(a.kmInicial < 0 || a.kmInicial > 9999999) errs.aKmInicial = 'Rango válido: 0 a 9,999,999.';
+  if(!a.destino || a.destino.length < 3) errs.aDestino = 'Indique el destino (mínimo 3 caracteres).';
+  else if(!RX.notas.test(a.destino)) errs.aDestino = 'No se permiten los caracteres < ni >.';
+  if(a.bitacora && !RX.idliga.test(a.bitacora)) errs.aBitacora = 'Contiene caracteres no permitidos.';
+  if(a.fotoKmInicial && !RX.notas.test(a.fotoKmInicial)) errs.aFotoKmIni = 'No se permiten los caracteres < ni >.';
+  if(a.comentarios && !RX.notas.test(a.comentarios)) errs.aComentarios = 'No se permiten los caracteres < ni >.';
+  if(a.proxServKm!==null && !isNaN(a.proxServKm)){
+    if(a.proxServKm < 0 || a.proxServKm > 9999999) errs.aProxServKm = 'Rango válido: 0 a 9,999,999.';
+    else if(!isNaN(a.kmInicial) && a.proxServKm < a.kmInicial - 100000) errs.aProxServKm = 'Valor inconsistente respecto al KM inicial.';
+  }
+  if(a.proxServFecha && isNaN(new Date(a.proxServFecha+'T00:00:00').getTime())) errs.aProxServFecha = 'Fecha inválida.';
+  if(a.firmaRecepcion && !RX.chofer.test(a.firmaRecepcion)) errs.aFirmaRecepcion = 'Solo letras, espacios y acentos.';
+
+  // Devolución: si se captura algo, se exige el bloque mínimo
+  const hayDev = a.devFecha || a.devKmFinal!==null || a.devEstado || a.devChofer || a.devRecibidoPor;
+  if(hayDev){
+    if(!a.devFecha) errs.dFecha = 'Indique la fecha de devolución.';
+    else if(a.fechaEntrega && a.devFecha < a.fechaEntrega) errs.dFecha = 'No puede ser anterior a la fecha de entrega.';
+    if(a.devKmFinal===null || isNaN(a.devKmFinal)) errs.dKmFinal = 'Capture el KM final.';
+    else if(a.devKmFinal < 0 || a.devKmFinal > 9999999) errs.dKmFinal = 'Rango válido: 0 a 9,999,999.';
+    else if(!isNaN(a.kmInicial) && a.devKmFinal < a.kmInicial) errs.dKmFinal = 'El KM final no puede ser menor al KM inicial.';
+    if(!a.devChofer || !RX.chofer.test(a.devChofer)) errs.dChofer = 'Capture quién devuelve la unidad.';
+    if(!a.devRecibidoPor || !RX.chofer.test(a.devRecibidoPor)) errs.dEntregadoPor = 'Capture quién recibe la unidad.';
+    if(!a.devEstado) errs.dEstado = 'Seleccione el estado de la unidad.';
+    if(a.devComentarios && !RX.notas.test(a.devComentarios)) errs.dComentarios = 'No se permiten los caracteres < ni >.';
+  }
+  return errs;
+}
+
+/* --- Guardado --- */
+async function guardarAsignacion(){
+  clearErrs();
+  const veh = $('#aVehiculo').value;
+  const u = STORE.unidades.find(x=>x.veh===veh);
+  if(!u){ toast('Unidad no encontrada.','err'); return; }
+
+  const num = id => $('#'+id).value===''?null:parseInt($('#'+id).value);
+  const a = {
+    vehiculo: veh,
+    // Sección 1
+    fechaEntrega: $('#aFechaEntrega').value,
+    chofer:       $('#aChofer').value.trim().toUpperCase(),
+    bitacora:     $('#aBitacora').value.trim(),
+    estado:       $('#aEstado').value,
+    tanque:       $('#aTanque').value,
+    kmInicial:    num('aKmInicial'),
+    destino:      $('#aDestino').value.trim(),
+    entregadoPor: $('#aEntregadoPor').value.trim().toUpperCase(),
+    fotoKmInicial:$('#aFotoKmIni').value.trim(),
+    comentarios:  $('#aComentarios').value.trim(),
+    // Sección 2
+    kmUltimoServicio: u.kmUltimoServicio ?? null,
+    proxServKm:    num('aProxServKm'),
+    proxServFecha: $('#aProxServFecha').value || null,
+    // Sección 3
+    docPoliza:   $('#aPoliza').value,   docTarjCirc: $('#aTarjCirc').value,
+    docTarjComb: $('#aTarjComb').value, docPlacaDel: $('#aPlacaDel').value,
+    docPlacaTra: $('#aPlacaTra').value,
+    // Sección 4
+    parAceite: $('#aAceite').value,   parAnticong: $('#aAnticong').value,
+    parFrenos: $('#aFrenos').value,   parLimpia:   $('#aLimpia').value,
+    // Sección 5
+    fotos: leerFotos(),
+    // Sección 6
+    firmaRecepcion:    $('#aFirmaRecepcion').value.trim().toUpperCase(),
+    aceptaCondiciones: $('#aAceptaCond').checked,
+    // Sección 7
+    devFecha:       $('#dFecha').value || null,
+    devChofer:      $('#dChofer').value.trim().toUpperCase(),
+    devEstado:      $('#dEstado').value,
+    devTanque:      $('#dTanque').value,
+    devKmFinal:     num('dKmFinal'),
+    devRecibidoPor: $('#dEntregadoPor').value.trim().toUpperCase(),
+    devComentarios: $('#dComentarios').value.trim()
+  };
+
+  const errs = validaAsignacion(a);
+  if(Object.keys(errs).length){
+    Object.entries(errs).forEach(([k,v])=>setErr(k,v));
+    // Llevar al usuario a la primera sección con error
+    const mapa = {
+      aFechaEntrega:'s1', aChofer:'s1', aEntregadoPor:'s1', aKmInicial:'s1', aDestino:'s1',
+      aBitacora:'s1', aFotoKmIni:'s1', aComentarios:'s1',
+      aProxServKm:'s2', aProxServFecha:'s2', aFirmaRecepcion:'s6',
+      dFecha:'s7', dKmFinal:'s7', dChofer:'s7', dEntregadoPor:'s7', dEstado:'s7', dComentarios:'s7'
+    };
+    setSeccion(mapa[Object.keys(errs)[0]] || 's1');
+    toast('Corrija los campos marcados.','err');
+    return;
+  }
+
+  const cerrada = !!(a.devFecha && a.devKmFinal!==null);
+  a.estadoRegistro = cerrada ? 'Cerrada' : 'Abierta';
+  a.kmRecorrido = cerrada ? (a.devKmFinal - a.kmInicial) : null;
+  if(a.aceptaCondiciones) a.firmaAt = a.firmaAt || nowISO();
+
+  const orig = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
+  const reg = orig
+    ? {...orig, ...a, updatedAt:nowISO(), updatedBy:session.rol}
+    : {id:uid(), ...a, createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO(), updatedBy:session.rol};
+
+  const ok = await fbWriteAsignacion(reg);
+  if(!ok) return;
+
+  // --- Actualización cruzada: KM final → KM actual de la unidad ---
+  let sincronizado = false;
+  if(cerrada && $('#dActualizarKm').checked && a.devKmFinal !== u.kmActual){
+    const antes = u.kmActual;
+    const actualizada = {...u, kmActual:a.devKmFinal, kmLegacy:null, updatedAt:nowISO()};
+    if(a.proxServKm!==null && !isNaN(a.proxServKm)) actualizada.kmProximoServicio = a.proxServKm;
+    const ok2 = await fbWriteUnidad(actualizada);
+    if(ok2){
+      sincronizado = true;
+      await logChange(veh,'EDIT','kmActual',antes,a.devKmFinal);
+    }
+  }
+
+  if(orig){
+    await logChange(veh, cerrada?'CIERRE_ASIG':'EDIT_ASIG', 'checklist',
+      orig.estadoRegistro, `${a.estadoRegistro}${cerrada?` · ${a.kmRecorrido.toLocaleString('es-MX')} km recorridos`:''}`);
+  } else {
+    await logChange(veh,'ALTA_ASIG','checklist','', `${a.fechaEntrega} · ${a.chofer} · ${a.destino}`);
+  }
+
+  toast(cerrada
+    ? `Checklist cerrado · ${a.kmRecorrido.toLocaleString('es-MX')} km recorridos${sincronizado?' · KM actual sincronizado':''}.`
+    : `Checklist de asignación guardado para ${veh}.`);
+  cerrarModal('modalAsignacion');
+}
+
+async function eliminarAsignacion(){
+  if(!editingAsigId || session.rol!=='admin') return;
+  if(!confirm('¿Eliminar este checklist de asignación? Esta acción no se puede deshacer.')) return;
+  const a = STORE.asignaciones.find(x=>x.id===editingAsigId);
+  const ok = await fbDeleteAsignacion(editingAsigId);
+  if(ok && a){ await logChange(a.vehiculo,'BAJA_ASIG','checklist',`${a.fechaEntrega} · ${a.chofer}`,''); toast('Checklist eliminado.','warn'); }
+  cerrarModal('modalAsignacion');
 }
 
 /* ============ TAREAS DE INCIDENCIA ============ */
@@ -1770,17 +2456,33 @@ function datosReporte(){
       'DESCUENTO USO PERSONAL (MXN)': c.descuento ?? '', 'OBSERVACIONES': c.notas||''
     }));
   });
+  const asig = [...STORE.asignaciones]
+    .sort((a,b)=>(b.fechaEntrega||'').localeCompare(a.fechaEntrega||''))
+    .map(a=>({
+      'UNIDAD': a.vehiculo, 'ESTADO REG.': a.estadoRegistro||'',
+      'F. ENTREGA': a.fechaEntrega||'', 'CHOFER': a.chofer||'', 'DESTINO': a.destino||'',
+      'KM INICIAL': a.kmInicial ?? '', 'TANQUE ENT.': a.tanque||'', 'EDO. ENT.': a.estado||'',
+      'F. DEVOLUCIÓN': a.devFecha||'', 'KM FINAL': a.devKmFinal ?? '',
+      'KM RECORRIDO': a.kmRecorrido ?? '', 'TANQUE DEV.': a.devTanque||'', 'EDO. DEV.': a.devEstado||'',
+      'ENTREGÓ': a.entregadoPor||'', 'RECIBIÓ': a.devRecibidoPor||'', 'FIRMA RECEPCIÓN': a.firmaRecepcion||'',
+      'DOCS. FALTANTES': [['docPoliza','Póliza'],['docTarjCirc','T.Circ'],['docTarjComb','T.Comb'],['docPlacaDel','PlacaDel'],['docPlacaTra','PlacaTra']]
+        .filter(([k])=>a[k] && a[k]!=='Tiene').map(([,l])=>l).join(', ') || 'Ninguno',
+      'PARÁM. NO ÓPTIMOS': [['parAceite','Aceite'],['parAnticong','Anticong'],['parFrenos','Frenos'],['parLimpia','Limpia']]
+        .filter(([k])=>a[k] && a[k]!=='Bueno').map(([,l])=>l).join(', ') || 'Ninguno',
+      'EVIDENCIAS': a.fotos ? Object.keys(a.fotos).length+'/6' : '0/6',
+      'BITÁCORA': a.bitacora||''
+    }));
   const bit = STORE.bitacora.slice(0,400).map(b=>({
     'FECHA': fechaCorta(b.ts), 'UNIDAD': b.unidad, 'ACCIÓN': b.accion,
     'CAMPO': b.campo, 'ANTES': b.antes, 'DESPUÉS': b.despues, 'ROL': b.rol
   }));
-  return {flot, inc, comb, bit, tar};
+  return {flot, inc, comb, bit, tar, asig};
 }
 
 function exportarExcel(){
   try{
     if(typeof XLSX==='undefined'){ toast('La librería de Excel no cargó. Verifique su conexión.','err'); return; }
-    const {flot, inc, comb, bit, tar} = datosReporte();
+    const {flot, inc, comb, bit, tar, asig} = datosReporte();
     const wb = XLSX.utils.book_new();
     const stamp = new Date().toLocaleString('es-MX');
 
@@ -1796,6 +2498,7 @@ function exportarExcel(){
 
     addSheet('Flotilla',     'Detalle de flotilla · estatus y servicio', flot);
     addSheet('Incidencias',  'Incidencias vehiculares registradas',      inc);
+    addSheet('Asignaciones','Checklist de asignación y devolución',      asig);
     addSheet('Combustibles', 'Consumo de combustible por período',       comb);
     if(session.rol!=='gerencia') addSheet('Tareas','Tareas de seguimiento por incidencia', tar);
     if(session.rol==='admin') addSheet('Bitácora','Trazabilidad de cambios (últimos 400)', bit);
@@ -1806,7 +2509,7 @@ function exportarExcel(){
 }
 
 function exportarPDF(){
-  const {flot, inc, comb, bit, tar} = datosReporte();
+  const {flot, inc, comb, bit, tar, asig} = datosReporte();
   const stamp = new Date().toLocaleString('es-MX');
   const esc = v => String(v??'').replace(/[<>&]/g, m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
 
@@ -1880,10 +2583,11 @@ tbody tr:nth-child(even){background:#f7fafd}
 </div>
 ${tabla('Detalle de Flotilla', flot)}
 ${tabla('Incidencias Vehiculares', inc)}
+${tabla('Asignaciones y Devoluciones', asig, 'Checklist PHVA de entrega y devolución de unidades.')}
 ${tabla('Consumo de Combustible por Período', comb, 'KM/L = Kilómetros recorridos ÷ Litros consumidos.')}
 ${session.rol!=='gerencia'?tabla('Tareas de Seguimiento', tar, 'Ordenadas por fecha compromiso. Las tareas sin fecha aparecen al final.'):''}
 ${session.rol==='admin'?tabla('Bitácora de Cambios', bit, 'Últimos 400 movimientos registrados.'):''}
-<div class="pie">Documento generado automáticamente por el Tablero Ejecutivo de Control Vehicular · Uso interno</div>
+<div class="pie">Documento generado automáticamente por el sistema de Control Vehicular · Uso interno</div>
 </body></html>`;
 
   const w = window.open('', '_blank');
@@ -2155,6 +2859,7 @@ function abrirConfig(){
   $('#s_units').textContent = STORE.unidades.length;
   $('#s_incs').textContent = STORE.incidencias.length;
   $('#s_comb').textContent = STORE.combustibles.length;
+  $('#s_asig').textContent = `${STORE.asignaciones.length} (${STORE.asignaciones.filter(a=>a.estadoRegistro==='Abierta').length} abiertas)`;
   $('#s_updated').textContent = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : '—';
   $('#modalConfig').classList.add('open');
 }
@@ -2179,10 +2884,12 @@ async function importarJSON(file){
       updates[`${FB_ROOT}/unidades`] = null;
       updates[`${FB_ROOT}/incidencias`] = null;
       updates[`${FB_ROOT}/combustibles`] = null;
+      updates[`${FB_ROOT}/asignaciones`] = null;
       d.unidades.forEach(u=>{ if(u.id) updates[`${FB_ROOT}/unidades/${u.id}`] = u; });
       (d.incidencias||[]).forEach(i=>{ if(i.id) updates[`${FB_ROOT}/incidencias/${i.id}`] = i; });
       (d.combustibles||[]).forEach(c=>{ if(c.id) updates[`${FB_ROOT}/combustibles/${c.id}`] = c; });
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.2 };
+      (d.asignaciones||[]).forEach(a=>{ if(a.id) updates[`${FB_ROOT}/asignaciones/${a.id}`] = a; });
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.4 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
@@ -2199,7 +2906,7 @@ async function purgarBitacora(){
 }
 async function resetTodo(){
   if(!confirm('⚠ ¿BORRAR TODAS las unidades, incidencias y bitácora en Firebase? Esta acción no se puede deshacer.')) return;
-  if(!confirm('Confirmación final: se borrarán '+STORE.unidades.length+' unidades, '+STORE.incidencias.length+' incidencias y '+STORE.combustibles.length+' períodos de combustible. ¿Continuar?')) return;
+  if(!confirm('Confirmación final: se borrarán '+STORE.unidades.length+' unidades, '+STORE.incidencias.length+' incidencias, '+STORE.combustibles.length+' períodos de combustible y '+STORE.asignaciones.length+' checklists. ¿Continuar?')) return;
   await fbDb.ref(FB_ROOT).remove();
   toast('Base de datos vacía. Use "Cargar datos iniciales" para reiniciar.', 'warn');
   cerrarModal('modalConfig');
@@ -2244,11 +2951,12 @@ $('#btnActualizar').onclick = async ()=>{
     STORE.unidades    = d.unidades    ? Object.values(d.unidades)    : [];
     STORE.incidencias = d.incidencias ? Object.values(d.incidencias) : [];
     STORE.combustibles= d.combustibles? Object.values(d.combustibles): [];
+    STORE.asignaciones = d.asignaciones ? Object.values(d.asignaciones) : [];
     STORE.bitacora    = d.bitacora    ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
     STORE.meta        = d.meta || STORE.meta;
     refrescarTodo();
     checkSeedBox();
-    toast(`Tablero actualizado · ${STORE.unidades.length} unidades · ${STORE.incidencias.length} incidencias · ${STORE.combustibles.length} períodos.`);
+    toast(`Tablero actualizado · ${STORE.unidades.length} unidades · ${STORE.incidencias.length} incidencias · ${STORE.combustibles.length} períodos · ${STORE.asignaciones.length} checklists.`);
   }catch(e){
     toast('No se pudo recargar desde Firebase: '+e.message,'err');
   }finally{
@@ -2259,6 +2967,17 @@ $('#btnActualizar').onclick = async ()=>{
 // Exportación
 $('#btnPDF').onclick = exportarPDF;
 $('#btnXLS').onclick = exportarExcel;
+
+// Asignación / Checklist
+$$('#modalAsignacion .asig-tabs .tab').forEach(t=>t.onclick=()=>setSeccion(t.dataset.sec));
+$('#btnGuardarAsig').onclick  = guardarAsignacion;
+$('#btnEliminarAsig').onclick = eliminarAsignacion;
+$$('#modalAsignacion select[data-tn], #modalAsignacion select[data-brm]').forEach(sel=>sel.onchange = pintaSelects);
+['aKmInicial','aProxServKm'].forEach(id=>{
+  document.addEventListener('input', e=>{ if(e.target.id===id){ calcAlertaServicio(); calcDevolucion(); } });
+});
+document.addEventListener('input', e=>{ if(e.target.id==='dKmFinal') calcDevolucion(); });
+$('#aAceptaCond').onchange = e=>{ $('#aFirmaSello').value = e.target.checked ? fechaCorta(nowISO()) : '—'; };
 
 // Tareas
 $('#btnAddTask').onclick = addTaskDraft;
