@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v2.6</title>
+<title>Control Vehicular · KPI-AFI-01 v2.8</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -469,10 +469,16 @@ tbody tr:hover{background:#d6e8fb}
 
 <!-- ============ UNIDADES EN PRÉSTAMO ============ -->
 <div class="card col-12">
-  <h3>Unidades en Préstamo
-    <span class="hint" style="font-weight:400">· checklists abiertos sin devolución registrada</span>
+  <h3>Préstamos de Unidades
+    <span class="hint" style="font-weight:400">· historial vigente hasta el cierre del día</span>
     <span id="presBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
   </h3>
+  <div class="tabs">
+    <div class="tab" data-pres="abiertos">En préstamo</div>
+    <div class="tab" data-pres="devueltos">Devueltos</div>
+    <div class="tab active" data-pres="vigentes">Vigentes (ambos)</div>
+    <div class="tab" data-pres="todos">Histórico completo</div>
+  </div>
   <div id="presBody"></div>
 </div>
 
@@ -1032,6 +1038,21 @@ tbody tr:hover{background:#d6e8fb}
           <div class="field-msg" id="e_dComentarios"></div>
         </div>
         <div class="full">
+          <label>Firma de devolución (conformidad de reingreso)</label>
+          <div class="firma-wrap">
+            <div class="firma-box">
+              <canvas id="firmaCanvasDev"></canvas>
+              <div class="firma-line"></div>
+              <div class="firma-hint" id="firmaHintDev">Firme aquí al devolver la unidad</div>
+            </div>
+            <div class="firma-tools">
+              <button type="button" class="btn" id="btnLimpiarFirmaDev" style="font-size:12px;padding:6px 13px">Limpiar firma</button>
+              <span class="estado" id="firmaEstadoDev">Sin firma registrada</span>
+            </div>
+          </div>
+          <div class="field-msg" id="e_firmaDev"></div>
+        </div>
+        <div class="full">
           <div class="sec-title" style="margin-top:6px"><span class="n">📷</span> Comparativa de Evidencias · Entrega vs. Devolución
             <span class="sub">Identifique nuevos daños comparando cada toma</span></div>
           <div class="foto-count" id="fotoCountDev">0 de 9 evidencias de devolución capturadas</div>
@@ -1055,6 +1076,18 @@ tbody tr:hover{background:#d6e8fb}
       <button class="btn" id="btnPdfLegal">📄 Descargar PDF Legal</button>
       <button class="btn" data-close-modal="modalAsignacion">Cancelar</button>
       <button class="btn btn-primary" id="btnGuardarAsig">Guardar checklist</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: HISTORIAL DE PRÉSTAMOS ============ -->
+<div class="modal-overlay" id="modalHistorial">
+  <div class="modal wide">
+    <h3 id="mHistTitle">Historial de préstamos</h3>
+    <div class="modal-sub">Todos los checklists registrados para la unidad. Descargue el PDF o abra el registro.</div>
+    <div id="histBody"></div>
+    <div class="modal-actions">
+      <button class="btn" data-close-modal="modalHistorial">Cerrar</button>
     </div>
   </div>
 </div>
@@ -1172,9 +1205,9 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.6 } };
+let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.8 } };
 let ALL=[], DATA=[];
-let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'' };
+let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'', presTab:'vigentes' };
 let session = { rol:null, loggedAt:null };
 let editingVeh = null;
 let editingIncId = null;
@@ -1329,7 +1362,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.6 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.8 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -1391,7 +1424,7 @@ async function seedFromCSV(){
       };
       cargadas++;
     }
-    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.6 };
+    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.8 };
     // Bitácora
     const bit = { id:uid(), ts:nowISO(), unidad:'—', accion:'SEED', campo:'inicialización', antes:'', despues:`${cargadas} unidades`, usuario:session.rol, rol:session.rol };
     updates[`${FB_ROOT}/bitacora/${bit.id}`] = bit;
@@ -1753,7 +1786,7 @@ function renderBitacora(){
 let fbStorage = null;
 let storageModo = 'probando';   // 'storage' | 'rtdb' | 'probando'
 let evidCache = {};             // { asigId: {fotos:{}, firma:''} } cargado bajo demanda
-let evidActual = { fotos:{}, fotosDev:{}, firma:'' };
+let evidActual = { fotos:{}, fotosDev:{}, firma:'', firmaDev:'' };
 let draftAsigId = null;
 
 function initStorage(){
@@ -1928,92 +1961,88 @@ function actualizaContadorFotos(){
 function leerFotos(){ return evidActual.fotos; }
 
 /* ============ FIRMA ELECTRÓNICA (canvas táctil) ============ */
-let firmaCtx=null, firmaPintando=false, firmaTrazos=0, firmaUlt={x:0,y:0};
+/* Gestor de firmas: admite varios lienzos (entrega y devolución) */
+const FIRMAS = {};   // { canvasId: {ctx, trazos, pintando, ult, hintId, estadoId} }
 
-function initFirma(){
-  const cv = $('#firmaCanvas'); if(!cv) return;
+function initFirmaCanvas(canvasId, hintId, estadoId){
+  const cv = document.getElementById(canvasId); if(!cv) return;
   const ratio = window.devicePixelRatio || 1;
   const rect = cv.getBoundingClientRect();
-  const w = rect.width || cv.parentElement.clientWidth || 520;
-  cv.width = Math.round(w*ratio);
+  const w = rect.width || (cv.parentElement ? cv.parentElement.clientWidth : 0) || 520;
+  cv.width  = Math.round(w*ratio);
   cv.height = Math.round(180*ratio);
-  firmaCtx = cv.getContext('2d');
-  firmaCtx.scale(ratio, ratio);
-  firmaCtx.lineWidth = 2.2;
-  firmaCtx.lineCap = 'round';
-  firmaCtx.lineJoin = 'round';
-  firmaCtx.strokeStyle = '#000000';
+  const ctx = cv.getContext('2d');
+  ctx.scale(ratio, ratio);
+  ctx.lineWidth = 2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle = '#000000';
 
-  const pos = ev => {
-    const r = cv.getBoundingClientRect();
-    const t = ev.touches ? ev.touches[0] : ev;
-    return { x:t.clientX-r.left, y:t.clientY-r.top };
-  };
-  const inicia = ev => {
-    ev.preventDefault();
-    firmaPintando = true;
-    firmaUlt = pos(ev);
-    $('#firmaHint').classList.add('hide');
-  };
+  const F = FIRMAS[canvasId] = FIRMAS[canvasId] || {};
+  F.ctx = ctx; F.trazos = F.trazos || 0; F.pintando = false; F.ult = {x:0,y:0};
+  F.hintId = hintId; F.estadoId = estadoId;
+
+  if(F.ligado) return;   // los escuchadores se registran una sola vez
+  F.ligado = true;
+
+  const pos = ev => { const r=cv.getBoundingClientRect(); const t=ev.touches?ev.touches[0]:ev;
+                      return {x:t.clientX-r.left, y:t.clientY-r.top}; };
+  const inicia = ev => { ev.preventDefault(); F.pintando=true; F.ult=pos(ev);
+                         const h=document.getElementById(F.hintId); if(h) h.classList.add('hide'); };
   const traza = ev => {
-    if(!firmaPintando) return;
-    ev.preventDefault();
-    const p = pos(ev);
-    firmaCtx.beginPath();
-    firmaCtx.moveTo(firmaUlt.x, firmaUlt.y);
-    firmaCtx.lineTo(p.x, p.y);
-    firmaCtx.stroke();
-    firmaUlt = p; firmaTrazos++;
-    marcaFirmaEstado(true);
+    if(!F.pintando) return; ev.preventDefault();
+    const pt = pos(ev);
+    F.ctx.beginPath(); F.ctx.moveTo(F.ult.x,F.ult.y); F.ctx.lineTo(pt.x,pt.y); F.ctx.stroke();
+    F.ult = pt; F.trazos++; marcaFirmaEstado(canvasId, true);
   };
-  const termina = ev => { if(ev) ev.preventDefault(); firmaPintando=false; };
+  const termina = ev => { if(ev) ev.preventDefault(); F.pintando=false; };
 
   cv.addEventListener('mousedown', inicia);
   cv.addEventListener('mousemove', traza);
   window.addEventListener('mouseup', termina);
   cv.addEventListener('mouseleave', termina);
   cv.addEventListener('touchstart', inicia, {passive:false});
-  cv.addEventListener('touchmove', traza,  {passive:false});
-  cv.addEventListener('touchend',  termina, {passive:false});
-  cv.addEventListener('touchcancel', termina, {passive:false});
+  cv.addEventListener('touchmove',  traza,  {passive:false});
+  cv.addEventListener('touchend',   termina,{passive:false});
+  cv.addEventListener('touchcancel',termina,{passive:false});
 }
-function marcaFirmaEstado(hay){
-  const el = $('#firmaEstado'); if(!el) return;
+function marcaFirmaEstado(canvasId, hay){
+  const F = FIRMAS[canvasId]; if(!F) return;
+  const el = document.getElementById(F.estadoId); if(!el) return;
   el.className = 'estado' + (hay?' ok':'');
   el.textContent = hay ? '✓ Firma capturada' : 'Sin firma registrada';
 }
-function limpiaFirma(){
-  if(!firmaCtx) return;
-  const cv = $('#firmaCanvas');
+function limpiaFirmaCanvas(canvasId, campo){
+  const F = FIRMAS[canvasId]; const cv = document.getElementById(canvasId);
+  if(!F || !F.ctx || !cv) return;
   const ratio = window.devicePixelRatio || 1;
-  firmaCtx.clearRect(0,0,cv.width/ratio,cv.height/ratio);
-  firmaTrazos = 0;
-  evidActual.firma = '';
-  $('#firmaHint').classList.remove('hide');
-  marcaFirmaEstado(false);
+  F.ctx.clearRect(0,0,cv.width/ratio,cv.height/ratio);
+  F.trazos = 0;
+  if(campo) evidActual[campo] = '';
+  const h = document.getElementById(F.hintId); if(h) h.classList.remove('hide');
+  marcaFirmaEstado(canvasId, false);
 }
-function cargaFirma(dataUrl){
-  limpiaFirma();
+function cargaFirmaCanvas(canvasId, dataUrl, campo){
+  limpiaFirmaCanvas(canvasId, campo);
   if(!dataUrl) return;
-  evidActual.firma = dataUrl;
+  if(campo) evidActual[campo] = dataUrl;
+  const F = FIRMAS[canvasId]; const cv = document.getElementById(canvasId);
+  if(!F || !F.ctx || !cv) return;
   const img = new Image();
   img.onload = ()=>{
-    const cv = $('#firmaCanvas');
     const ratio = window.devicePixelRatio || 1;
-    firmaCtx.drawImage(img, 0, 0, cv.width/ratio, cv.height/ratio);
-    firmaTrazos = 1;
-    $('#firmaHint').classList.add('hide');
-    marcaFirmaEstado(true);
+    F.ctx.drawImage(img, 0, 0, cv.width/ratio, cv.height/ratio);
+    F.trazos = 1;
+    const h = document.getElementById(F.hintId); if(h) h.classList.add('hide');
+    marcaFirmaEstado(canvasId, true);
   };
   img.src = dataUrl;
 }
 /* Recorta el lienzo al trazo real y devuelve un PNG compacto */
-function exportaFirma(){
-  if(firmaTrazos===0) return evidActual.firma || '';
-  const cv = $('#firmaCanvas');
+function exportaFirmaCanvas(canvasId, campo){
+  const F = FIRMAS[canvasId]; const cv = document.getElementById(canvasId);
+  if(!F || !F.ctx || !cv) return (campo && evidActual[campo]) || '';
+  if(F.trazos===0) return (campo && evidActual[campo]) || '';
   const ratio = window.devicePixelRatio || 1;
   const w = cv.width, h = cv.height;
-  const px = firmaCtx.getImageData(0,0,w,h).data;
+  const px = F.ctx.getImageData(0,0,w,h).data;
   let x0=w, y0=h, x1=0, y1=0, hay=false;
   for(let y=0;y<h;y++) for(let x=0;x<w;x++){
     if(px[(y*w+x)*4+3] > 12){ hay=true; if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; }
@@ -2029,23 +2058,35 @@ function exportaFirma(){
   return out.toDataURL('image/png');
 }
 
+/* Envolturas: firma de ENTREGA (sección 6) y de DEVOLUCIÓN (sección 7) */
+function initFirma(){
+  initFirmaCanvas('firmaCanvas','firmaHint','firmaEstado');
+  initFirmaCanvas('firmaCanvasDev','firmaHintDev','firmaEstadoDev');
+}
+function limpiaFirma(){    limpiaFirmaCanvas('firmaCanvas','firma'); }
+function limpiaFirmaDev(){ limpiaFirmaCanvas('firmaCanvasDev','firmaDev'); }
+function cargaFirma(d){    cargaFirmaCanvas('firmaCanvas', d, 'firma'); }
+function cargaFirmaDev(d){ cargaFirmaCanvas('firmaCanvasDev', d, 'firmaDev'); }
+function exportaFirma(){    return exportaFirmaCanvas('firmaCanvas','firma'); }
+function exportaFirmaDev(){ return exportaFirmaCanvas('firmaCanvasDev','firmaDev'); }
+
 /* ============ EVIDENCIAS EN FIREBASE (nodo aparte, carga bajo demanda) ============ */
 async function cargaEvidencias(asigId){
-  if(!asigId) return {fotos:{}, fotosDev:{}, firma:''};
+  if(!asigId) return {fotos:{}, fotosDev:{}, firma:'', firmaDev:''};
   if(evidCache[asigId]) return evidCache[asigId];
   try{
     const snap = await fbDb.ref(`${FB_ROOT}/evidencias/${asigId}`).get();
     const d = snap.val() || {};
-    const r = { fotos: d.fotos || {}, fotosDev: d.fotosDev || {}, firma: d.firma || '' };
+    const r = { fotos: d.fotos || {}, fotosDev: d.fotosDev || {}, firma: d.firma || '', firmaDev: d.firmaDev || '' };
     evidCache[asigId] = r;
     return r;
-  }catch(e){ return {fotos:{}, fotosDev:{}, firma:''}; }
+  }catch(e){ return {fotos:{}, fotosDev:{}, firma:'', firmaDev:''}; }
 }
-async function guardaEvidencias(asigId, fotos, fotosDev, firma){
-  const payload = { fotos: fotos||{}, fotosDev: fotosDev||{}, firma: firma||'', updatedAt: nowISO(), updatedBy: session.rol };
+async function guardaEvidencias(asigId, fotos, fotosDev, firma, firmaDev){
+  const payload = { fotos: fotos||{}, fotosDev: fotosDev||{}, firma: firma||'', firmaDev: firmaDev||'', updatedAt: nowISO(), updatedBy: session.rol };
   try{
     await fbDb.ref(`${FB_ROOT}/evidencias/${asigId}`).set(payload);
-    evidCache[asigId] = { fotos: payload.fotos, fotosDev: payload.fotosDev, firma: payload.firma };
+    evidCache[asigId] = { fotos: payload.fotos, fotosDev: payload.fotosDev, firma: payload.firma, firmaDev: payload.firmaDev };
     return true;
   }catch(e){
     toast('No se pudieron guardar las evidencias: '+e.message+' (el checklist sí se guardó)','warn');
@@ -2141,45 +2182,91 @@ function diasDesde(fechaISO){
   if(isNaN(a)) return null;
   return Math.max(0, Math.floor((new Date(b.getFullYear(),b.getMonth(),b.getDate()) - a)/86400000));
 }
+function diasEntreFechas(ini, fin){
+  if(!ini || !fin) return null;
+  const a = new Date(ini+'T00:00:00'), b = new Date(fin+'T00:00:00');
+  if(isNaN(a)||isNaN(b)) return null;
+  return Math.max(0, Math.round((b-a)/86400000));
+}
 function renderPrestamos(){
-  const abiertos = STORE.asignaciones
-    .filter(a=>a.estadoRegistro==='Abierta')
-    .sort((a,b)=>(a.fechaEntrega||'').localeCompare(b.fechaEntrega||''));
   const esEditor = session.rol==='admin' || session.rol==='auxiliar';
-  $('#presBadge').innerHTML = abiertos.length
-    ? `<b style="color:var(--accent)">${abiertos.length}</b> unidad(es) fuera · ${STORE.unidades.length-abiertos.length} disponibles`
-    : `<b style="color:var(--green)">Ninguna unidad fuera</b>`;
+  const vista = state.presTab || 'vigentes';
 
-  if(abiertos.length===0){
-    $('#presBody').innerHTML = '<div class="pres-empty">No hay unidades en préstamo. Todos los checklists están cerrados.</div>';
+  const abiertos  = STORE.asignaciones.filter(a=>a.estadoRegistro==='Abierta');
+  const devueltos = STORE.asignaciones.filter(a=>a.estadoRegistro==='Cerrada');
+  // "Vigente" = aún no incluido en un cierre de día
+  const devVigentes = devueltos.filter(a=>!a.archivado);
+
+  let lista;
+  if(vista==='abiertos')       lista = abiertos;
+  else if(vista==='devueltos') lista = devVigentes;
+  else if(vista==='todos')     lista = [...STORE.asignaciones];
+  else                         lista = [...abiertos, ...devVigentes];
+
+  lista.sort((a,b)=>{
+    if(a.estadoRegistro!==b.estadoRegistro) return a.estadoRegistro==='Abierta'?-1:1;
+    return (b.fechaEntrega||'').localeCompare(a.fechaEntrega||'');
+  });
+
+  $('#presBadge').innerHTML =
+    `<b style="color:var(--accent)">${abiertos.length}</b> en préstamo · `+
+    `<b style="color:var(--green)">${devVigentes.length}</b> devueltos vigentes`+
+    (devueltos.length-devVigentes.length ? ` · ${devueltos.length-devVigentes.length} archivados` : '');
+
+  if(lista.length===0){
+    const msg = vista==='abiertos' ? 'No hay unidades en préstamo. Todos los checklists están cerrados.'
+      : vista==='devueltos' ? 'Sin devoluciones pendientes de archivar. El último cierre de día ya las respaldó.'
+      : 'Sin registros de préstamo.';
+    $('#presBody').innerHTML = `<div class="pres-empty">${msg}</div>`;
     return;
   }
+
   $('#presBody').innerHTML = `
-    <div class="tablewrap" style="max-height:340px">
+    <div class="tablewrap" style="max-height:400px">
       <table><thead><tr>
-        <th>FOLIO</th><th>UNIDAD</th><th>CHOFER</th><th>ZONA</th><th>DESTINO</th>
-        <th>F. ENTREGA</th><th>DÍAS FUERA</th><th>KM INICIAL</th><th>EVID.</th><th></th>
-      </tr></thead><tbody>${abiertos.map(a=>{
-        const d = diasDesde(a.fechaEntrega);
+        <th>ESTADO</th><th>FOLIO</th><th>UNIDAD</th><th>CHOFER</th><th>ZONA</th><th>DESTINO</th>
+        <th>F. ENTREGA</th><th>F. DEVOL.</th><th>DÍAS</th><th>KM INI.</th><th>KM FIN.</th>
+        <th>RECORRIDO</th><th>EVID.</th><th>DOC.</th>
+      </tr></thead><tbody>${lista.map(a=>{
+        const cerrada = a.estadoRegistro==='Cerrada';
+        const d = cerrada ? diasEntreFechas(a.fechaEntrega, a.devFecha) : diasDesde(a.fechaEntrega);
         const cls = d===null?'d-ok':d<=3?'d-ok':d<=10?'d-mid':'d-long';
-        const nf = a.fotos ? Object.keys(a.fotos).length : 0;
-        return `<tr>
+        const nf  = a.evidenciasCount ?? (a.fotos?Object.keys(a.fotos).length:0);
+        const nfd = a.evidenciasDevCount ?? 0;
+        const evTxt = cerrada ? `${nf}/${TOTAL_FOTOS} · ${nfd}/${TOTAL_FOTOS}` : `${nf}/${TOTAL_FOTOS}`;
+        const evCol = (cerrada ? (nf===TOTAL_FOTOS && nfd===TOTAL_FOTOS) : nf===TOTAL_FOTOS)
+          ? 'var(--green)' : (nf||nfd) ? 'var(--gold)' : 'var(--muted)';
+        return `<tr${a.archivado?' style="opacity:.62"':''}>
+          <td><span class="asig-state ${cerrada?'st-cerrada':'st-abierta'}">${cerrada?'DEVUELTA':'EN PRÉSTAMO'}</span>${
+            a.archivado?'<br><span style="font-size:10px;color:var(--muted)">archivada</span>':''}</td>
           <td style="font-variant-numeric:tabular-nums">${a.bitacora||'—'}</td>
           <td><b>${a.vehiculo}</b></td>
           <td>${a.chofer||'—'}</td>
           <td>${a.zona||'—'}</td>
           <td>${a.destino||'—'}</td>
           <td>${a.fechaEntrega||'—'}</td>
+          <td>${a.devFecha||'—'}</td>
           <td><span class="dias-badge ${cls}">${d===null?'—':d+(d===1?' día':' días')}</span></td>
           <td class="num">${fmt(a.kmInicial)}</td>
-          <td class="num" style="color:${nf===TOTAL_FOTOS?'var(--green)':nf?'var(--gold)':'var(--muted)'}">${nf}/${TOTAL_FOTOS}</td>
-          <td>${esEditor?`<button class="btn" style="padding:3px 9px;font-size:11px" onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}')">Devolver</button>`:''}</td>
+          <td class="num">${fmt(a.devKmFinal)}</td>
+          <td class="num">${a.kmRecorrido!=null?fmt(a.kmRecorrido):'—'}</td>
+          <td class="num" style="color:${evCol}">${evTxt}</td>
+          <td style="white-space:nowrap">
+            <button class="btn" style="padding:3px 9px;font-size:11px" onclick="pdfDePrestamo('${a.id}',this)">📄 PDF</button>
+            ${esEditor?`<button class="btn" style="padding:3px 9px;font-size:11px;margin-left:4px"
+              onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}')">${cerrada?'Ver':'Devolver'}</button>`:''}
+          </td>
         </tr>`;
       }).join('')}</tbody></table>
+    </div>
+    <div class="legend-note">
+      <b>Vigencia del historial:</b> los préstamos devueltos permanecen en la vista “Devueltos” hasta que se ejecute
+      el <b>Cierre de Día (ZIP)</b>; al respaldarse quedan marcados como archivados y solo aparecen en el histórico completo.
+      La columna EVID. muestra entrega · devolución.
     </div>`;
 }
 
-/* ============ RESPALDO DE EVIDENCIAS (ZIP) ============ */
+/* ============ RESPALDO DE EVIDENCIAS (ZIP) ============ *//* ============ RESPALDO DE EVIDENCIAS (ZIP) ============ */
 function b64aBlob(dataUrl){
   const [cab, datos] = dataUrl.split(',');
   const mime = (cab.match(/:(.*?);/)||[])[1] || 'image/jpeg';
@@ -2200,6 +2287,7 @@ async function calculaUsoEvidencias(){
         bytes += f.peso || (typeof f.valor==='string' ? f.valor.length*0.75 : 0);
       });
       if(e.firma){ firmas++; bytes += e.firma.length*0.75; }
+      if(e.firmaDev){ firmas++; bytes += e.firmaDev.length*0.75; }
     });
     return {bytes, fotos, firmas, regs};
   }catch(e){ return {bytes:0, fotos:0, firmas:0, regs:0, error:e.message}; }
@@ -2251,10 +2339,11 @@ async function respaldoEvidencias(){
       }
       if(evid[id].firma){
         try{
-          dir.file('firma.png', b64aBlob(evid[id].firma));
-          idx.push([a.bitacora||id, a.vehiculo||'', a.chofer||'', a.fechaEntrega||'', a.estadoRegistro||'', `${carpeta}/firma.png`, 'Firma']);
+          dir.file('firma_entrega.png', b64aBlob(evid[id].firma));
+          idx.push([a.bitacora||id, a.vehiculo||'', a.chofer||'', a.fechaEntrega||'', a.estadoRegistro||'', `${carpeta}/firma_entrega.png`, 'Firma entrega']);
           ok++;
         }catch(e){ fallos++; }
+        if(evid[id].firmaDev){ try{ dir.file('firma_devolucion.png', b64aBlob(evid[id].firmaDev)); ok++; }catch(e){ fallos++; } }
       }
     }
     zip.file('INDICE.csv', idx.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n'));
@@ -2411,8 +2500,8 @@ function actualizaContadorFotosDev(){
 function leerFotosDev(){ return evidActual.fotosDev; }
 
 /* ============ PDF LEGAL: PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES ============ */
-function armaHtmlLegal(a, u, fotos, fotosDev, firma){
-  const esc = v => String(v??'—').replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+function armaHtmlLegal(a, u, fotos, fotosDev, firma, firmaDev){
+  const esc = v => (v===null||v===undefined||v==='') ? '—' : String(v).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
   const fila = (l,v) => `<tr><th>${l}</th><td>${esc(v)}</td></tr>`;
   const km = v => v==null||v===''?'—':Number(v).toLocaleString('es-MX')+' km';
 
@@ -2422,18 +2511,27 @@ function armaHtmlLegal(a, u, fotos, fotosDev, firma){
   const pars = [['Nivel de aceite',a.parAceite],['Anticongelante',a.parAnticong],
     ['Frenos',a.parFrenos],['Líquido limpiaparabrisas',a.parLimpia]];
 
-  const celdaFoto = (m,lab) => m
-    ? `<div class="ph"><img src="${srcDe(m)}"><span>${lab}</span></div>`
+  const celdaFoto = (m,lab) => (m && m.valor)
+    ? `<div class="ph"><img src="${m.valor}"><span>${lab}</span></div>`
     : `<div class="ph vac"><span>${lab}<br><i>sin evidencia</i></span></div>`;
 
-  const hayDev = !!(a.devFecha || a.devKmFinal!=null);
+  const hayDev = !!(a.devFecha || a.devKmFinal!=null || a.devChofer);
+  const nSec = n => hayDev ? n : n;
+
+  const bloqueFirma = (img, nombre, rol) => `
+    <div class="fbox">
+      ${img?`<img class="fimg" src="${img}">`:'<div class="fimg vacia"></div>'}
+      <div class="fline"></div>
+      <div class="fnom">${esc(nombre)}</div>
+      <div class="frol">${rol}</div>
+    </div>`;
 
   return `
   <div class="doc">
     <div class="enc">
       <div class="tit">PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES</div>
       <div class="emp">${RAZON_SOCIAL}</div>
-      <div class="fol">Folio: <b>${esc(a.bitacora)}</b> · Emitido: ${new Date().toLocaleString('es-MX')}</div>
+      <div class="fol">Folio: <b>${esc(a.bitacora)}</b> &nbsp;·&nbsp; Estado: <b>${esc(a.estadoRegistro)}</b> &nbsp;·&nbsp; Emitido: ${new Date().toLocaleString('es-MX')}</div>
     </div>
 
     <div class="sec">1. Datos del Vehículo</div>
@@ -2454,16 +2552,17 @@ function armaHtmlLegal(a, u, fotos, fotosDev, firma){
 
     <div class="sec">3. Inventario de Documentos y Placas</div>
     <table class="inv"><tr>${docs.map(([l])=>`<th>${l}</th>`).join('')}</tr>
-      <tr>${docs.map(([,v])=>`<td class="${v==='Tiene'?'si':'no'}">${esc(v||'—')}</td>`).join('')}</tr></table>
+      <tr>${docs.map(([,v])=>`<td class="${v==='Tiene'?'si':'no'}">${esc(v)}</td>`).join('')}</tr></table>
 
     <div class="sec">4. Parámetros Básicos</div>
     <table class="inv"><tr>${pars.map(([l])=>`<th>${l}</th>`).join('')}</tr>
-      <tr>${pars.map(([,v])=>`<td class="${v==='Bueno'?'si':v==='Regular'?'md':'no'}">${esc(v||'—')}</td>`).join('')}</tr></table>
+      <tr>${pars.map(([,v])=>`<td class="${v==='Bueno'?'si':v==='Regular'?'md':'no'}">${esc(v)}</td>`).join('')}</tr></table>
 
     <div class="sec">5. Evidencia Fotográfica de Entrega</div>
     <div class="fotos">${FOTOS_DEF.map(f=>celdaFoto(fotos[f.k], f.lab)).join('')}</div>
 
     ${hayDev?`
+    <div class="salto"></div>
     <div class="sec">6. Devolución de la Unidad</div>
     <table class="t2">
       ${fila('Fecha de devolución', a.devFecha)}${fila('Chofer que devuelve', a.devChofer)}
@@ -2472,7 +2571,7 @@ function armaHtmlLegal(a, u, fotos, fotosDev, firma){
       ${fila('Kilómetros del recorrido', km(a.kmRecorrido))}${fila('Estado del registro', a.estadoRegistro)}
     </table>
     ${a.devComentarios?`<p class="obs"><b>Comentarios de devolución:</b> ${esc(a.devComentarios)}</p>`:''}
-    ${Object.keys(fotosDev).length?`<div class="sec sub">Evidencia Fotográfica de Devolución</div>
+    ${Object.keys(fotosDev||{}).length?`<div class="sec sub">Evidencia Fotográfica de Devolución</div>
       <div class="fotos">${FOTOS_DEF.map(f=>celdaFoto(fotosDev[f.k], f.lab)).join('')}</div>`:''}
     `:''}
 
@@ -2480,20 +2579,18 @@ function armaHtmlLegal(a, u, fotos, fotosDev, firma){
     <div class="sec">${hayDev?'7':'6'}. Carta Responsiva</div>
     <p class="carta">${esc(CARTA_RESPONSIVA)}</p>
 
+    <div class="sec">${hayDev?'8':'7'}. Firmas de Conformidad</div>
+    <div class="sub-firmas">Entrega</div>
     <div class="firmas">
-      <div class="fbox">
-        ${firma?`<img class="fimg" src="${firma}">`:'<div class="fimg vacia"></div>'}
-        <div class="fline"></div>
-        <div class="fnom">${esc(a.firmaRecepcion || a.chofer)}</div>
-        <div class="frol">Chofer responsable · Recibe de conformidad</div>
-      </div>
-      <div class="fbox">
-        <div class="fimg vacia"></div>
-        <div class="fline"></div>
-        <div class="fnom">${esc(a.entregadoPor)}</div>
-        <div class="frol">Por ${RAZON_SOCIAL}</div>
-      </div>
+      ${bloqueFirma(firma, a.firmaRecepcion || a.chofer, 'Chofer responsable · Recibe de conformidad')}
+      ${bloqueFirma('', a.entregadoPor, 'Por '+RAZON_SOCIAL)}
     </div>
+    ${hayDev?`
+    <div class="sub-firmas">Devolución</div>
+    <div class="firmas">
+      ${bloqueFirma(firmaDev, a.devChofer, 'Chofer que devuelve · Entrega de conformidad')}
+      ${bloqueFirma('', a.devRecibidoPor, 'Por '+RAZON_SOCIAL+' · Recibe la unidad')}
+    </div>`:''}
 
     <div class="pie">
       Documento generado por el sistema de Control Vehicular · KPI-AFI-01 ·
@@ -2503,50 +2600,135 @@ function armaHtmlLegal(a, u, fotos, fotosDev, firma){
 }
 
 const CSS_LEGAL = `
-.doc{font-family:'Times New Roman',Georgia,serif;color:#12181f;background:#fff;padding:6mm 2mm;font-size:10.5pt;line-height:1.5}
-.enc{text-align:center;border-bottom:2.5px solid #12181f;padding-bottom:9px;margin-bottom:15px}
-.enc .tit{font-size:15pt;font-weight:700;letter-spacing:.6px}
-.enc .emp{font-size:9.5pt;margin-top:4px;font-weight:600}
-.enc .fol{font-size:8.5pt;color:#414d5c;margin-top:5px}
-.sec{font-size:10.5pt;font-weight:700;background:#eef2f7;border-left:4px solid #12181f;padding:5px 9px;margin:15px 0 8px}
-.sec.sub{background:#f6f8fb;border-left-color:#8b98a8;font-size:9.5pt}
+.doc{font-family:Arial,Helvetica,sans-serif;color:#12181f;background:#fff;padding:4px 2px;font-size:11px;line-height:1.5;width:760px}
+.enc{text-align:center;border-bottom:3px solid #12181f;padding-bottom:9px;margin-bottom:14px}
+.enc .tit{font-size:19px;font-weight:bold;letter-spacing:.5px}
+.enc .emp{font-size:12px;margin-top:4px;font-weight:bold}
+.enc .fol{font-size:10px;color:#414d5c;margin-top:5px}
+.sec{font-size:13px;font-weight:bold;background:#eef2f7;border-left:4px solid #0b4f9e;padding:6px 10px;margin:14px 0 8px}
+.sec.sub{background:#f6f8fb;border-left-color:#8b98a8;font-size:12px}
+.sub-firmas{font-size:11px;font-weight:bold;color:#0b4f9e;margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px}
 table{width:100%;border-collapse:collapse;margin-bottom:6px}
-.t2 th{width:23%;text-align:left;background:#f6f8fb;padding:5px 8px;border:1px solid #ccd4de;font-size:9pt;font-weight:600}
-.t2 td{padding:5px 8px;border:1px solid #ccd4de;font-size:9.5pt;width:27%}
-.inv th{background:#f6f8fb;border:1px solid #ccd4de;padding:5px 4px;font-size:8pt;font-weight:600;text-align:center}
-.inv td{border:1px solid #ccd4de;padding:5px 4px;font-size:9pt;text-align:center;font-weight:600}
+.t2 th{width:23%;text-align:left;background:#f6f8fb;padding:6px 8px;border:1px solid #ccd4de;font-size:10px;font-weight:bold}
+.t2 td{padding:6px 8px;border:1px solid #ccd4de;font-size:11px;width:27%}
+.inv th{background:#f6f8fb;border:1px solid #ccd4de;padding:6px 4px;font-size:9px;font-weight:bold;text-align:center}
+.inv td{border:1px solid #ccd4de;padding:6px 4px;font-size:11px;text-align:center;font-weight:bold}
 .inv .si{color:#12703f}.inv .md{color:#9a6b00}.inv .no{color:#a41d2c}
-.obs{font-size:9pt;margin:5px 0 0;text-align:justify;padding:6px 9px;background:#f9fafc;border:1px solid #e2e8f0}
-.fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:5px}
-.ph{border:1px solid #ccd4de;border-radius:3px;overflow:hidden;background:#f2f5f9}
-.ph img{width:100%;height:74px;object-fit:cover;display:block}
-.ph span{display:block;font-size:7.5pt;padding:3px 5px;background:#eef2f7;text-align:center;font-weight:600}
-.ph.vac{height:96px;display:flex;align-items:center;justify-content:center}
-.ph.vac span{background:none;color:#8b98a8;font-weight:400}
-.carta{text-align:justify;font-size:9.5pt;line-height:1.72;padding:11px 13px;border:1px solid #ccd4de;background:#fcfdfe;margin:0}
-.salto{page-break-before:always}
-.firmas{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:34px}
-.fbox{text-align:center}
-.fimg{height:62px;object-fit:contain;max-width:100%;display:block;margin:0 auto}
-.fimg.vacia{height:62px}
-.fline{border-bottom:1.3px solid #12181f;margin:2px 12px 6px}
-.fnom{font-size:9.5pt;font-weight:700;text-transform:uppercase}
-.frol{font-size:8pt;color:#414d5c;margin-top:3px;line-height:1.35}
-.pie{margin-top:26px;padding-top:8px;border-top:1px solid #ccd4de;font-size:7.5pt;color:#5a6a7d;text-align:center}
+.obs{font-size:10px;margin:5px 0 0;text-align:justify;padding:7px 10px;background:#f9fafc;border:1px solid #e2e8f0}
+.fotos{display:table;width:100%;border-spacing:5px;border-collapse:separate}
+.ph{display:inline-block;width:31%;vertical-align:top;border:1px solid #ccd4de;background:#f2f5f9;margin:0 4px 8px 0}
+.ph img{width:100%;height:82px;object-fit:cover;display:block}
+.ph span{display:block;font-size:9px;padding:3px 4px;background:#eef2f7;text-align:center;font-weight:bold}
+.ph.vac{height:104px;text-align:center;padding-top:38px;box-sizing:border-box}
+.ph.vac span{background:none;color:#8b98a8;font-weight:normal}
+.carta{text-align:justify;font-size:10.5px;line-height:1.7;padding:12px 14px;border:1px solid #ccd4de;background:#fcfdfe;margin:0}
+.salto{page-break-before:always;height:0}
+.firmas{display:table;width:100%;margin-top:12px}
+.fbox{display:inline-block;width:46%;text-align:center;vertical-align:bottom;margin:0 1.5%}
+.fimg{height:64px;max-width:100%;display:block;margin:0 auto}
+.fimg.vacia{height:64px}
+.fline{border-bottom:1.5px solid #12181f;margin:2px 10px 6px}
+.fnom{font-size:11px;font-weight:bold;text-transform:uppercase}
+.frol{font-size:9px;color:#414d5c;margin-top:3px;line-height:1.35}
+.pie{margin-top:22px;padding-top:8px;border-top:1px solid #ccd4de;font-size:9px;color:#5a6a7d;text-align:center}
 `;
 
+/* Convierte una URL remota a data URL para que html2canvas no la descarte por CORS */
+function aDataUrl(url){
+  return new Promise(res=>{
+    if(!url) return res('');
+    if(url.startsWith('data:')) return res(url);
+    const t = setTimeout(()=>res(''), 12000);
+    fetch(url).then(r=>r.ok?r.blob():Promise.reject(new Error('HTTP '+r.status)))
+      .then(b=>{ const fr=new FileReader(); fr.onload=()=>{clearTimeout(t);res(fr.result);};
+                 fr.onerror=()=>{clearTimeout(t);res('');}; fr.readAsDataURL(b); })
+      .catch(()=>{ clearTimeout(t); res(''); });
+  });
+}
+/* Deja todas las evidencias en base64 antes de renderizar */
+async function inlineEvidencias(obj){
+  const out = {};
+  for(const [k,f] of Object.entries(obj||{})){
+    if(!f || !f.valor) continue;
+    const d = await aDataUrl(f.valor);
+    if(d) out[k] = {...f, valor:d};
+  }
+  return out;
+}
+
+/* ===== Generador central del PDF legal ===== */
+async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
+  if(typeof html2pdf === 'undefined'){ toast('La librería de PDF no cargó. Verifique su conexión.','err'); return false; }
+  const paso = m => { if(avisar) avisar(m); };
+
+  paso('Preparando imágenes…');
+  const fIn  = await inlineEvidencias(fotos);
+  const fdIn = await inlineEvidencias(fotosDev);
+  const firmaIn    = await aDataUrl(firma);
+  const firmaDevIn = await aDataUrl(firmaDev);
+
+  // Contenedor con posición ABSOLUTA fuera de pantalla (nunca 'fixed', que
+  // html2canvas no captura; ni opacidad, que se aplicaría al lienzo final).
+  const cont = document.createElement('div');
+  cont.setAttribute('id','pdfLegalTmp');
+  cont.style.cssText = 'position:absolute;left:-10000px;top:0;width:760px;background:#ffffff';
+  cont.innerHTML = `<style>${CSS_LEGAL}</style>` + armaHtmlLegal(a, u, fIn, fdIn, firmaIn, firmaDevIn);
+  document.body.appendChild(cont);
+
+  try{
+    paso('Cargando recursos…');
+    // Esperar a que cada <img> termine de decodificar antes de capturar
+    const imgs = [...cont.querySelectorAll('img')];
+    await Promise.all(imgs.map(img => img.complete && img.naturalWidth
+      ? Promise.resolve()
+      : new Promise(r=>{ const t=setTimeout(r,8000);
+          img.onload=()=>{clearTimeout(t);r();}; img.onerror=()=>{clearTimeout(t);img.remove();r();}; })));
+    await new Promise(r=>setTimeout(r,180));   // margen para el trazado final
+
+    paso('Generando PDF…');
+    const nombre = `Prestamo-${(a.bitacora||'SIN-FOLIO')}-${a.vehiculo||''}.pdf`.replace(/[^\w\-.]/g,'_');
+    await html2pdf().set({
+      margin: [9,8,10,8],
+      filename: nombre,
+      image: {type:'jpeg', quality:0.92},
+      html2canvas: {scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false,
+                    scrollX:0, scrollY:0, windowWidth:820, width:760},
+      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'},
+      pagebreak: {mode:['css','legacy']}
+    }).from(cont.querySelector('.doc') || cont).save();
+    return true;
+  }catch(e){
+    console.error('generaPdfLegal', e);
+    toast('No se pudo generar el PDF ('+e.message+'). Abriendo versión imprimible…','warn');
+    const w = window.open('','_blank');
+    if(w){
+      w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+        <title>Préstamo ${a.bitacora||''}</title><style>${CSS_LEGAL}
+        @page{size:A4;margin:11mm 9mm} .doc{width:auto}
+        .noprint{position:fixed;top:10px;right:10px;background:#0b4f9e;color:#fff;border:none;
+        padding:10px 20px;border-radius:6px;font-size:14px;cursor:pointer}
+        @media print{.noprint{display:none}}</style></head><body>
+        <button class="noprint" onclick="window.print()">Imprimir / Guardar como PDF</button>
+        ${armaHtmlLegal(a,u,fIn,fdIn,firmaIn,firmaDevIn)}</body></html>`);
+      w.document.close();
+      setTimeout(()=>{ try{ w.focus(); w.print(); }catch(_){} }, 800);
+    }
+    return false;
+  }finally{
+    const tmp = document.getElementById('pdfLegalTmp');
+    if(tmp) document.body.removeChild(tmp);
+  }
+}
+
+/* Desde el modal: toma lo capturado en pantalla, esté guardado o no */
 async function descargarPdfLegal(){
-  if(typeof html2pdf === 'undefined'){ toast('La librería de PDF no cargó. Verifique su conexión.','err'); return; }
   const veh = $('#aVehiculo').value;
   const u = STORE.unidades.find(x=>x.veh===veh);
   if(!u){ toast('Unidad no encontrada.','err'); return; }
-
   const btn = $('#btnPdfLegal'); const txt = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Generando…';
+  btn.disabled = true;
   try{
-    // Se arma con lo que hay en pantalla: funciona con el checklist abierto o cerrado
     const num = id => $('#'+id).value===''?null:parseInt($('#'+id).value);
-    const guardado = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
     const a = {
       bitacora:$('#aBitacora').value, vehiculo:veh, zona:$('#aZona').value,
       fechaEntrega:$('#aFechaEntrega').value, chofer:$('#aChofer').value,
@@ -2565,29 +2747,30 @@ async function descargarPdfLegal(){
       estadoRegistro: ($('#dFecha').value && num('dKmFinal')!==null) ? 'Cerrada' : 'Abierta'
     };
     a.kmRecorrido = (a.devKmFinal!=null && a.kmInicial!=null) ? a.devKmFinal - a.kmInicial : null;
-
-    const firma = exportaFirma() || (guardado && guardado.firmaCapturada ? evidActual.firma : '');
-    const cont = document.createElement('div');
-    cont.style.cssText = 'position:fixed;left:-99999px;top:0;width:186mm;background:#fff';
-    cont.innerHTML = `<style>${CSS_LEGAL}</style>` + armaHtmlLegal(a, u, evidActual.fotos, evidActual.fotosDev, firma);
-    document.body.appendChild(cont);
-
-    const nombre = `Prestamo-${(a.bitacora||'SIN-FOLIO')}-${veh}.pdf`.replace(/[^\w\-.]/g,'_');
-    await html2pdf().set({
-      margin: [10,9,11,9],
-      filename: nombre,
-      image: {type:'jpeg', quality:0.9},
-      html2canvas: {scale:2, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false},
-      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'},
-      pagebreak: {mode:['css','legacy']}
-    }).from(cont).save();
-
-    document.body.removeChild(cont);
-    toast('PDF legal generado.');
-    if(editingAsigId) await logChange(veh,'PDF_LEGAL','documento','', a.bitacora||'');
+    const ok = await generaPdfLegal(a, u, evidActual.fotos, evidActual.fotosDev,
+      exportaFirma()||evidActual.firma, exportaFirmaDev()||evidActual.firmaDev,
+      m=>{ btn.textContent = m; });
+    if(ok){ toast('PDF legal generado.'); if(editingAsigId) await logChange(veh,'PDF_LEGAL','documento','', a.bitacora||''); }
   }catch(e){ toast('Error al generar el PDF: '+e.message,'err'); }
   finally{ btn.disabled=false; btn.textContent=txt; }
 }
+
+/* Desde la tabla o el historial: reconstruye el documento desde el registro guardado */
+window.pdfDePrestamo = async function(asigId, boton){
+  const a = STORE.asignaciones.find(x=>x.id===asigId);
+  if(!a){ toast('Registro no encontrado.','err'); return; }
+  const u = STORE.unidades.find(x=>x.veh===a.vehiculo) || {veh:a.vehiculo, placas:'—', zona:a.zona, depto:'—', estatus:'—'};
+  const btn = boton || null;
+  const txt = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; }
+  try{
+    const ev = await cargaEvidencias(asigId);
+    const ok = await generaPdfLegal(a, u, ev.fotos, ev.fotosDev, ev.firma, ev.firmaDev,
+      m=>{ if(btn) btn.textContent = m.replace('…',''); });
+    if(ok){ toast(`PDF del folio ${a.bitacora||''} generado.`); await logChange(a.vehiculo,'PDF_LEGAL','documento','', a.bitacora||''); }
+  }catch(e){ toast('Error al generar el PDF: '+e.message,'err'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent=txt; } }
+};
 
 /* ============ EXPORTACIÓN DIARIA EN ZIP ============ */
 async function exportacionDiariaZip(){
@@ -2657,7 +2840,8 @@ async function exportacionDiariaZip(){
       };
       await vuelca(ev.fotos, 'entrega_');
       await vuelca(ev.fotosDev, 'devolucion_');
-      if(ev.firma){ try{ d.file('firma.png', b64aBlob(ev.firma)); arch++; }catch(e){ fallos++; } }
+      if(ev.firma){ try{ d.file('firma_entrega.png', b64aBlob(ev.firma)); arch++; }catch(e){ fallos++; } }
+      if(ev.firmaDev){ try{ d.file('firma_devolucion.png', b64aBlob(ev.firmaDev)); arch++; }catch(e){ fallos++; } }
     }
 
     zip.file('LEEME.txt',
@@ -2774,11 +2958,12 @@ async function cierreDeDia(){
       };
       await vuelca(evid[id].fotos,    'entrega_',    'Evidencia de entrega');
       await vuelca(evid[id].fotosDev, 'devolucion_', 'Evidencia de devolución');
-      if(evid[id].firma){
+      for(const [campo,nom,tipo] of [['firma','firma_entrega.png','Firma de entrega'],['firmaDev','firma_devolucion.png','Firma de devolución']]){
+        if(!evid[id][campo]) continue;
         try{
-          d.file('firma.png', b64aBlob(evid[id].firma));
+          d.file(nom, b64aBlob(evid[id][campo]));
           idx.push([a.bitacora||id, a.vehiculo||'', a.chofer||'', a.fechaEntrega||'',
-                    a.estadoRegistro||'', `${carpeta}/firma.png`, 'Firma de conformidad','Base de datos']);
+                    a.estadoRegistro||'', `${carpeta}/${nom}`, tipo, 'Base de datos']);
           arch++;
         }catch(e){ fallos++; }
       }
@@ -2825,8 +3010,21 @@ async function cierreDeDia(){
     link.click();
     URL.revokeObjectURL(url);
 
-    await logChange('—','CIERRE_DIA','respaldo','', `${arch} archivo(s) · ${(blob.size/1048576).toFixed(1)} MB`);
-    toast(`Cierre de día generado: ${arch} archivo(s), ${(blob.size/1048576).toFixed(1)} MB${fallos?` · ${fallos} no recuperados`:''}.`);
+    // Los préstamos ya devueltos quedan archivados: salen del historial vigente
+    const porArchivar = STORE.asignaciones.filter(a=>a.estadoRegistro==='Cerrada' && !a.archivado);
+    if(porArchivar.length){
+      btn.textContent = 'Archivando…';
+      const up = {};
+      const sello = nowISO();
+      porArchivar.forEach(a=>{
+        up[`${FB_ROOT}/asignaciones/${a.id}/archivado`] = true;
+        up[`${FB_ROOT}/asignaciones/${a.id}/archivadoEn`] = sello;
+      });
+      try{ await fbDb.ref().update(up); }catch(e){ console.warn('archivado', e); }
+    }
+
+    await logChange('—','CIERRE_DIA','respaldo','', `${arch} archivo(s) · ${(blob.size/1048576).toFixed(1)} MB · ${porArchivar.length} préstamo(s) archivado(s)`);
+    toast(`Cierre de día generado: ${arch} archivo(s), ${(blob.size/1048576).toFixed(1)} MB${porArchivar.length?` · ${porArchivar.length} devolución(es) archivada(s)`:''}${fallos?` · ${fallos} no recuperados`:''}.`);
   }catch(e){ toast('Error en el cierre de día: '+e.message,'err'); }
   finally{ btn.disabled=false; btn.textContent=txt; }
 }
@@ -2902,12 +3100,13 @@ async function limpiarArchivosYEvidencias(){
       updates[`${FB_ROOT}/asignaciones/${a.id}/evidenciasCount`] = 0;
       updates[`${FB_ROOT}/asignaciones/${a.id}/evidenciasDevCount`] = 0;
       updates[`${FB_ROOT}/asignaciones/${a.id}/firmaCapturada`] = false;
+      updates[`${FB_ROOT}/asignaciones/${a.id}/firmaDevCapturada`] = false;
       updates[`${FB_ROOT}/asignaciones/${a.id}/evidenciasPurgadas`] = nowISO();
       // firmaRecepcion (nombre en texto), fechas, km, choferes y folio NO se tocan
     });
     await fbDb.ref().update(updates);
     evidCache = {};
-    evidActual = { fotos:{}, fotosDev:{}, firma:'' };
+    evidActual = { fotos:{}, fotosDev:{}, firma:'', firmaDev:'' };
 
     await logChange('—','LIMPIEZA_ARCHIVOS','multimedia',
       `${uso.fotos} foto(s) · ${uso.firmas} firma(s) · ${mb} MB`,
@@ -3026,16 +3225,45 @@ function calcDevolucion(){
 /* --- Apertura del modal --- */
 window.verHistorialAsig = function(veh){
   const lista = asignacionesDe(veh);
-  if(!lista.length){ toast('Sin checklists de préstamo registrados para '+veh+'.','warn'); return; }
-  const txt = lista.map((a,i)=>{
-    const est = a.estadoRegistro==='Cerrada'
-      ? `cerrada el ${a.devFecha} · ${a.kmRecorrido!=null?a.kmRecorrido.toLocaleString('es-MX')+' km':'—'}`
-      : 'ABIERTA';
-    return `${i+1}. ${a.fechaEntrega||'—'} · ${a.chofer||'—'} · ${a.destino||'—'} · ${est}`;
-  }).join('\n');
-  const sel = prompt(`Historial de préstamos · ${veh}\n\n${txt}\n\nEscriba el número del checklist a abrir (o cancele):`);
-  const n = parseInt(sel);
-  if(!isNaN(n) && n>=1 && n<=lista.length) abrirModalAsignacion(veh, lista[n-1].id);
+  const esEditor = session.rol==='admin' || session.rol==='auxiliar';
+  $('#mHistTitle').textContent = `Historial de préstamos · ${veh}`;
+
+  if(!lista.length){
+    $('#histBody').innerHTML = '<div class="pres-empty">Sin checklists de préstamo registrados para esta unidad.</div>';
+  } else {
+    const abiertos = lista.filter(a=>a.estadoRegistro==='Abierta').length;
+    $('#histBody').innerHTML = `
+      <div class="foto-count" style="margin-bottom:10px">
+        <b>${lista.length}</b> registro(s) · <b>${abiertos}</b> abierto(s) ·
+        <b>${lista.length-abiertos}</b> devuelto(s)
+      </div>
+      <div class="tablewrap" style="max-height:400px">
+        <table><thead><tr>
+          <th>ESTADO</th><th>FOLIO</th><th>CHOFER</th><th>DESTINO</th><th>ENTREGA</th>
+          <th>DEVOLUCIÓN</th><th>KM REC.</th><th>FIRMAS</th><th></th>
+        </tr></thead><tbody>${lista.map(a=>{
+          const cerrada = a.estadoRegistro==='Cerrada';
+          const firmas = `${a.firmaCapturada?'✓':'—'} / ${a.firmaDevCapturada?'✓':'—'}`;
+          return `<tr${a.archivado?' style="opacity:.62"':''}>
+            <td><span class="asig-state ${cerrada?'st-cerrada':'st-abierta'}">${cerrada?'DEVUELTA':'ABIERTA'}</span></td>
+            <td style="font-variant-numeric:tabular-nums">${a.bitacora||'—'}</td>
+            <td>${a.chofer||'—'}</td>
+            <td>${a.destino||'—'}</td>
+            <td>${a.fechaEntrega||'—'}</td>
+            <td>${a.devFecha||'—'}</td>
+            <td class="num">${a.kmRecorrido!=null?fmt(a.kmRecorrido):'—'}</td>
+            <td style="text-align:center" title="Entrega / Devolución">${firmas}</td>
+            <td style="white-space:nowrap">
+              <button class="btn" style="padding:3px 9px;font-size:11px" onclick="pdfDePrestamo('${a.id}',this)">📄 PDF</button>
+              ${esEditor?`<button class="btn" style="padding:3px 9px;font-size:11px;margin-left:4px"
+                onclick="cerrarModal('modalHistorial');abrirModalAsignacion('${a.vehiculo}','${a.id}')">Abrir</button>`:''}
+            </td>
+          </tr>`;
+        }).join('')}</tbody></table>
+      </div>
+      <div class="legend-note">La columna FIRMAS indica entrega / devolución.</div>`;
+  }
+  $('#modalHistorial').classList.add('open');
 };
 
 window.abrirModalAsignacion = async function(veh, asigId){
@@ -3098,7 +3326,7 @@ window.abrirModalAsignacion = async function(veh, asigId){
 
   // Sección 5 y 6: las evidencias viven en un nodo aparte y se cargan bajo demanda
   const ev = editingAsigId ? await cargaEvidencias(editingAsigId) : {fotos:{}, fotosDev:{}, firma:''};
-  evidActual = { fotos:{}, fotosDev:{}, firma: ev.firma || '' };
+  evidActual = { fotos:{}, fotosDev:{}, firma: ev.firma || '', firmaDev: ev.firmaDev || '' };
   buildFotoGrid(ev.fotos && Object.keys(ev.fotos).length ? ev.fotos : (a.fotos || {}));
   buildComparador(ev.fotosDev || {});
   pintaNotaStorage();
@@ -3124,7 +3352,7 @@ window.abrirModalAsignacion = async function(veh, asigId){
   pintaSelects(); calcAlertaServicio(); calcDevolucion();
   $('#modalAsignacion').classList.add('open');
   // El canvas necesita estar visible para medirse correctamente
-  setTimeout(()=>{ initFirma(); cargaFirma(evidActual.firma); }, 60);
+  setTimeout(()=>{ initFirma(); cargaFirma(evidActual.firma); cargaFirmaDev(evidActual.firmaDev); }, 60);
 };
 
 /* --- Validación --- */
@@ -3244,6 +3472,7 @@ async function guardarAsignacion(){
   a.fotosDev = indice(fotosDevFull);
   a.evidenciasDevCount = Object.keys(fotosDevFull).length;
   a.firmaCapturada = !!exportaFirma();
+  a.firmaDevCapturada = !!exportaFirmaDev();
 
   const orig = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
   const reg = orig
@@ -3254,10 +3483,10 @@ async function guardarAsignacion(){
   if(!ok) return;
 
   // Imágenes y firma en su propio nodo (no viajan en el listener principal)
-  const firmaFinal = exportaFirma();
-  evidActual.firma = firmaFinal;
-  if(Object.keys(fotosFull).length || Object.keys(fotosDevFull).length || firmaFinal)
-    await guardaEvidencias(reg.id, fotosFull, fotosDevFull, firmaFinal);
+  const firmaFinal = exportaFirma(), firmaDevFinal = exportaFirmaDev();
+  evidActual.firma = firmaFinal; evidActual.firmaDev = firmaDevFinal;
+  if(Object.keys(fotosFull).length || Object.keys(fotosDevFull).length || firmaFinal || firmaDevFinal)
+    await guardaEvidencias(reg.id, fotosFull, fotosDevFull, firmaFinal, firmaDevFinal);
 
   // --- Actualización cruzada: KM final → KM actual de la unidad ---
   let sincronizado = false;
@@ -4228,6 +4457,7 @@ async function eliminarIncidencia(){
 
 /* ============ MODAL HELPERS ============ */
 function cerrarModal(id){ $('#'+id).classList.remove('open'); }
+window.cerrarModal = cerrarModal;
 $$('[data-close-modal]').forEach(b=>b.onclick=()=>cerrarModal(b.dataset.closeModal));
 
 /* ============ CONFIG / RESPALDO ============ */
@@ -4273,7 +4503,7 @@ async function importarJSON(file){
       (d.asignaciones||[]).forEach(a=>{ if(a.id) updates[`${FB_ROOT}/asignaciones/${a.id}`] = a; });
       if(d.evidencias) updates[`${FB_ROOT}/evidencias`] = d.evidencias;
       if(d.choferesExtra) updates[`${FB_ROOT}/choferesExtra`] = d.choferesExtra;
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.6 };
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.8 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
@@ -4366,6 +4596,7 @@ document.addEventListener('input', e=>{ if(e.target.id==='dKmFinal') calcDevoluc
 $('#aAceptaCond').onchange = e=>{ $('#aFirmaSello').value = e.target.checked ? fechaCorta(nowISO()) : '—'; };
 $('#aChofer').onchange = onChoferChange;
 $('#btnLimpiarFirma').onclick = limpiaFirma;
+$('#btnLimpiarFirmaDev').onclick = limpiaFirmaDev;
 $('#btnRespaldoEvid').onclick = respaldoEvidencias;
 $('#btnPdfLegal').onclick = descargarPdfLegal;
 $('#btnCierreDia').onclick = cierreDeDia;
@@ -4389,8 +4620,8 @@ $('#btnPurgarEvid').onclick = purgarEvidenciasCerradas;
 // El canvas se remide al rotar el dispositivo o cambiar el tamaño
 window.addEventListener('resize', ()=>{
   if($('#modalAsignacion').classList.contains('open')){
-    const f = evidActual.firma || exportaFirma();
-    initFirma(); cargaFirma(f);
+    const f = evidActual.firma || exportaFirma(), fd = evidActual.firmaDev || exportaFirmaDev();
+    initFirma(); cargaFirma(f); cargaFirmaDev(fd);
   }
 });
 
@@ -4434,6 +4665,14 @@ $('#btnEliminarUnidad').onclick = eliminarUnidad;
 // Incidencias
 $('#btnGuardarInc').onclick = guardarIncidencia;
 $('#btnEliminarInc').onclick = eliminarIncidencia;
+
+// Tabs de préstamos
+$$('.tab[data-pres]').forEach(t=>t.onclick=()=>{
+  $$('.tab[data-pres]').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  state.presTab = t.dataset.pres;
+  renderPrestamos();
+});
 
 // Tabs incidencias
 $$('.tab[data-inc]').forEach(t=>t.onclick=()=>{
