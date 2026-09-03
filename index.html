@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v2.8</title>
+<title>Control Vehicular · KPI-AFI-01 v2.9</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -1205,7 +1205,7 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.8 } };
+let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.9 } };
 let ALL=[], DATA=[];
 let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'', presTab:'vigentes' };
 let session = { rol:null, loggedAt:null };
@@ -1362,7 +1362,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.8 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.9 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -1424,7 +1424,7 @@ async function seedFromCSV(){
       };
       cargadas++;
     }
-    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.8 };
+    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.9 };
     // Bitácora
     const bit = { id:uid(), ts:nowISO(), unidad:'—', accion:'SEED', campo:'inicialización', antes:'', despues:`${cargadas} unidades`, usuario:session.rol, rol:session.rol };
     updates[`${FB_ROOT}/bitacora/${bit.id}`] = bit;
@@ -2500,140 +2500,23 @@ function actualizaContadorFotosDev(){
 function leerFotosDev(){ return evidActual.fotosDev; }
 
 /* ============ PDF LEGAL: PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES ============ */
-function armaHtmlLegal(a, u, fotos, fotosDev, firma, firmaDev){
-  const esc = v => (v===null||v===undefined||v==='') ? '—' : String(v).replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
-  const fila = (l,v) => `<tr><th>${l}</th><td>${esc(v)}</td></tr>`;
-  const km = v => v==null||v===''?'—':Number(v).toLocaleString('es-MX')+' km';
+/* ============ PDF LEGAL · MOTOR NATIVO jsPDF ============
+   Se dibuja en coordenadas milimétricas sobre A4. El texto queda vectorial
+   (nítido y seleccionable) y las imágenes se incrustan con addImage, sin
+   depender de html2canvas, que desfasaba el contenido y omitía las fotos. */
 
-  const docs = [['Póliza de seguro',a.docPoliza],['Tarjeta de circulación',a.docTarjCirc],
-    ['Tarjeta de combustible',a.docTarjComb],['Placa delantera',a.docPlacaDel],
-    ['Placa trasera',a.docPlacaTra],['Permiso IMOVEQROO',a.docImoveqroo]];
-  const pars = [['Nivel de aceite',a.parAceite],['Anticongelante',a.parAnticong],
-    ['Frenos',a.parFrenos],['Líquido limpiaparabrisas',a.parLimpia]];
-
-  const celdaFoto = (m,lab) => (m && m.valor)
-    ? `<div class="ph"><img src="${m.valor}"><span>${lab}</span></div>`
-    : `<div class="ph vac"><span>${lab}<br><i>sin evidencia</i></span></div>`;
-
-  const hayDev = !!(a.devFecha || a.devKmFinal!=null || a.devChofer);
-  const nSec = n => hayDev ? n : n;
-
-  const bloqueFirma = (img, nombre, rol) => `
-    <div class="fbox">
-      ${img?`<img class="fimg" src="${img}">`:'<div class="fimg vacia"></div>'}
-      <div class="fline"></div>
-      <div class="fnom">${esc(nombre)}</div>
-      <div class="frol">${rol}</div>
-    </div>`;
-
-  return `
-  <div class="doc">
-    <div class="enc">
-      <div class="tit">PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES</div>
-      <div class="emp">${RAZON_SOCIAL}</div>
-      <div class="fol">Folio: <b>${esc(a.bitacora)}</b> &nbsp;·&nbsp; Estado: <b>${esc(a.estadoRegistro)}</b> &nbsp;·&nbsp; Emitido: ${new Date().toLocaleString('es-MX')}</div>
-    </div>
-
-    <div class="sec">1. Datos del Vehículo</div>
-    <table class="t2">
-      ${fila('Unidad', a.vehiculo)}${fila('Placas', u.placas)}
-      ${fila('Zona', a.zona||u.zona)}${fila('Departamento', u.depto)}
-      ${fila('Estatus operativo', u.estatus)}${fila('KM al momento de la entrega', km(a.kmInicial))}
-    </table>
-
-    <div class="sec">2. Datos del Préstamo</div>
-    <table class="t2">
-      ${fila('Fecha de entrega', a.fechaEntrega)}${fila('Chofer responsable', a.chofer)}
-      ${fila('Destino', a.destino)}${fila('Entregado por', a.entregadoPor)}
-      ${fila('Estado de la unidad', a.estado)}${fila('Nivel de tanque', a.tanque)}
-      ${fila('Próximo servicio (KM)', km(a.proxServKm))}${fila('Próximo servicio (fecha)', a.proxServFecha)}
-    </table>
-    ${a.comentarios?`<p class="obs"><b>Comentarios de entrega:</b> ${esc(a.comentarios)}</p>`:''}
-
-    <div class="sec">3. Inventario de Documentos y Placas</div>
-    <table class="inv"><tr>${docs.map(([l])=>`<th>${l}</th>`).join('')}</tr>
-      <tr>${docs.map(([,v])=>`<td class="${v==='Tiene'?'si':'no'}">${esc(v)}</td>`).join('')}</tr></table>
-
-    <div class="sec">4. Parámetros Básicos</div>
-    <table class="inv"><tr>${pars.map(([l])=>`<th>${l}</th>`).join('')}</tr>
-      <tr>${pars.map(([,v])=>`<td class="${v==='Bueno'?'si':v==='Regular'?'md':'no'}">${esc(v)}</td>`).join('')}</tr></table>
-
-    <div class="sec">5. Evidencia Fotográfica de Entrega</div>
-    <div class="fotos">${FOTOS_DEF.map(f=>celdaFoto(fotos[f.k], f.lab)).join('')}</div>
-
-    ${hayDev?`
-    <div class="salto"></div>
-    <div class="sec">6. Devolución de la Unidad</div>
-    <table class="t2">
-      ${fila('Fecha de devolución', a.devFecha)}${fila('Chofer que devuelve', a.devChofer)}
-      ${fila('Recibido por', a.devRecibidoPor)}${fila('Estado de la unidad', a.devEstado)}
-      ${fila('Nivel de tanque', a.devTanque)}${fila('KM final', km(a.devKmFinal))}
-      ${fila('Kilómetros del recorrido', km(a.kmRecorrido))}${fila('Estado del registro', a.estadoRegistro)}
-    </table>
-    ${a.devComentarios?`<p class="obs"><b>Comentarios de devolución:</b> ${esc(a.devComentarios)}</p>`:''}
-    ${Object.keys(fotosDev||{}).length?`<div class="sec sub">Evidencia Fotográfica de Devolución</div>
-      <div class="fotos">${FOTOS_DEF.map(f=>celdaFoto(fotosDev[f.k], f.lab)).join('')}</div>`:''}
-    `:''}
-
-    <div class="salto"></div>
-    <div class="sec">${hayDev?'7':'6'}. Carta Responsiva</div>
-    <p class="carta">${esc(CARTA_RESPONSIVA)}</p>
-
-    <div class="sec">${hayDev?'8':'7'}. Firmas de Conformidad</div>
-    <div class="sub-firmas">Entrega</div>
-    <div class="firmas">
-      ${bloqueFirma(firma, a.firmaRecepcion || a.chofer, 'Chofer responsable · Recibe de conformidad')}
-      ${bloqueFirma('', a.entregadoPor, 'Por '+RAZON_SOCIAL)}
-    </div>
-    ${hayDev?`
-    <div class="sub-firmas">Devolución</div>
-    <div class="firmas">
-      ${bloqueFirma(firmaDev, a.devChofer, 'Chofer que devuelve · Entrega de conformidad')}
-      ${bloqueFirma('', a.devRecibidoPor, 'Por '+RAZON_SOCIAL+' · Recibe la unidad')}
-    </div>`:''}
-
-    <div class="pie">
-      Documento generado por el sistema de Control Vehicular · KPI-AFI-01 ·
-      Coordinación de Activos Fijos y Control Vehicular · Folio ${esc(a.bitacora)}
-    </div>
-  </div>`;
+/* --- Carga una imagen y devuelve sus dimensiones naturales --- */
+function cargaImagen(dataUrl){
+  return new Promise(res=>{
+    if(!dataUrl) return res(null);
+    const img = new Image();
+    const t = setTimeout(()=>res(null), 9000);
+    img.onload  = ()=>{ clearTimeout(t); res({d:dataUrl, w:img.naturalWidth, h:img.naturalHeight}); };
+    img.onerror = ()=>{ clearTimeout(t); res(null); };
+    img.src = dataUrl;
+  });
 }
-
-const CSS_LEGAL = `
-.doc{font-family:Arial,Helvetica,sans-serif;color:#12181f;background:#fff;padding:4px 2px;font-size:11px;line-height:1.5;width:760px}
-.enc{text-align:center;border-bottom:3px solid #12181f;padding-bottom:9px;margin-bottom:14px}
-.enc .tit{font-size:19px;font-weight:bold;letter-spacing:.5px}
-.enc .emp{font-size:12px;margin-top:4px;font-weight:bold}
-.enc .fol{font-size:10px;color:#414d5c;margin-top:5px}
-.sec{font-size:13px;font-weight:bold;background:#eef2f7;border-left:4px solid #0b4f9e;padding:6px 10px;margin:14px 0 8px}
-.sec.sub{background:#f6f8fb;border-left-color:#8b98a8;font-size:12px}
-.sub-firmas{font-size:11px;font-weight:bold;color:#0b4f9e;margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px}
-table{width:100%;border-collapse:collapse;margin-bottom:6px}
-.t2 th{width:23%;text-align:left;background:#f6f8fb;padding:6px 8px;border:1px solid #ccd4de;font-size:10px;font-weight:bold}
-.t2 td{padding:6px 8px;border:1px solid #ccd4de;font-size:11px;width:27%}
-.inv th{background:#f6f8fb;border:1px solid #ccd4de;padding:6px 4px;font-size:9px;font-weight:bold;text-align:center}
-.inv td{border:1px solid #ccd4de;padding:6px 4px;font-size:11px;text-align:center;font-weight:bold}
-.inv .si{color:#12703f}.inv .md{color:#9a6b00}.inv .no{color:#a41d2c}
-.obs{font-size:10px;margin:5px 0 0;text-align:justify;padding:7px 10px;background:#f9fafc;border:1px solid #e2e8f0}
-.fotos{display:table;width:100%;border-spacing:5px;border-collapse:separate}
-.ph{display:inline-block;width:31%;vertical-align:top;border:1px solid #ccd4de;background:#f2f5f9;margin:0 4px 8px 0}
-.ph img{width:100%;height:82px;object-fit:cover;display:block}
-.ph span{display:block;font-size:9px;padding:3px 4px;background:#eef2f7;text-align:center;font-weight:bold}
-.ph.vac{height:104px;text-align:center;padding-top:38px;box-sizing:border-box}
-.ph.vac span{background:none;color:#8b98a8;font-weight:normal}
-.carta{text-align:justify;font-size:10.5px;line-height:1.7;padding:12px 14px;border:1px solid #ccd4de;background:#fcfdfe;margin:0}
-.salto{page-break-before:always;height:0}
-.firmas{display:table;width:100%;margin-top:12px}
-.fbox{display:inline-block;width:46%;text-align:center;vertical-align:bottom;margin:0 1.5%}
-.fimg{height:64px;max-width:100%;display:block;margin:0 auto}
-.fimg.vacia{height:64px}
-.fline{border-bottom:1.5px solid #12181f;margin:2px 10px 6px}
-.fnom{font-size:11px;font-weight:bold;text-transform:uppercase}
-.frol{font-size:9px;color:#414d5c;margin-top:3px;line-height:1.35}
-.pie{margin-top:22px;padding-top:8px;border-top:1px solid #ccd4de;font-size:9px;color:#5a6a7d;text-align:center}
-`;
-
-/* Convierte una URL remota a data URL para que html2canvas no la descarte por CORS */
+/* Convierte una URL remota a base64 (evita bloqueos de origen cruzado) */
 function aDataUrl(url){
   return new Promise(res=>{
     if(!url) return res('');
@@ -2645,79 +2528,367 @@ function aDataUrl(url){
       .catch(()=>{ clearTimeout(t); res(''); });
   });
 }
-/* Deja todas las evidencias en base64 antes de renderizar */
 async function inlineEvidencias(obj){
   const out = {};
   for(const [k,f] of Object.entries(obj||{})){
     if(!f || !f.valor) continue;
     const d = await aDataUrl(f.valor);
-    if(d) out[k] = {...f, valor:d};
+    if(d){ const im = await cargaImagen(d); if(im) out[k] = im; }
   }
   return out;
 }
 
-/* ===== Generador central del PDF legal ===== */
+/* ===== Generador principal ===== */
 async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
-  if(typeof html2pdf === 'undefined'){ toast('La librería de PDF no cargó. Verifique su conexión.','err'); return false; }
+  const JSPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if(!JSPDF){ toast('La librería de PDF no cargó. Verifique su conexión.','err'); return false; }
   const paso = m => { if(avisar) avisar(m); };
 
   paso('Preparando imágenes…');
-  const fIn  = await inlineEvidencias(fotos);
-  const fdIn = await inlineEvidencias(fotosDev);
-  const firmaIn    = await aDataUrl(firma);
-  const firmaDevIn = await aDataUrl(firmaDev);
+  const F   = await inlineEvidencias(fotos);
+  const FD  = await inlineEvidencias(fotosDev);
+  const fEnt = await cargaImagen(await aDataUrl(firma));
+  const fDev = await cargaImagen(await aDataUrl(firmaDev));
 
-  // Contenedor con posición ABSOLUTA fuera de pantalla (nunca 'fixed', que
-  // html2canvas no captura; ni opacidad, que se aplicaría al lienzo final).
-  const cont = document.createElement('div');
-  cont.setAttribute('id','pdfLegalTmp');
-  cont.style.cssText = 'position:absolute;left:-10000px;top:0;width:760px;background:#ffffff';
-  cont.innerHTML = `<style>${CSS_LEGAL}</style>` + armaHtmlLegal(a, u, fIn, fdIn, firmaIn, firmaDevIn);
-  document.body.appendChild(cont);
+  paso('Generando PDF…');
+  const doc = new JSPDF({unit:'mm', format:'a4', orientation:'portrait'});
+  const W=210, H=297, ML=13, MR=13, MT=13, MB=15;
+  const CW = W-ML-MR;                       // 184 mm de ancho útil
+  let y = MT;
 
-  try{
-    paso('Cargando recursos…');
-    // Esperar a que cada <img> termine de decodificar antes de capturar
-    const imgs = [...cont.querySelectorAll('img')];
-    await Promise.all(imgs.map(img => img.complete && img.naturalWidth
-      ? Promise.resolve()
-      : new Promise(r=>{ const t=setTimeout(r,8000);
-          img.onload=()=>{clearTimeout(t);r();}; img.onerror=()=>{clearTimeout(t);img.remove();r();}; })));
-    await new Promise(r=>setTimeout(r,180));   // margen para el trazado final
+  /* --- Paleta --- */
+  const AZUL=[11,79,158], AZUL_C=[214,232,251], GRIS=[246,248,251],
+        LINEA=[196,212,230], TXT=[15,23,32], SUAVE=[90,106,125],
+        VERDE=[16,110,64], AMBAR=[150,102,6], ROJO=[164,29,44];
 
-    paso('Generando PDF…');
-    const nombre = `Prestamo-${(a.bitacora||'SIN-FOLIO')}-${a.vehiculo||''}.pdf`.replace(/[^\w\-.]/g,'_');
-    await html2pdf().set({
-      margin: [9,8,10,8],
-      filename: nombre,
-      image: {type:'jpeg', quality:0.92},
-      html2canvas: {scale:2, useCORS:true, backgroundColor:'#ffffff', logging:false,
-                    scrollX:0, scrollY:0, windowWidth:820, width:760},
-      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'},
-      pagebreak: {mode:['css','legacy']}
-    }).from(cont.querySelector('.doc') || cont).save();
-    return true;
-  }catch(e){
-    console.error('generaPdfLegal', e);
-    toast('No se pudo generar el PDF ('+e.message+'). Abriendo versión imprimible…','warn');
-    const w = window.open('','_blank');
-    if(w){
-      w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
-        <title>Préstamo ${a.bitacora||''}</title><style>${CSS_LEGAL}
-        @page{size:A4;margin:11mm 9mm} .doc{width:auto}
-        .noprint{position:fixed;top:10px;right:10px;background:#0b4f9e;color:#fff;border:none;
-        padding:10px 20px;border-radius:6px;font-size:14px;cursor:pointer}
-        @media print{.noprint{display:none}}</style></head><body>
-        <button class="noprint" onclick="window.print()">Imprimir / Guardar como PDF</button>
-        ${armaHtmlLegal(a,u,fIn,fdIn,firmaIn,firmaDevIn)}</body></html>`);
-      w.document.close();
-      setTimeout(()=>{ try{ w.focus(); w.print(); }catch(_){} }, 800);
-    }
-    return false;
-  }finally{
-    const tmp = document.getElementById('pdfLegalTmp');
-    if(tmp) document.body.removeChild(tmp);
+  const hayDev = !!(a.devFecha || a.devKmFinal!=null || a.devChofer);
+  /* Las fuentes estándar de jsPDF usan Latin-1: se sustituyen los símbolos
+     que quedarían ilegibles (flechas, comillas tipográficas, guiones largos). */
+  const sane = t => String(t)
+    .replace(/[\u2192\u27A1\u2794]/g,'>').replace(/[\u2190]/g,'<')
+    .replace(/[\u2018\u2019\u201B]/g,"'").replace(/[\u201C\u201D]/g,'"')
+    .replace(/[\u2013\u2014]/g,'-').replace(/\u2026/g,'...')
+    .replace(/[\u2022\u25CF]/g,'-').replace(/\u2713/g,'X')
+    .replace(/[^\x00-\xFF]/g,'');
+  const val = v => (v===null||v===undefined||v==='') ? '—' : sane(v);
+  const km  = v => v==null||v===''?'—':Number(v).toLocaleString('es-MX')+' km';
+
+  /* --- Encabezado reducido en páginas siguientes --- */
+  function encabezadoContinuacion(){
+    doc.setFillColor(...AZUL); doc.rect(0,0,W,11,'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text('PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES', ML, 7.2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.text('Folio '+val(a.bitacora), W-MR, 7.2, {align:'right'});
+    doc.setTextColor(...TXT);
+    y = 17;
   }
+  function nuevaPagina(){ doc.addPage(); encabezadoContinuacion(); }
+  /* Reserva vertical: salta de página si no cabe el bloque */
+  function reserva(alto){ if(y+alto > H-MB){ nuevaPagina(); return true; } return false; }
+
+  /* --- Portada del documento --- */
+  function encabezadoPrincipal(){
+    doc.setFillColor(...AZUL); doc.rect(0,0,W,26,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(15);
+    doc.text('PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES', W/2, 11, {align:'center'});
+    doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+    doc.text(RAZON_SOCIAL, W/2, 17, {align:'center'});
+    doc.setFontSize(7.5);
+    doc.text('KPI-AFI-01 · Coordinación de Activos Fijos y Control Vehicular', W/2, 22, {align:'center'});
+    doc.setTextColor(...TXT);
+    y = 32;
+
+    // Cintillo con folio, estado y fecha de emisión
+    doc.setFillColor(...AZUL_C); doc.setDrawColor(...LINEA);
+    doc.roundedRect(ML, y, CW, 11, 1.4, 1.4, 'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...AZUL);
+    doc.text('FOLIO: '+val(a.bitacora), ML+4, y+7);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.setTextColor(...(a.estadoRegistro==='Cerrada'?VERDE:AZUL));
+    doc.text('Estado: '+val(a.estadoRegistro), ML+CW/2, y+7, {align:'center'});
+    doc.setTextColor(...SUAVE);
+    doc.text('Emitido: '+new Date().toLocaleString('es-MX'), W-MR-4, y+7, {align:'right'});
+    doc.setTextColor(...TXT);
+    y += 16;
+  }
+
+  /* --- Título de sección --- */
+  function seccion(txt){
+    reserva(14);
+    doc.setFillColor(...GRIS); doc.rect(ML, y, CW, 7.5, 'F');
+    doc.setFillColor(...AZUL);  doc.rect(ML, y, 1.6, 7.5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...AZUL);
+    doc.text(txt.toUpperCase(), ML+5, y+5.2);
+    doc.setTextColor(...TXT);
+    y += 10.5;
+  }
+
+  /* --- Rejilla de datos: dos pares etiqueta/valor por renglón --- */
+  function datos(pares){
+    const colW = CW/2, labW = 33, alto = 7;
+    for(let i=0;i<pares.length;i+=2){
+      reserva(alto+1);
+      for(let c=0;c<2;c++){
+        const par = pares[i+c]; if(!par) continue;
+        const x = ML + c*colW;
+        doc.setFillColor(...GRIS); doc.setDrawColor(...LINEA); doc.setLineWidth(0.15);
+        doc.rect(x, y, labW, alto, 'FD');
+        doc.rect(x+labW, y, colW-labW, alto, 'S');
+        doc.setFont('helvetica','bold'); doc.setFontSize(6.8); doc.setTextColor(...SUAVE);
+        doc.text(doc.splitTextToSize(par[0], labW-3)[0], x+1.8, y+4.6);
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...TXT);
+        const t = doc.splitTextToSize(val(par[1]), colW-labW-4)[0];
+        doc.text(t, x+labW+2, y+4.6);
+      }
+      y += alto;
+    }
+    y += 3.5;
+  }
+
+  /* --- Fila de inventario con semáforo --- */
+  function inventario(items, okTxt){
+    const n = items.length, cw = CW/n, alto = 13;
+    reserva(alto+2);
+    items.forEach(([lab,v],i)=>{
+      const x = ML + i*cw;
+      doc.setFillColor(...GRIS); doc.setDrawColor(...LINEA); doc.setLineWidth(0.15);
+      doc.rect(x, y, cw, 6, 'FD');
+      doc.rect(x, y+6, cw, alto-6, 'S');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.2); doc.setTextColor(...SUAVE);
+      const l = doc.splitTextToSize(lab, cw-2);
+      doc.text(l[0], x+cw/2, y+4, {align:'center'});
+      const ok = (v===okTxt), med = (v==='Regular');
+      doc.setTextColor(...(ok?VERDE:med?AMBAR:ROJO));
+      doc.setFontSize(8);
+      doc.text(val(v), x+cw/2, y+10.6, {align:'center'});
+    });
+    doc.setTextColor(...TXT);
+    y += alto + 4;
+  }
+
+  /* --- Bloque de texto largo (carta responsiva) --- */
+  function parrafo(txt, tam){
+    doc.setFont('helvetica','normal'); doc.setFontSize(tam||8.4); doc.setTextColor(...TXT);
+    const lineas = doc.splitTextToSize(sane(txt), CW-8);
+    const alto = lineas.length*4.1 + 8;
+    if(y+alto > H-MB){
+      // Si no cabe completo, se reparte respetando el margen inferior
+      let i=0;
+      while(i<lineas.length){
+        const caben = Math.max(1, Math.floor((H-MB-y-6)/4.1));
+        const trozo = lineas.slice(i, i+caben);
+        doc.setDrawColor(...LINEA); doc.setFillColor(252,253,254);
+        doc.rect(ML, y, CW, trozo.length*4.1+6, 'FD');
+        doc.text(trozo, ML+4, y+5.6, {align:'justify', maxWidth:CW-8});
+        y += trozo.length*4.1+9;
+        i += caben;
+        if(i<lineas.length) nuevaPagina();
+      }
+    } else {
+      doc.setDrawColor(...LINEA); doc.setFillColor(252,253,254);
+      doc.rect(ML, y, CW, alto-2, 'FD');
+      doc.text(lineas, ML+4, y+5.6, {align:'justify', maxWidth:CW-8});
+      y += alto + 1;
+    }
+  }
+
+  /* --- Dibuja una imagen ajustada a su recuadro, conservando proporción --- */
+  function imagenEn(im, x, yy, bw, bh, etiqueta){
+    doc.setDrawColor(...LINEA); doc.setLineWidth(0.2);
+    if(!im){
+      doc.setFillColor(248,250,252); doc.rect(x, yy, bw, bh, 'FD');
+      doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(...SUAVE);
+      doc.text('Sin evidencia', x+bw/2, yy+bh/2+1, {align:'center'});
+      doc.setTextColor(...TXT);
+    } else {
+      doc.setFillColor(255,255,255); doc.rect(x, yy, bw, bh, 'FD');
+      const r = Math.min((bw-1.4)/im.w, (bh-1.4)/im.h);
+      const w = im.w*r, h = im.h*r;
+      const fmt = im.d.indexOf('image/png')>=0 ? 'PNG' : 'JPEG';
+      try{ doc.addImage(im.d, fmt, x+(bw-w)/2, yy+(bh-h)/2, w, h); }catch(e){}
+    }
+    if(etiqueta){
+      doc.setFillColor(...GRIS); doc.rect(x, yy+bh, bw, 5, 'FD');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.4); doc.setTextColor(...SUAVE);
+      doc.text(doc.splitTextToSize(etiqueta, bw-2)[0], x+bw/2, yy+bh+3.4, {align:'center'});
+      doc.setTextColor(...TXT);
+    }
+  }
+
+  /* --- Rejilla simple de 3 columnas (solo entrega) --- */
+  function rejillaFotos(mapa){
+    const cols=3, gap=4, bw=(CW-gap*(cols-1))/cols, bh=bw*0.74;
+    for(let i=0;i<FOTOS_DEF.length;i+=cols){
+      reserva(bh+5+gap);
+      for(let c=0;c<cols;c++){
+        const f = FOTOS_DEF[i+c]; if(!f) continue;
+        imagenEn(mapa[f.k], ML+c*(bw+gap), y, bw, bh, f.lab);
+      }
+      y += bh+5+gap;
+    }
+    y += 1;
+  }
+
+  /* --- Comparativa: una vista por renglón, entrega y devolución --- */
+  function comparativa(){
+    const gap=6, bw=(CW-gap)/2, bh=bw*0.72;   // se aproxima al 4:3 de una foto
+    // Cabecera de columnas
+    reserva(9);
+    doc.setFillColor(...AZUL_C); doc.rect(ML, y, bw, 6, 'F');
+    doc.setFillColor(251,238,205); doc.rect(ML+bw+gap, y, bw, 6, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.6);
+    doc.setTextColor(...AZUL);   doc.text('ENTREGA', ML+bw/2, y+4.1, {align:'center'});
+    doc.setTextColor(125,86,6);  doc.text('DEVOLUCIÓN', ML+bw+gap+bw/2, y+4.1, {align:'center'});
+    doc.setTextColor(...TXT);
+    y += 8;
+
+    FOTOS_DEF.forEach(f=>{
+      if(reserva(bh+11)){
+        // Repetir cabecera de columnas al cambiar de página
+        doc.setFillColor(...AZUL_C); doc.rect(ML, y, bw, 6, 'F');
+        doc.setFillColor(251,238,205); doc.rect(ML+bw+gap, y, bw, 6, 'F');
+        doc.setFont('helvetica','bold'); doc.setFontSize(7.6);
+        doc.setTextColor(...AZUL);  doc.text('ENTREGA', ML+bw/2, y+4.1, {align:'center'});
+        doc.setTextColor(125,86,6); doc.text('DEVOLUCIÓN', ML+bw+gap+bw/2, y+4.1, {align:'center'});
+        doc.setTextColor(...TXT);
+        y += 8;
+      }
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.4); doc.setTextColor(...AZUL);
+      doc.text(f.lab.toUpperCase(), ML, y+3);
+      doc.setDrawColor(...LINEA); doc.setLineWidth(0.15);
+      doc.line(ML+doc.getTextWidth(f.lab.toUpperCase())+3, y+2.2, W-MR, y+2.2);
+      doc.setTextColor(...TXT);
+      y += 5;
+      imagenEn(F[f.k],  ML,          y, bw, bh, null);
+      imagenEn(FD[f.k], ML+bw+gap,   y, bw, bh, null);
+      y += bh+6;
+    });
+  }
+
+  /* --- Bloques de firma --- */
+  function firmas(bloques){
+    const gap=12, bw=(CW-gap)/2, alto=30;
+    for(let i=0;i<bloques.length;i+=2){
+      reserva(alto+6);
+      for(let c=0;c<2;c++){
+        const b = bloques[i+c]; if(!b) continue;
+        const x = ML + c*(bw+gap);
+        if(b.img){
+          const r = Math.min((bw-8)/b.img.w, 18/b.img.h);
+          const w = b.img.w*r, h = b.img.h*r;
+          try{ doc.addImage(b.img.d, 'PNG', x+(bw-w)/2, y+20-h, w, h); }catch(e){}
+        }
+        doc.setDrawColor(...TXT); doc.setLineWidth(0.4);
+        doc.line(x+4, y+21, x+bw-4, y+21);
+        doc.setFont('helvetica','bold'); doc.setFontSize(8.2); doc.setTextColor(...TXT);
+        doc.text(doc.splitTextToSize(val(b.nombre).toUpperCase(), bw-2)[0], x+bw/2, y+25, {align:'center'});
+        doc.setFont('helvetica','normal'); doc.setFontSize(6.6); doc.setTextColor(...SUAVE);
+        doc.splitTextToSize(b.rol, bw-4).slice(0,2).forEach((l,k)=>
+          doc.text(l, x+bw/2, y+28.4+k*3, {align:'center'}));
+        doc.setTextColor(...TXT);
+      }
+      y += alto+6;
+    }
+  }
+
+  /* ================= ARMADO DEL DOCUMENTO ================= */
+  encabezadoPrincipal();
+
+  seccion('1. Datos del vehículo');
+  datos([
+    ['Unidad', a.vehiculo], ['Placas', u.placas],
+    ['Zona', a.zona||u.zona], ['Departamento', u.depto],
+    ['Estatus operativo', u.estatus], ['KM a la entrega', km(a.kmInicial)]
+  ]);
+
+  seccion('2. Datos del préstamo');
+  datos([
+    ['Fecha de entrega', a.fechaEntrega], ['Chofer responsable', a.chofer],
+    ['Destino', a.destino], ['Entregado por', a.entregadoPor],
+    ['Estado unidad', a.estado], ['Nivel de tanque', a.tanque],
+    ['Próx. servicio KM', km(a.proxServKm)], ['Próx. servicio fecha', a.proxServFecha]
+  ]);
+  if(a.comentarios){
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.4); doc.setTextColor(...SUAVE);
+    doc.text('COMENTARIOS DE ENTREGA', ML, y); y += 3.5;
+    parrafo(a.comentarios, 8);
+  }
+
+  seccion('3. Inventario de documentos y placas');
+  inventario([['Póliza de seguro',a.docPoliza],['Tarjeta de circulación',a.docTarjCirc],
+              ['Tarjeta de combustible',a.docTarjComb],['Placa delantera',a.docPlacaDel],
+              ['Placa trasera',a.docPlacaTra],['Permiso IMOVEQROO',a.docImoveqroo]], 'Tiene');
+
+  seccion('4. Parámetros básicos');
+  inventario([['Nivel de aceite',a.parAceite],['Anticongelante',a.parAnticong],
+              ['Frenos',a.parFrenos],['Líquido limpiaparabrisas',a.parLimpia]], 'Bueno');
+
+  if(hayDev){
+    seccion('5. Devolución de la unidad');
+    datos([
+      ['Fecha devolución', a.devFecha], ['Chofer que devuelve', a.devChofer],
+      ['Recibido por', a.devRecibidoPor], ['Estado unidad', a.devEstado],
+      ['Nivel de tanque', a.devTanque], ['KM final', km(a.devKmFinal)],
+      ['KM del recorrido', km(a.kmRecorrido)], ['Estado del registro', a.estadoRegistro]
+    ]);
+    if(a.devComentarios){
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.4); doc.setTextColor(...SUAVE);
+      doc.text('COMENTARIOS DE DEVOLUCIÓN', ML, y); y += 3.5;
+      parrafo(a.devComentarios, 8);
+    }
+  }
+
+  paso('Incrustando evidencias…');
+  if(hayDev){
+    doc.addPage(); encabezadoContinuacion();
+    seccion('6. Evidencia fotográfica · comparativa entrega vs. devolución');
+    comparativa();
+  } else {
+    doc.addPage(); encabezadoContinuacion();
+    seccion('5. Evidencia fotográfica de entrega');
+    rejillaFotos(F);
+  }
+
+  doc.addPage(); encabezadoContinuacion();
+  seccion((hayDev?'7':'6')+'. Carta responsiva');
+  parrafo(CARTA_RESPONSIVA, 8.4);
+  y += 3;
+
+  seccion((hayDev?'8':'7')+'. Firmas de conformidad');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.6); doc.setTextColor(...AZUL);
+  doc.text('ENTREGA', ML, y); y += 4;
+  doc.setTextColor(...TXT);
+  firmas([
+    {img:fEnt, nombre:a.firmaRecepcion||a.chofer, rol:'Chofer responsable · Recibe de conformidad'},
+    {img:null, nombre:a.entregadoPor,             rol:'Por '+RAZON_SOCIAL}
+  ]);
+  if(hayDev){
+    reserva(42);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.6); doc.setTextColor(...AZUL);
+    doc.text('DEVOLUCIÓN', ML, y); y += 4;
+    doc.setTextColor(...TXT);
+    firmas([
+      {img:fDev, nombre:a.devChofer,      rol:'Chofer que devuelve · Entrega de conformidad'},
+      {img:null, nombre:a.devRecibidoPor, rol:'Por '+RAZON_SOCIAL+' · Recibe la unidad'}
+    ]);
+  }
+
+  /* --- Pie con numeración en todas las páginas --- */
+  const tot = doc.internal.getNumberOfPages();
+  for(let i=1;i<=tot;i++){
+    doc.setPage(i);
+    doc.setDrawColor(...LINEA); doc.setLineWidth(0.2);
+    doc.line(ML, H-11, W-MR, H-11);
+    doc.setFont('helvetica','normal'); doc.setFontSize(6.6); doc.setTextColor(...SUAVE);
+    doc.text('Control Vehicular · KPI-AFI-01 · Folio '+val(a.bitacora)+' · Unidad '+val(a.vehiculo), ML, H-7);
+    doc.text('Página '+i+' de '+tot, W-MR, H-7, {align:'right'});
+  }
+
+  const nombre = ('Prestamo-'+(a.bitacora||'SIN-FOLIO')+'-'+(a.vehiculo||'')+'.pdf').replace(/[^\w\-.]/g,'_');
+  doc.save(nombre);
+  return true;
 }
 
 /* Desde el modal: toma lo capturado en pantalla, esté guardado o no */
@@ -2751,7 +2922,7 @@ async function descargarPdfLegal(){
       exportaFirma()||evidActual.firma, exportaFirmaDev()||evidActual.firmaDev,
       m=>{ btn.textContent = m; });
     if(ok){ toast('PDF legal generado.'); if(editingAsigId) await logChange(veh,'PDF_LEGAL','documento','', a.bitacora||''); }
-  }catch(e){ toast('Error al generar el PDF: '+e.message,'err'); }
+  }catch(e){ console.error(e); toast('Error al generar el PDF: '+e.message,'err'); }
   finally{ btn.disabled=false; btn.textContent=txt; }
 }
 
@@ -2759,16 +2930,17 @@ async function descargarPdfLegal(){
 window.pdfDePrestamo = async function(asigId, boton){
   const a = STORE.asignaciones.find(x=>x.id===asigId);
   if(!a){ toast('Registro no encontrado.','err'); return; }
-  const u = STORE.unidades.find(x=>x.veh===a.vehiculo) || {veh:a.vehiculo, placas:'—', zona:a.zona, depto:'—', estatus:'—'};
+  const u = STORE.unidades.find(x=>x.veh===a.vehiculo) ||
+            {veh:a.vehiculo, placas:'—', zona:a.zona, depto:'—', estatus:'—'};
   const btn = boton || null;
   const txt = btn ? btn.textContent : '';
-  if(btn){ btn.disabled = true; }
+  if(btn) btn.disabled = true;
   try{
     const ev = await cargaEvidencias(asigId);
     const ok = await generaPdfLegal(a, u, ev.fotos, ev.fotosDev, ev.firma, ev.firmaDev,
       m=>{ if(btn) btn.textContent = m.replace('…',''); });
-    if(ok){ toast(`PDF del folio ${a.bitacora||''} generado.`); await logChange(a.vehiculo,'PDF_LEGAL','documento','', a.bitacora||''); }
-  }catch(e){ toast('Error al generar el PDF: '+e.message,'err'); }
+    if(ok){ toast('PDF del folio '+(a.bitacora||'')+' generado.'); await logChange(a.vehiculo,'PDF_LEGAL','documento','', a.bitacora||''); }
+  }catch(e){ console.error(e); toast('Error al generar el PDF: '+e.message,'err'); }
   finally{ if(btn){ btn.disabled=false; btn.textContent=txt; } }
 };
 
@@ -4503,7 +4675,7 @@ async function importarJSON(file){
       (d.asignaciones||[]).forEach(a=>{ if(a.id) updates[`${FB_ROOT}/asignaciones/${a.id}`] = a; });
       if(d.evidencias) updates[`${FB_ROOT}/evidencias`] = d.evidencias;
       if(d.choferesExtra) updates[`${FB_ROOT}/choferesExtra`] = d.choferesExtra;
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.8 };
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.9 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
