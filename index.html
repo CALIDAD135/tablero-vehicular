@@ -3,35 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v2.5</title>
+<title>Control Vehicular · KPI-AFI-01 v2.6</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <style>
 :root{
-  --bg:#0f1626; --panel:#16203a; --panel2:#1c2747; --line:#27345c;
-  --txt:#e8edf7; --muted:#90a0c0; --accent:#3fa9f5; --gold:#f5c451;
-  --green:#39c08a; --red:#ef5c6e; --orange:#f08a3c; --purple:#9b6dff;
-  --overlay:rgba(8,12,24,.85);
+  --bg:#eef5fd; --panel:#ffffff; --panel2:#e3eefb; --line:#c2d8ef;
+  --txt:#000000; --muted:#42566f; --accent:#0b4f9e; --sky:#38a3f5; --gold:#a5730a;
+  --green:#0f7a4e; --red:#b81f30; --orange:#b45c09; --purple:#5a3fb8;
+  --overlay:rgba(18,40,70,.55);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;padding:18px 22px 60px}
-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:18px}
-h1{font-size:20px;font-weight:700;letter-spacing:.2px}
+body{font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#eef5fd 0%,#dceafa 100%) fixed;color:var(--txt);font-size:14px;padding:18px 22px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;border-bottom:3px solid var(--accent);padding-bottom:14px;margin-bottom:18px}
+h1{font-size:20px;font-weight:700;letter-spacing:.2px;color:var(--accent)}
 .sub{color:var(--muted);font-size:12px;margin-top:4px}
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .btn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;transition:.15s;font-weight:500}
-.btn:hover{border-color:var(--accent);color:#fff}
+.btn:hover{border-color:var(--accent);color:var(--accent);background:#d6e8fb}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn-primary:hover{background:#5ab7f7;border-color:#5ab7f7}
-.btn-success{background:var(--green);border-color:var(--green);color:#062018}
-.btn-success:hover{background:#4ed3a0}
+.btn-primary:hover{background:#0d63c4;border-color:#0d63c4}
+.btn-success{background:var(--green);border-color:var(--green);color:#ffffff}
+.btn-success:hover{background:#0d9160}
 .btn-danger{background:var(--red);border-color:var(--red);color:#fff}
-.btn-danger:hover{background:#f27484}
+.btn-danger:hover{background:#d02b3d}
 .btn-ghost{background:transparent}
 input[type="text"],input[type="number"],input[type="date"],input[type="url"],input[type="password"],select,textarea{
   background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 10px;border-radius:8px;font-size:13px;font-family:inherit;width:100%
@@ -41,7 +42,7 @@ input.err,select.err,textarea.err{border-color:var(--red);box-shadow:0 0 0 2px r
 .field-msg{color:var(--red);font-size:11px;margin-top:3px;min-height:14px}
 label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-weight:600}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:18px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;position:relative;overflow:hidden}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(11,79,158,.07)}
 .kpi .v{font-size:30px;font-weight:700;line-height:1}
 .kpi .l{color:var(--muted);font-size:11.5px;margin-top:8px;text-transform:uppercase;letter-spacing:.5px}
 .kpi .bar{position:absolute;left:0;top:0;width:4px;height:100%}
@@ -49,7 +50,7 @@ label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;l
 .kpi.b-orange .bar{background:var(--orange)} .kpi.b-green .bar{background:var(--green)}
 .kpi.b-gold .bar{background:var(--gold)} .kpi.b-purple .bar{background:var(--purple)}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:16px;box-shadow:0 1px 3px rgba(11,79,158,.07)}
 .card:last-child{margin-bottom:0}
 .card h3{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .card .hint{color:var(--muted);font-size:11px;margin-bottom:8px}
@@ -58,28 +59,77 @@ label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;l
 @media(max-width:900px){.col-6,.col-4,.col-8,.col-3{grid-column:span 12}}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{padding:7px 9px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{color:var(--muted);font-weight:600;cursor:pointer;position:sticky;top:0;background:var(--panel);user-select:none;z-index:2}
-th:hover{color:#fff}
-tbody tr:hover{background:var(--panel2)}
+th{color:#ffffff;font-weight:600;cursor:pointer;position:sticky;top:0;background:var(--accent);user-select:none;z-index:2}
+th:hover{color:var(--accent)}
+tbody tr:hover{background:#d6e8fb}
 .tag{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
-.t-circ{background:rgba(57,192,138,.18);color:#5fe0ab}
-.t-resg{background:rgba(155,109,255,.20);color:#bfa3ff}
-.t-tall{background:rgba(245,196,81,.18);color:var(--gold)}
-.t-sin{background:rgba(239,92,110,.18);color:#ff8a98}
-.t-mec{background:rgba(63,169,245,.18);color:#7cc4f8}
-.t-elec{background:rgba(245,196,81,.18);color:var(--gold)}
-.t-est{background:rgba(155,109,255,.18);color:#bfa3ff}
-.t-sini{background:rgba(239,92,110,.18);color:#ff8a98}
-.t-legal{background:rgba(240,138,60,.18);color:#f5a86b}
-.t-doc{background:rgba(57,192,138,.18);color:#5fe0ab}
-.t-pend{background:rgba(239,92,110,.18);color:#ff8a98}
-.t-proc{background:rgba(240,138,60,.18);color:#f5a86b}
-.t-resu{background:rgba(57,192,138,.18);color:#5fe0ab}
+.t-circ{background:#d3f2e3;color:#0a5e3b;border:1px solid #9fdcc2}
+.t-resg{background:#e2dcfa;color:#432c94;border:1px solid #bfb0ee}
+.t-tall{background:#fbeecd;color:#7d5606;border:1px solid #edd394}
+.t-sin{background:#fbdade;color:#8f1826;border:1px solid #f0aeb6}
+.t-mec{background:#d6e8fb;color:#0b4f9e;border:1px solid #a8cdf2}
+.t-elec{background:#fbeecd;color:#7d5606;border:1px solid #edd394}
+.t-est{background:#e2dcfa;color:#432c94;border:1px solid #bfb0ee}
+.t-sini{background:#fbdade;color:#8f1826;border:1px solid #f0aeb6}
+.t-legal{background:#fce3cb;color:#8a4406;border:1px solid #f3c193}
+.t-doc{background:#d3f2e3;color:#0a5e3b;border:1px solid #9fdcc2}
+.t-pend{background:#fbdade;color:#8f1826;border:1px solid #f0aeb6}
+.t-proc{background:#fce3cb;color:#8a4406;border:1px solid #f3c193}
+.t-resu{background:#d3f2e3;color:#0a5e3b;border:1px solid #9fdcc2}
 .num{text-align:right;font-variant-numeric:tabular-nums}
 .bad{color:var(--red);font-weight:700}.warn{color:var(--orange);font-weight:600}.ok{color:var(--green)}
 .tablewrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px}
 .legend-note{color:var(--muted);font-size:11px;margin-top:10px;line-height:1.6}
 
+
+
+/* ===== CARTA RESPONSIVA ===== */
+.carta-box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.carta-tit{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px}
+.carta-txt{max-height:190px;overflow-y:auto;font-size:12px;line-height:1.72;color:var(--txt);text-align:justify;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;white-space:pre-line}
+.carta-txt::-webkit-scrollbar{width:8px}
+.carta-txt::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.carta-chk{display:flex;align-items:flex-start;gap:9px;margin-top:11px;font-size:12.5px;color:var(--txt);
+  text-transform:none;letter-spacing:0;font-weight:500;cursor:pointer}
+
+/* ===== COMPARADOR ENTREGA / DEVOLUCIÓN ===== */
+.cmp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.cmp-item{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 11px}
+.cmp-lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:8px;
+  display:flex;align-items:center;gap:7px}
+.cmp-lab .flag{font-size:10px;padding:1px 7px;border-radius:20px;font-weight:700}
+.flag-ok{background:#d3f2e3;color:#0a5e3b}
+.flag-no{background:#e8eef6;color:#42566f}
+.cmp-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cmp-side{display:flex;flex-direction:column;gap:5px}
+.cmp-side .cap{font-size:10px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;text-align:center;
+  padding:3px 0;border-radius:5px}
+.cap-ent{background:#d6e8fb;color:#0b4f9e}
+.cap-dev{background:#fbeecd;color:#7d5606}
+.cmp-ph{height:112px;border-radius:7px;border:1px solid var(--line);background:#eef5fd;display:flex;
+  align-items:center;justify-content:center;color:var(--muted);font-size:10.5px;text-align:center;padding:6px;overflow:hidden}
+.cmp-ph img{width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+.cmp-drop{height:112px;border:2px dashed var(--line);border-radius:7px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;cursor:pointer;background:var(--panel);transition:.15s;padding:6px}
+.cmp-drop:hover,.cmp-drop:active{border-color:var(--gold);background:rgba(245,196,81,.06)}
+.cmp-drop .ico{font-size:19px;opacity:.75}
+.cmp-drop .txt{font-size:10px;color:var(--muted);text-align:center;line-height:1.35}
+.cmp-drop.has{border-style:solid;border-color:rgba(245,196,81,.55);padding:0;overflow:hidden;position:relative}
+.cmp-drop.has img{width:100%;height:100%;object-fit:cover}
+.cmp-del{position:absolute;top:3px;right:3px;background:rgba(11,79,158,.85);border:none;color:#fff;border-radius:5px;
+  width:21px;height:21px;cursor:pointer;font-size:12px;line-height:1}
+.cmp-del:hover{background:var(--red)}
+.cmp-item input[type="file"]{display:none}
+
+/* ===== VISOR AMPLIADO ===== */
+.lightbox{position:fixed;inset:0;background:rgba(6,10,20,.94);z-index:300;display:none;align-items:center;
+  justify-content:center;padding:24px;flex-direction:column;gap:12px}
+.lightbox.open{display:flex}
+.lightbox img{max-width:94vw;max-height:82vh;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.lightbox .cap{color:var(--txt);font-size:13px;font-weight:600}
+.lightbox .cerrar{position:absolute;top:16px;right:20px;background:var(--panel2);border:1px solid var(--line);
+  color:var(--txt);border-radius:8px;padding:7px 15px;cursor:pointer;font-size:13px}
 
 /* ===== CAPTURA DE EVIDENCIA (móvil) ===== */
 .foto-item{position:relative}
@@ -89,7 +139,7 @@ tbody tr:hover{background:var(--panel2)}
 .foto-drop:hover,.foto-drop:active{border-color:var(--accent);background:rgba(63,169,245,.06)}
 .foto-drop .ico{font-size:24px;line-height:1;opacity:.75}
 .foto-drop .txt{font-size:11.5px;color:var(--muted);line-height:1.4}
-.foto-drop.has{border-style:solid;border-color:rgba(57,192,138,.5);padding:0;overflow:hidden;background:#0b1020}
+.foto-drop.has{border-style:solid;border-color:#46b98a;padding:0;overflow:hidden;background:#eef5fd}
 .foto-thumb{width:100%;height:118px;object-fit:cover;display:block}
 .foto-bar{display:flex;align-items:center;gap:7px;padding:6px 8px;font-size:10.5px;color:var(--muted);width:100%;background:var(--panel2)}
 .foto-bar .ok{color:var(--green);font-weight:700}
@@ -102,7 +152,7 @@ tbody tr:hover{background:var(--panel2)}
 
 /* ===== FIRMA ELECTRÓNICA ===== */
 .firma-wrap{border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:10px 12px}
-.firma-box{position:relative;background:#fbfcfe;border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none}
+.firma-box{position:relative;background:#ffffff;border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none}
 #firmaCanvas{display:block;width:100%;height:180px;cursor:crosshair;touch-action:none}
 .firma-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
   color:#9aa8bd;font-size:12.5px;letter-spacing:.3px}
@@ -115,9 +165,9 @@ tbody tr:hover{background:var(--panel2)}
 /* ===== UNIDADES EN PRÉSTAMO ===== */
 .pres-empty{text-align:center;color:var(--muted);padding:28px 20px;font-size:13px}
 .dias-badge{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
-.d-ok{background:rgba(57,192,138,.16);color:#5fe0ab}
-.d-mid{background:rgba(245,196,81,.16);color:var(--gold)}
-.d-long{background:rgba(239,92,110,.16);color:#ff8a98}
+.d-ok{background:#d3f2e3;color:#0a5e3b;border:1px solid #9fdcc2}
+.d-mid{background:#fbeecd;color:#7d5606;border:1px solid #edd394}
+.d-long{background:#fbdade;color:#8f1826;border:1px solid #f0aeb6}
 .storage-note{font-size:11.5px;line-height:1.6;border-radius:9px;padding:11px 13px;margin-bottom:12px;border:1px solid var(--line);background:var(--panel2)}
 .storage-note.warn{border-color:rgba(245,196,81,.4);color:var(--gold)}
 .storage-note.ok{border-color:rgba(57,192,138,.4)}
@@ -127,15 +177,15 @@ tbody tr:hover{background:var(--panel2)}
 .sec-title{font-size:12.5px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;
   margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px}
 .sec-title:first-of-type{margin-top:4px}
-.sec-title .n{background:var(--accent);color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;
+.sec-title .n{background:var(--accent);color:#ffffff;width:20px;height:20px;border-radius:50%;display:inline-flex;
   align-items:center;justify-content:center;font-size:11px;flex:0 0 auto}
 .sec-title .sub{margin-left:auto;font-size:10.5px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
 .asig-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:6px;flex-wrap:wrap}
 .asig-tabs .tab{padding:7px 13px;font-size:12px}
 .sec-pane{display:none}
 .sec-pane.active{display:block}
-.ok-badge{background:rgba(57,192,138,.16);color:#5fe0ab;border:1px solid rgba(57,192,138,.4)}
-.no-badge{background:rgba(239,92,110,.16);color:#ff8a98;border:1px solid rgba(239,92,110,.4)}
+.ok-badge{background:#d3f2e3;color:#0a5e3b;border:1px solid #9fdcc2}
+.no-badge{background:#fbdade;color:#8f1826;border:1px solid #f0aeb6}
 .sel-ok{border-color:rgba(57,192,138,.55)!important}
 .sel-warn{border-color:rgba(245,196,81,.55)!important}
 .sel-bad{border-color:rgba(239,92,110,.55)!important}
@@ -150,8 +200,8 @@ tbody tr:hover{background:var(--panel2)}
 .km-alert.warn{border-color:rgba(245,196,81,.45);color:var(--gold)}
 .km-alert.bad{border-color:rgba(239,92,110,.45);color:#ff9aa6}
 .asig-state{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.st-abierta{background:rgba(63,169,245,.16);color:#7cc4f8}
-.st-cerrada{background:rgba(57,192,138,.16);color:#5fe0ab}
+.st-abierta{background:#d6e8fb;color:#0b4f9e;border:1px solid #a8cdf2}
+.st-cerrada{background:#d3f2e3;color:#0a5e3b;border:1px solid #9fdcc2}
 .confirm-box{background:rgba(63,169,245,.08);border:1px solid rgba(63,169,245,.35);border-radius:9px;padding:11px 13px;margin-top:8px;font-size:12px;line-height:1.55}
 .confirm-box label{display:flex;align-items:center;gap:9px;text-transform:none;letter-spacing:0;font-size:12.5px;color:var(--txt);margin:8px 0 0;cursor:pointer;font-weight:500}
 
@@ -165,23 +215,23 @@ tbody tr:hover{background:var(--panel2)}
 .task-row.done input[type="text"]{text-decoration:line-through;opacity:.55}
 .chk{width:19px;height:19px;border-radius:5px;border:2px solid var(--line);background:var(--panel);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:.15s;padding:0}
 .chk:hover{border-color:var(--green)}
-.chk.on{background:var(--green);border-color:var(--green);color:#062018;font-weight:800;font-size:12px}
+.chk.on{background:var(--green);border-color:var(--green);color:#ffffff;font-weight:800;font-size:12px}
 .t-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:5px;line-height:1}
 .t-del:hover{color:var(--red);background:rgba(239,92,110,.12)}
 .tasks-empty{color:var(--muted);font-size:12px;padding:10px 0;text-align:center}
-.task-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(63,169,245,.14);border:1px solid rgba(63,169,245,.35);color:#9ed0f9;padding:1px 7px;border-radius:5px;font-size:10.5px;margin:1px 0}
-.task-chip.done{background:rgba(57,192,138,.14);border-color:rgba(57,192,138,.35);color:#7fe0b6;text-decoration:line-through;opacity:.75}
-.task-chip.late{background:rgba(239,92,110,.14);border-color:rgba(239,92,110,.4);color:#ff9aa6}
+.task-chip{display:inline-flex;align-items:center;gap:5px;background:#d6e8fb;border:1px solid #a8cdf2;color:#0b4f9e;padding:1px 7px;border-radius:5px;font-size:10.5px;margin:1px 0}
+.task-chip.done{background:#d3f2e3;border-color:#9fdcc2;color:#0a5e3b;text-decoration:line-through;opacity:.75}
+.task-chip.late{background:#fbdade;border-color:#f0aeb6;color:#8f1826}
 
 /* ===== CALENDARIO ===== */
 .cal-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .cal-title{font-size:14px;font-weight:700;min-width:190px}
 .cal-nav{display:flex;gap:4px}
 .cal-nav button{background:var(--panel2);border:1px solid var(--line);color:var(--txt);width:32px;height:32px;border-radius:7px;cursor:pointer;font-size:14px;line-height:1}
-.cal-nav button:hover{border-color:var(--accent);color:#fff}
+.cal-nav button:hover{border-color:var(--accent);color:var(--accent);background:#d6e8fb}
 .cal-switch{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .cal-switch button{background:var(--panel2);border:none;color:var(--muted);padding:7px 15px;cursor:pointer;font-size:12.5px;font-weight:600}
-.cal-switch button.active{background:var(--accent);color:#fff}
+.cal-switch button.active{background:var(--accent);color:#ffffff}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-left:auto}
 .cal-legend i{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:middle}
 
@@ -227,12 +277,13 @@ tbody tr:hover{background:var(--panel2)}
 .fleet-legend span{display:inline-flex;align-items:center;gap:6px}
 .dot{width:13px;height:13px;border-radius:4px;display:inline-block}
 .fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
-.unit{border-radius:9px;padding:10px 8px;cursor:pointer;text-align:center;color:#0c1322;font-weight:700;font-size:12.5px;border:2px solid transparent;transition:.12s;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:3px;position:relative}
+.unit{border-radius:9px;padding:10px 8px;cursor:pointer;text-align:center;color:#0a1420;font-weight:700;font-size:12.5px;border:2px solid transparent;transition:.12s;min-height:56px;display:flex;flex-direction:column;justify-content:center;gap:3px;position:relative}
 .unit small{font-weight:600;font-size:10px;opacity:.85;text-transform:uppercase;letter-spacing:.3px}
-.unit:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.35)}
-.unit.sel{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.4)}
-.unit .pend-dot{position:absolute;top:4px;right:4px;width:9px;height:9px;border-radius:50%;background:var(--red);border:1.5px solid var(--panel)}
-.u-circ{background:#39c08a} .u-tall{background:#f5c451} .u-resg{background:#9b6dff;color:#fff} .u-sin{background:#ef5c6e;color:#fff}
+.unit:hover{transform:translateY(-2px);box-shadow:0 5px 14px rgba(11,79,158,.28)}
+.unit.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(11,79,158,.35)}
+.unit .pend-dot{position:absolute;top:4px;right:4px;width:9px;height:9px;border-radius:50%;background:var(--red);border:1.5px solid #fff}
+.u-circ{background:#7ddcb4;border:1px solid #46b98a} .u-tall{background:#f7da8f;border:1px solid #dcae3a}
+.u-resg{background:#bdaef5;border:1px solid #8a72e0} .u-sin{background:#f5a3ad;border:1px solid #dd6a79}
 #fleetDetail{margin-top:14px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:0;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
 #fleetDetail.open{max-height:800px;padding:16px 18px}
 #fleetDetail h4{font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -241,24 +292,24 @@ tbody tr:hover{background:var(--panel2)}
 .fd-item .lab{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px}
 .fd-item .val{font-size:16px;font-weight:600;margin-top:3px;word-break:break-word;white-space:normal}
 .fd-close{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px}
-.fd-close:hover{color:#fff;border-color:var(--accent)}
+.fd-close:hover{color:var(--accent);border-color:var(--accent)}
 .fd-actions{display:flex;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--line)}
 .update-badge{font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
 .role-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
-.role-admin{background:rgba(63,169,245,.15);color:var(--accent);border:1px solid var(--accent)}
-.role-aux{background:rgba(245,196,81,.15);color:var(--gold);border:1px solid var(--gold)}
-.role-ger{background:rgba(155,109,255,.15);color:var(--purple);border:1px solid var(--purple)}
+.role-admin{background:#d6e8fb;color:#0b4f9e;border:1px solid #7db4ea}
+.role-aux{background:#fbeecd;color:#7d5606;border:1px solid #dcb257}
+.role-ger{background:#e2dcfa;color:#432c94;border:1px solid #a892e8}
 .sync-badge{font-size:11px;padding:4px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:5px}
-.sync-on{background:rgba(57,192,138,.15);color:var(--green);border:1px solid var(--green)}
-.sync-off{background:rgba(144,160,192,.15);color:var(--muted);border:1px solid var(--line)}
-.sync-err{background:rgba(239,92,110,.15);color:var(--red);border:1px solid var(--red)}
+.sync-on{background:#d3f2e3;color:#0a5e3b;border:1px solid #5cc294}
+.sync-off{background:#e8eef6;color:#42566f;border:1px solid var(--line)}
+.sync-err{background:#fbdade;color:#8f1826;border:1px solid #e08694}
 .pulse{animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* Overlay login */
 .overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
 .overlay.hidden{display:none}
-.login-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px 32px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px 32px;max-width:420px;width:100%;box-shadow:0 18px 50px rgba(11,79,158,.22)}
 .login-box h2{font-size:18px;margin-bottom:6px}
 .login-box .sub{margin-bottom:22px}
 .login-role-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:18px}
@@ -272,7 +323,7 @@ tbody tr:hover{background:var(--panel2)}
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(4px);z-index:90;display:none;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
 .modal-overlay.open{display:flex}
-.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 26px;max-width:640px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 26px;max-width:640px;width:100%;box-shadow:0 18px 50px rgba(11,79,158,.22)}
 .modal h3{font-size:16px;margin-bottom:4px;display:flex;align-items:center;gap:10px}
 .modal .modal-sub{color:var(--muted);font-size:12px;margin-bottom:18px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 14px}
@@ -283,7 +334,7 @@ tbody tr:hover{background:var(--panel2)}
 .km-preview .val{font-size:18px;font-weight:700}
 
 /* Toast */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:8px;padding:12px 18px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:200;font-size:13px;max-width:340px;opacity:0;transform:translateY(20px);transition:.25s}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:8px;padding:12px 18px;box-shadow:0 6px 20px rgba(11,79,158,.20);z-index:200;font-size:13px;max-width:340px;opacity:0;transform:translateY(20px);transition:.25s}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.err{border-left-color:var(--red)}
 .toast.warn{border-left-color:var(--orange)}
@@ -339,6 +390,7 @@ tbody tr:hover{background:var(--panel2)}
     <button class="btn btn-primary" id="btnActualizar">↻ Actualizar</button>
     <button class="btn" id="btnPDF" title="Descargar reporte en PDF">↓ PDF</button>
     <button class="btn" id="btnXLS" title="Descargar reporte en Excel">↓ Excel</button>
+    <button class="btn btn-success" id="btnCierreDia" title="Respaldo completo: Excel, CSV y todas las evidencias">🗜 Cierre de Día (ZIP)</button>
     <button class="btn hidden" id="btnConfig" title="Configuración">⚙</button>
     <button class="btn btn-ghost" id="btnLogout" title="Cerrar sesión">Salir</button>
     <span class="update-badge" id="updateBadge">—</span>
@@ -771,13 +823,8 @@ tbody tr:hover{background:var(--panel2)}
         </div>
         <div>
           <label>Entregado por</label>
-          <input type="text" id="aEntregadoPor" maxlength="60" placeholder="Nombre de quien entrega">
+          <select id="aEntregadoPor"></select>
           <div class="field-msg" id="e_aEntregadoPor"></div>
-        </div>
-        <div>
-          <label>Foto KM inicial (URL)</label>
-          <input type="text" id="aFotoKmIni" maxlength="400" placeholder="https://… o ruta del archivo">
-          <div class="field-msg" id="e_aFotoKmIni"></div>
         </div>
         <div class="full">
           <label>Comentarios de entrega</label>
@@ -841,6 +888,10 @@ tbody tr:hover{background:var(--panel2)}
           <select id="aPlacaTra" data-tn><option value="Tiene">Tiene</option><option value="No tiene">No tiene</option></select>
         </div>
         <div>
+          <label>Permiso IMOVEQROO</label>
+          <select id="aImoveqroo" data-tn><option value="Tiene">Tiene</option><option value="No tiene">No tiene</option></select>
+        </div>
+        <div>
           <label>Faltantes detectados</label>
           <input type="text" id="aDocResumen" readonly style="opacity:.75" value="Sin faltantes">
         </div>
@@ -878,7 +929,7 @@ tbody tr:hover{background:var(--panel2)}
       <div class="sec-title"><span class="n">5</span> Evidencia Fotográfica
         <span class="sub">Toque cada recuadro para abrir la cámara</span></div>
       <div class="storage-note" id="fotoStorageNote">Verificando el motor de almacenamiento…</div>
-      <div class="foto-count" id="fotoCount">0 de 6 evidencias capturadas</div>
+      <div class="foto-count" id="fotoCount">0 de 9 evidencias capturadas</div>
       <div class="foto-grid" id="fotoGrid"></div>
       <div class="field-msg" id="e_fotos"></div>
     </div>
@@ -912,11 +963,11 @@ tbody tr:hover{background:var(--panel2)}
           <div class="field-msg" id="e_firma"></div>
         </div>
         <div class="full">
-          <div class="confirm-box">
-            El chofer manifiesta haber recibido la unidad en las condiciones descritas en las secciones 1 a 5, con los
-            documentos y accesorios inventariados, y se compromete a devolverla en las mismas condiciones salvo el
-            desgaste normal de uso.
-            <label><input type="checkbox" id="aAceptaCond" style="width:auto;flex:0 0 auto"> Se registra la conformidad del chofer</label>
+          <div class="carta-box">
+            <div class="carta-tit">Carta Responsiva</div>
+            <div class="carta-txt" id="cartaTexto"></div>
+            <label class="carta-chk"><input type="checkbox" id="aAceptaCond" style="width:auto;flex:0 0 auto">
+              El chofer leyó y acepta íntegramente la carta responsiva</label>
           </div>
         </div>
       </div>
@@ -938,7 +989,7 @@ tbody tr:hover{background:var(--panel2)}
         </div>
         <div>
           <label>Chofer que devuelve</label>
-          <input type="text" id="dChofer" maxlength="60" placeholder="Nombre completo">
+          <select id="dChofer"></select>
           <div class="field-msg" id="e_dChofer"></div>
         </div>
         <div>
@@ -968,7 +1019,7 @@ tbody tr:hover{background:var(--panel2)}
         </div>
         <div>
           <label>Recibido por</label>
-          <input type="text" id="dEntregadoPor" maxlength="60" placeholder="Nombre de quien recibe">
+          <select id="dEntregadoPor"></select>
           <div class="field-msg" id="e_dEntregadoPor"></div>
         </div>
         <div>
@@ -979,6 +1030,13 @@ tbody tr:hover{background:var(--panel2)}
           <label>Comentarios de devolución</label>
           <textarea id="dComentarios" rows="2" maxlength="500" placeholder="Observaciones al reingreso de la unidad"></textarea>
           <div class="field-msg" id="e_dComentarios"></div>
+        </div>
+        <div class="full">
+          <div class="sec-title" style="margin-top:6px"><span class="n">📷</span> Comparativa de Evidencias · Entrega vs. Devolución
+            <span class="sub">Identifique nuevos daños comparando cada toma</span></div>
+          <div class="foto-count" id="fotoCountDev">0 de 9 evidencias de devolución capturadas</div>
+          <div class="cmp-grid" id="fotoGridDev"></div>
+          <div class="field-msg" id="e_fotosDev"></div>
         </div>
         <div class="full">
           <div class="confirm-box" id="dSyncBox">
@@ -994,6 +1052,7 @@ tbody tr:hover{background:var(--panel2)}
 
     <div class="modal-actions">
       <button class="btn btn-danger hidden" id="btnEliminarAsig">Eliminar</button>
+      <button class="btn" id="btnPdfLegal">📄 Descargar PDF Legal</button>
       <button class="btn" data-close-modal="modalAsignacion">Cancelar</button>
       <button class="btn btn-primary" id="btnGuardarAsig">Guardar checklist</button>
     </div>
@@ -1026,11 +1085,41 @@ tbody tr:hover{background:var(--panel2)}
       <input type="file" id="fileImport" accept=".json" style="display:none">
     </div>
 
+    <h4 style="font-size:13px;margin:22px 0 8px;color:var(--accent)">Cierre de día · Respaldo general</h4>
+    <div class="setup-note">Empaqueta en un solo archivo el reporte general en Excel, los CSV equivalentes y todas las evidencias fotográficas y firmas de cada folio. Se descarga como <b>Respaldo_IES_AAAAMMDD_HHMM.zip</b>.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+      <button class="btn btn-success" id="btnCierreDiaCfg">🗜 Cierre de Día (ZIP)</button>
+    </div>
+
+    <h4 style="font-size:13px;margin:22px 0 8px;color:var(--accent)">Exportación por período (ZIP)</h4>
+    <div class="setup-note">Genera un paquete con los movimientos del período en CSV (préstamos, incidencias, combustibles, tareas y flotilla) más las evidencias fotográficas de cada folio. Por omisión exporta el día de hoy.</div>
+    <div class="form-grid" style="margin-bottom:10px">
+      <div><label>Desde</label><input type="date" id="zipDesde"></div>
+      <div><label>Hasta</label><input type="date" id="zipHasta"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="btnZipDiario">🗓 Exportar período en ZIP</button>
+      <button class="btn" id="btnZipHoy">Hoy</button>
+      <button class="btn" id="btnZipSemana">Últimos 7 días</button>
+      <button class="btn" id="btnZipMes">Mes en curso</button>
+    </div>
+
     <h4 style="font-size:13px;margin:22px 0 8px;color:var(--accent)">Evidencias fotográficas</h4>
     <div id="evidResumen" class="storage-note">Calculando…</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn" id="btnRespaldoEvid">🗜 Respaldo de evidencias (ZIP)</button>
       <button class="btn" id="btnPurgarEvid">Purgar evidencias de checklists cerrados</button>
+    </div>
+
+    <h4 style="font-size:13px;margin:22px 0 8px;color:var(--red)">Liberación de espacio</h4>
+    <div class="setup-note" style="border-color:#f0aeb6;background:#fdf1f3">
+      <b>Limpiar Archivos y Evidencias</b> elimina del servidor únicamente las fotografías y firmas para liberar cuota.
+      Conserva íntegros el parque vehicular, zonas, estatus, departamentos, préstamos (folios, fechas, choferes,
+      kilómetros y firmantes), incidencias, tareas, combustibles y bitácora. Requiere doble confirmación.
+      <b>Descargue antes el Cierre de Día.</b>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-danger" id="btnLimpiarArchivos">🧹 Limpiar Archivos y Evidencias</button>
     </div>
 
     <h4 style="font-size:13px;margin:22px 0 8px;color:var(--red)">Zona peligrosa</h4>
@@ -1043,6 +1132,13 @@ tbody tr:hover{background:var(--panel2)}
       <button class="btn" data-close-modal="modalConfig">Cerrar</button>
     </div>
   </div>
+</div>
+
+<!-- ============ VISOR DE EVIDENCIA ============ -->
+<div class="lightbox" id="lightbox">
+  <button class="cerrar" onclick="cerrarVisor()">Cerrar ✕</button>
+  <img id="lbImg" src="" alt="Evidencia">
+  <div class="cap" id="lbCap"></div>
 </div>
 
 <!-- ============ TOAST ============ -->
@@ -1076,7 +1172,7 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.5 } };
+let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.6 } };
 let ALL=[], DATA=[];
 let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'' };
 let session = { rol:null, loggedAt:null };
@@ -1087,8 +1183,8 @@ let fbConnected = false;
 let fbInitialLoad = false;
 const charts = {};
 
-const C = {blue:'#3fa9f5',gold:'#f5c451',green:'#39c08a',red:'#ef5c6e',orange:'#f08a3c',purple:'#9b6dff',muted:'#90a0c0'};
-const STCOLOR = {CIRCULACION:C.green,TALLER:C.gold,RESGUARDO:C.purple,SINIESTRADO:C.red};
+const C = {blue:'#0b4f9e',sky:'#38a3f5',gold:'#c8920e',green:'#0f7a4e',red:'#b81f30',orange:'#b45c09',purple:'#5a3fb8',muted:'#42566f'};
+const STCOLOR = {CIRCULACION:'#2fae7c',TALLER:'#dca917',RESGUARDO:'#7a5fd0',SINIESTRADO:'#cf3a4b'};
 const STCLASS = {CIRCULACION:'u-circ',TALLER:'u-tall',RESGUARDO:'u-resg',SINIESTRADO:'u-sin'};
 const INC_CLASS = {'Mecánica':'t-mec','Eléctrica':'t-elec','Estética':'t-est','Siniestro':'t-sini','Legal':'t-legal','Documental':'t-doc'};
 const INC_ST_CLASS = {'Pendiente':'t-pend','En proceso':'t-proc','Resuelto':'t-resu'};
@@ -1233,7 +1329,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.5 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.6 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -1295,7 +1391,7 @@ async function seedFromCSV(){
       };
       cargadas++;
     }
-    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.5 };
+    updates[`${FB_ROOT}/meta`] = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.6 };
     // Bitácora
     const bit = { id:uid(), ts:nowISO(), unidad:'—', accion:'SEED', campo:'inicialización', antes:'', despues:`${cargadas} unidades`, usuario:session.rol, rol:session.rol };
     updates[`${FB_ROOT}/bitacora/${bit.id}`] = bit;
@@ -1472,7 +1568,7 @@ function renderFleetDetail(){
 function pie(id, counts, key){
   const el = document.getElementById(id);
   const ch = charts[id] || (charts[id] = echarts.init(el));
-  const paleta = [C.blue,C.gold,C.purple,C.green];
+  const paleta = [C.blue,C.sky,C.purple,C.green];
   const data = Object.entries(counts).map(([k,v],i)=>({
     name:k, value:v,
     itemStyle:{color:(id==='cEstatus')?(STCOLOR[k]||C.blue):paleta[i%4]}
@@ -1481,7 +1577,7 @@ function pie(id, counts, key){
     tooltip:{trigger:'item',formatter:'{b}: <b>{c}</b> ({d}%)'},
     legend:{bottom:0,textStyle:{color:C.muted,fontSize:11}},
     series:[{type:'pie',radius:['45%','72%'],center:['50%','44%'],
-      label:{color:'#e8edf7',fontSize:12,formatter:'{b}\n{c}'},
+      label:{color:'#000000',fontSize:12,formatter:'{b}\n{c}'},
       labelLine:{lineStyle:{color:C.muted}}, data}]
   }, true);
   ch.off('click');
@@ -1496,9 +1592,9 @@ function barDepto(){
   ch.setOption({
     grid:{left:100,right:24,top:10,bottom:20},
     tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>`${p[0].name}: <b>${p[0].value}</b> unidades`},
-    xAxis:{type:'value',axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
-    yAxis:{type:'category',data:ent.map(e=>e[0]),axisLabel:{color:'#e8edf7',fontSize:11}},
-    series:[{type:'bar',data:ent.map(e=>e[1]),itemStyle:{color:C.blue,borderRadius:[0,4,4,0]},label:{show:true,position:'right',color:'#e8edf7'}}]
+    xAxis:{type:'value',axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#cfe0f2'}}},
+    yAxis:{type:'category',data:ent.map(e=>e[0]),axisLabel:{color:'#000000',fontSize:11}},
+    series:[{type:'bar',data:ent.map(e=>e[1]),itemStyle:{color:C.blue,borderRadius:[0,4,4,0]},label:{show:true,position:'right',color:'#000000'}}]
   }, true);
   ch.off('click');
   ch.on('click', p=>{state.depto=state.depto===p.name?'':p.name; syncSelects(); applyFilters();});
@@ -1514,12 +1610,12 @@ function barServicio(){
       const r = d[p[0].dataIndex];
       const placas = r.placas?` · <b>${r.placas}</b>`:'';
       return `<b>${r.veh}</b>${placas}<br>${r.zona} · ${r.depto}<br>Chofer: ${r.chofer}<br>${r.km<0
-        ?'<span style=color:#ef5c6e>VENCIDO</span> por '+Math.abs(r.km).toLocaleString('es-MX')+' km'
+        ?'<span style=color:#b81f30>VENCIDO</span> por '+Math.abs(r.km).toLocaleString('es-MX')+' km'
         :r.km.toLocaleString('es-MX')+' km restantes'}`;
     }},
     dataZoom:[{type:'slider',bottom:34,height:16,textStyle:{color:C.muted}}],
     xAxis:{type:'category',data:d.map(r=>r.veh),axisLabel:{color:C.muted,rotate:55,fontSize:10}},
-    yAxis:{type:'value',name:'km',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
+    yAxis:{type:'value',name:'km',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#cfe0f2'}}},
     series:[{type:'bar',data:d.map(r=>({value:r.km,itemStyle:{
       color:r.km<0?C.red:r.km<=1500?C.orange:C.green,
       borderRadius:r.km<0?[0,0,3,3]:[3,3,0,0]
@@ -1657,7 +1753,7 @@ function renderBitacora(){
 let fbStorage = null;
 let storageModo = 'probando';   // 'storage' | 'rtdb' | 'probando'
 let evidCache = {};             // { asigId: {fotos:{}, firma:''} } cargado bajo demanda
-let evidActual = { fotos:{}, firma:'' };
+let evidActual = { fotos:{}, fotosDev:{}, firma:'' };
 let draftAsigId = null;
 
 function initStorage(){
@@ -1756,7 +1852,7 @@ function buildFotoGrid(valores){
         <span class="ico">📷</span>
         <span class="txt">Tocar para capturar<br>o elegir archivo</span>
       </div>
-      <input type="file" id="foto_${f.k}" accept="image/*" capture="environment">
+      <input type="file" id="foto_${f.k}" accept="image/*">
       <div class="up-bar" id="bar_${f.k}" style="display:none"><i></i></div>
     </div>`).join('');
   FOTOS_DEF.forEach(f=>{
@@ -1827,7 +1923,7 @@ function pintaFoto(k){
 function actualizaContadorFotos(){
   const n = Object.keys(evidActual.fotos).length;
   const el = $('#fotoCount');
-  if(el) el.innerHTML = `<b>${n}</b> de 6 evidencias capturadas${n===6?' · completo':''}`;
+  if(el) el.innerHTML = `<b>${n}</b> de ${TOTAL_FOTOS} evidencias capturadas${n===TOTAL_FOTOS?' · completo':''}`;
 }
 function leerFotos(){ return evidActual.fotos; }
 
@@ -1846,7 +1942,7 @@ function initFirma(){
   firmaCtx.lineWidth = 2.2;
   firmaCtx.lineCap = 'round';
   firmaCtx.lineJoin = 'round';
-  firmaCtx.strokeStyle = '#16203a';
+  firmaCtx.strokeStyle = '#000000';
 
   const pos = ev => {
     const r = cv.getBoundingClientRect();
@@ -1935,21 +2031,21 @@ function exportaFirma(){
 
 /* ============ EVIDENCIAS EN FIREBASE (nodo aparte, carga bajo demanda) ============ */
 async function cargaEvidencias(asigId){
-  if(!asigId) return {fotos:{}, firma:''};
+  if(!asigId) return {fotos:{}, fotosDev:{}, firma:''};
   if(evidCache[asigId]) return evidCache[asigId];
   try{
     const snap = await fbDb.ref(`${FB_ROOT}/evidencias/${asigId}`).get();
     const d = snap.val() || {};
-    const r = { fotos: d.fotos || {}, firma: d.firma || '' };
+    const r = { fotos: d.fotos || {}, fotosDev: d.fotosDev || {}, firma: d.firma || '' };
     evidCache[asigId] = r;
     return r;
-  }catch(e){ return {fotos:{}, firma:''}; }
+  }catch(e){ return {fotos:{}, fotosDev:{}, firma:''}; }
 }
-async function guardaEvidencias(asigId, fotos, firma){
-  const payload = { fotos: fotos||{}, firma: firma||'', updatedAt: nowISO(), updatedBy: session.rol };
+async function guardaEvidencias(asigId, fotos, fotosDev, firma){
+  const payload = { fotos: fotos||{}, fotosDev: fotosDev||{}, firma: firma||'', updatedAt: nowISO(), updatedBy: session.rol };
   try{
     await fbDb.ref(`${FB_ROOT}/evidencias/${asigId}`).set(payload);
-    evidCache[asigId] = { fotos: payload.fotos, firma: payload.firma };
+    evidCache[asigId] = { fotos: payload.fotos, fotosDev: payload.fotosDev, firma: payload.firma };
     return true;
   }catch(e){
     toast('No se pudieron guardar las evidencias: '+e.message+' (el checklist sí se guardó)','warn');
@@ -1957,16 +2053,36 @@ async function guardaEvidencias(asigId, fotos, firma){
   }
 }
 
-/* ============ FOLIO AUTOMÁTICO ============ */
-function generaFolio(fechaISO){
+/* ============ FOLIO ÚNICO IRREPETIBLE ============
+   Se compone de la fecha + Date.now() en base36 + sufijo aleatorio, y se
+   RESERVA en Firebase con una transacción atómica. Si el Coordinador y el
+   Auxiliar generan un folio en el mismo instante, la transacción rechaza al
+   segundo y el sistema reintenta: nunca se emiten dos folios iguales. */
+function candidatoFolio(fechaISO){
   const base = (fechaISO || new Date().toISOString().slice(0,10)).replace(/-/g,'');
-  let folio, intentos = 0;
-  do{
-    const suf = (Math.random().toString(36).slice(2,6) + '0000').slice(0,4).toUpperCase();
-    folio = `PR-${base}-${suf}`;
-    intentos++;
-  } while(STORE.asignaciones.some(a=>a.bitacora===folio) && intentos < 40);
-  return folio;
+  const t   = Date.now().toString(36).slice(-5).toUpperCase();
+  const r   = (Math.random().toString(36).slice(2,6)+'0000').slice(0,4).toUpperCase();
+  return `PR-${base}-${t}${r}`;
+}
+/* Reserva atómica: devuelve el folio confirmado por el servidor */
+async function reservaFolio(fechaISO, asigId){
+  for(let i=0;i<12;i++){
+    const folio = candidatoFolio(fechaISO);
+    if(STORE.asignaciones.some(a=>a.bitacora===folio)) continue;
+    try{
+      const ref = fbDb.ref(`${FB_ROOT}/folios/${folio}`);
+      const res = await ref.transaction(actual => (actual===null) ? {
+        asigId, rol: session.rol, ts: firebase.database.ServerValue.TIMESTAMP
+      } : undefined);   // undefined aborta si ya existe
+      if(res.committed) return folio;
+    }catch(e){ console.warn('reservaFolio', e); }
+  }
+  // Último recurso: marca de tiempo completa, imposible de colisionar en la práctica
+  return `PR-${(fechaISO||'').replace(/-/g,'')}-${Date.now().toString(36).toUpperCase()}`;
+}
+async function liberaFolio(folio){
+  if(!folio) return;
+  try{ await fbDb.ref(`${FB_ROOT}/folios/${folio}`).remove(); }catch(e){}
 }
 
 /* ============ CHOFER Y ZONA DINÁMICOS ============ */
@@ -1977,14 +2093,26 @@ function choferesConocidos(){
   (STORE.choferesExtra||[]).forEach(c=>set.add(String(c).toUpperCase()));
   return [...set].sort();
 }
-function buildChoferSelect(valor){
-  const sel = $('#aChofer');
+function buildChoferSelect(valor, selector){
+  const sel = $(selector || '#aChofer');
   const lista = choferesConocidos();
   if(valor && valor.trim() && !lista.includes(valor.trim().toUpperCase())) lista.unshift(valor.trim().toUpperCase());
+  const conNuevo = (!selector || selector==='#aChofer');
   sel.innerHTML = '<option value="">— Seleccione un chofer —</option>'
     + lista.map(c=>`<option value="${c}">${c}</option>`).join('')
-    + '<option value="nuevo">+ Agregar nuevo…</option>';
+    + (conNuevo ? '<option value="nuevo">+ Agregar nuevo…</option>' : '');
   sel.value = valor ? valor.trim().toUpperCase() : '';
+}
+function buildEntregadorSelect(sel, valor){
+  const el = $(sel);
+  const lista = [...ENTREGADORES];
+  const v = (valor||'').trim();
+  // Conserva un valor histórico que ya no esté en el catálogo
+  if(v && !lista.some(x=>x.toUpperCase()===v.toUpperCase())) lista.push(v);
+  el.innerHTML = '<option value="">— Seleccione —</option>' +
+    lista.map(n=>`<option value="${n}">${n}</option>`).join('');
+  const match = lista.find(x=>x.toUpperCase()===v.toUpperCase());
+  el.value = match || '';
 }
 function buildZonaSelectAsig(valor){
   const sel = $('#aZona');
@@ -2044,7 +2172,7 @@ function renderPrestamos(){
           <td>${a.fechaEntrega||'—'}</td>
           <td><span class="dias-badge ${cls}">${d===null?'—':d+(d===1?' día':' días')}</span></td>
           <td class="num">${fmt(a.kmInicial)}</td>
-          <td class="num" style="color:${nf===6?'var(--green)':nf?'var(--gold)':'var(--muted)'}">${nf}/6</td>
+          <td class="num" style="color:${nf===TOTAL_FOTOS?'var(--green)':nf?'var(--gold)':'var(--muted)'}">${nf}/${TOTAL_FOTOS}</td>
           <td>${esEditor?`<button class="btn" style="padding:3px 9px;font-size:11px" onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}')">Devolver</button>`:''}</td>
         </tr>`;
       }).join('')}</tbody></table>
@@ -2067,7 +2195,7 @@ async function calculaUsoEvidencias(){
     let bytes = 0, fotos = 0, firmas = 0, regs = 0;
     Object.values(d).forEach(e=>{
       regs++;
-      Object.values(e.fotos||{}).forEach(f=>{
+      [...Object.values(e.fotos||{}), ...Object.values(e.fotosDev||{})].forEach(f=>{
         fotos++;
         bytes += f.peso || (typeof f.valor==='string' ? f.valor.length*0.75 : 0);
       });
@@ -2110,7 +2238,9 @@ async function respaldoEvidencias(){
       const carpeta = `${(a.bitacora||id)}_${(a.vehiculo||'SIN-UNIDAD')}`.replace(/[^\w\-]/g,'_');
       const dir = zip.folder(carpeta);
 
-      for(const [k,f] of Object.entries(evid[id].fotos||{})){
+      const todas = {...Object.fromEntries(Object.entries(evid[id].fotos||{}).map(([k,v])=>['entrega_'+k,v])),
+                     ...Object.fromEntries(Object.entries(evid[id].fotosDev||{}).map(([k,v])=>['devolucion_'+k,v]))};
+      for(const [k,f] of Object.entries(todas)){
         const nombre = `${k}.jpg`;
         try{
           if(typeof f.valor==='string' && f.valor.startsWith('data:')) dir.file(nombre, b64aBlob(f.valor));
@@ -2153,11 +2283,11 @@ async function purgarEvidenciasCerradas(){
   for(const a of cerrados){
     try{
       const ev = evidCache[a.id] || (await cargaEvidencias(a.id));
-      for(const f of Object.values(ev.fotos||{})){
+      for(const f of [...Object.values(ev.fotos||{}), ...Object.values(ev.fotosDev||{})]){
         if(f.modo==='storage' && f.ruta && fbStorage) await fbStorage.ref(f.ruta).delete().catch(()=>{});
       }
       await fbDb.ref(`${FB_ROOT}/evidencias/${a.id}`).remove();
-      await fbWriteAsignacion({...a, fotos:{}, evidenciasPurgadas:nowISO()});
+      await fbWriteAsignacion({...a, fotos:{}, fotosDev:{}, evidenciasPurgadas:nowISO()});
       delete evidCache[a.id];
       n++;
     }catch(e){}
@@ -2167,6 +2297,629 @@ async function purgarEvidenciasCerradas(){
   pintaResumenEvidencias();
 }
 
+/* ============ COMPARADOR DE EVIDENCIAS (entrega vs. devolución) ============ */
+window.abrirVisor = function(src, cap){
+  $('#lbImg').src = src;
+  $('#lbCap').textContent = cap || '';
+  $('#lightbox').classList.add('open');
+};
+window.cerrarVisor = function(){ $('#lightbox').classList.remove('open'); $('#lbImg').src=''; };
+
+function srcDe(m){ return m ? m.valor : ''; }
+
+function buildComparador(valoresDev){
+  evidActual.fotosDev = {};
+  if(valoresDev) Object.entries(valoresDev).forEach(([k,v])=>{
+    evidActual.fotosDev[k] = (typeof v==='string') ? {modo:'storage', valor:v, nombre:'evidencia'} : v;
+  });
+  $('#fotoGridDev').innerHTML = FOTOS_DEF.map(f=>`
+    <div class="cmp-item">
+      <div class="cmp-lab" id="cmplab_${f.k}">${f.lab}</div>
+      <div class="cmp-pair">
+        <div class="cmp-side">
+          <span class="cap cap-ent">Entrega</span>
+          <div class="cmp-ph" id="cmpent_${f.k}">Sin evidencia<br>de entrega</div>
+        </div>
+        <div class="cmp-side">
+          <span class="cap cap-dev">Devolución</span>
+          <div class="cmp-drop" id="cmpdev_${f.k}" data-k="${f.k}">
+            <span class="ico">📷</span><span class="txt">Capturar<br>o elegir</span>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="fotodev_${f.k}" accept="image/*">
+      <div class="up-bar" id="bardev_${f.k}" style="display:none"><i></i></div>
+    </div>`).join('');
+  FOTOS_DEF.forEach(f=>{
+    $('#fotodev_'+f.k).onchange = e=>{ if(e.target.files && e.target.files[0]) manejaFotoDev(f.k, e.target.files[0]); };
+    pintaLadoEntrega(f.k);
+    pintaFotoDev(f.k);
+  });
+  actualizaContadorFotosDev();
+}
+
+function pintaLadoEntrega(k){
+  const el = $('#cmpent_'+k); if(!el) return;
+  const m = evidActual.fotos[k];
+  const lab = FOTOS_DEF.find(f=>f.k===k).lab;
+  if(!m){ el.innerHTML = 'Sin evidencia<br>de entrega'; return; }
+  el.innerHTML = `<img src="${srcDe(m)}" alt="${k}" onclick="abrirVisor('${srcDe(m).replace(/'/g,"\\'")}','${lab} · Entrega')">`;
+}
+
+async function manejaFotoDev(k, file){
+  if(file.size > 25*1024*1024){ toast('La imagen supera 25 MB. Use una foto de menor resolución.','err'); return; }
+  const drop = $('#cmpdev_'+k), bar = $('#bardev_'+k);
+  bar.style.display='block'; bar.firstElementChild.style.width='0%';
+  drop.className='cmp-drop';
+  drop.innerHTML = '<span class="ico">⏳</span><span class="txt">Procesando…</span>';
+  try{
+    const meta = await subeEvidencia('dev_'+k, file, pct=>{
+      bar.firstElementChild.style.width = pct+'%';
+      drop.innerHTML = `<span class="ico">⬆</span><span class="txt">Subiendo ${pct}%</span>`;
+    });
+    evidActual.fotosDev[k] = meta;
+    bar.style.display='none';
+    pintaFotoDev(k); actualizaContadorFotosDev();
+    toast(`Evidencia de devolución "${FOTOS_DEF.find(f=>f.k===k).lab}" capturada.`);
+  }catch(e){
+    bar.style.display='none';
+    delete evidActual.fotosDev[k];
+    pintaFotoDev(k);
+    const msg = String(e && (e.code||e.message) || e);
+    if(msg.indexOf('402')>=0 || msg.indexOf('403')>=0 || msg.indexOf('unauthorized')>=0){
+      storageModo='rtdb'; pintaNotaStorage();
+      toast('Storage no disponible: se cambió a guardado en base de datos. Vuelva a capturar la foto.','warn');
+    } else toast('Error al procesar la imagen: '+msg,'err');
+  }
+}
+
+function pintaFotoDev(k){
+  const drop = $('#cmpdev_'+k); if(!drop) return;
+  const m = evidActual.fotosDev[k];
+  const lab = FOTOS_DEF.find(f=>f.k===k).lab;
+  const flagEl = $('#cmplab_'+k);
+  if(!m){
+    drop.className='cmp-drop';
+    drop.innerHTML='<span class="ico">📷</span><span class="txt">Capturar<br>o elegir</span>';
+    drop.onclick = ()=>$('#fotodev_'+k).click();
+    if(flagEl) flagEl.innerHTML = `${lab} <span class="flag flag-no">Pendiente</span>`;
+    return;
+  }
+  drop.className='cmp-drop has';
+  drop.innerHTML = `<img src="${srcDe(m)}" alt="${k}">
+    <button type="button" class="cmp-del" data-del-dev="${k}" title="Eliminar">✕</button>`;
+  drop.onclick = e=>{
+    if(e.target.dataset && e.target.dataset.delDev){
+      e.stopPropagation();
+      if(!confirm('¿Eliminar esta evidencia de devolución?')) return;
+      const prev = evidActual.fotosDev[k];
+      if(prev && prev.modo==='storage' && prev.ruta && fbStorage) fbStorage.ref(prev.ruta).delete().catch(()=>{});
+      delete evidActual.fotosDev[k];
+      $('#fotodev_'+k).value='';
+      pintaFotoDev(k); actualizaContadorFotosDev();
+      return;
+    }
+    abrirVisor(srcDe(m), lab+' · Devolución');
+  };
+  if(flagEl) flagEl.innerHTML = `${lab} <span class="flag flag-ok">Comparable</span>`;
+}
+function actualizaContadorFotosDev(){
+  const n = Object.keys(evidActual.fotosDev).length;
+  const el = $('#fotoCountDev');
+  if(el) el.innerHTML = `<b>${n}</b> de ${TOTAL_FOTOS} evidencias de devolución capturadas${n===TOTAL_FOTOS?' · completo':''}`;
+}
+function leerFotosDev(){ return evidActual.fotosDev; }
+
+/* ============ PDF LEGAL: PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES ============ */
+function armaHtmlLegal(a, u, fotos, fotosDev, firma){
+  const esc = v => String(v??'—').replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
+  const fila = (l,v) => `<tr><th>${l}</th><td>${esc(v)}</td></tr>`;
+  const km = v => v==null||v===''?'—':Number(v).toLocaleString('es-MX')+' km';
+
+  const docs = [['Póliza de seguro',a.docPoliza],['Tarjeta de circulación',a.docTarjCirc],
+    ['Tarjeta de combustible',a.docTarjComb],['Placa delantera',a.docPlacaDel],
+    ['Placa trasera',a.docPlacaTra],['Permiso IMOVEQROO',a.docImoveqroo]];
+  const pars = [['Nivel de aceite',a.parAceite],['Anticongelante',a.parAnticong],
+    ['Frenos',a.parFrenos],['Líquido limpiaparabrisas',a.parLimpia]];
+
+  const celdaFoto = (m,lab) => m
+    ? `<div class="ph"><img src="${srcDe(m)}"><span>${lab}</span></div>`
+    : `<div class="ph vac"><span>${lab}<br><i>sin evidencia</i></span></div>`;
+
+  const hayDev = !!(a.devFecha || a.devKmFinal!=null);
+
+  return `
+  <div class="doc">
+    <div class="enc">
+      <div class="tit">PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES</div>
+      <div class="emp">${RAZON_SOCIAL}</div>
+      <div class="fol">Folio: <b>${esc(a.bitacora)}</b> · Emitido: ${new Date().toLocaleString('es-MX')}</div>
+    </div>
+
+    <div class="sec">1. Datos del Vehículo</div>
+    <table class="t2">
+      ${fila('Unidad', a.vehiculo)}${fila('Placas', u.placas)}
+      ${fila('Zona', a.zona||u.zona)}${fila('Departamento', u.depto)}
+      ${fila('Estatus operativo', u.estatus)}${fila('KM al momento de la entrega', km(a.kmInicial))}
+    </table>
+
+    <div class="sec">2. Datos del Préstamo</div>
+    <table class="t2">
+      ${fila('Fecha de entrega', a.fechaEntrega)}${fila('Chofer responsable', a.chofer)}
+      ${fila('Destino', a.destino)}${fila('Entregado por', a.entregadoPor)}
+      ${fila('Estado de la unidad', a.estado)}${fila('Nivel de tanque', a.tanque)}
+      ${fila('Próximo servicio (KM)', km(a.proxServKm))}${fila('Próximo servicio (fecha)', a.proxServFecha)}
+    </table>
+    ${a.comentarios?`<p class="obs"><b>Comentarios de entrega:</b> ${esc(a.comentarios)}</p>`:''}
+
+    <div class="sec">3. Inventario de Documentos y Placas</div>
+    <table class="inv"><tr>${docs.map(([l])=>`<th>${l}</th>`).join('')}</tr>
+      <tr>${docs.map(([,v])=>`<td class="${v==='Tiene'?'si':'no'}">${esc(v||'—')}</td>`).join('')}</tr></table>
+
+    <div class="sec">4. Parámetros Básicos</div>
+    <table class="inv"><tr>${pars.map(([l])=>`<th>${l}</th>`).join('')}</tr>
+      <tr>${pars.map(([,v])=>`<td class="${v==='Bueno'?'si':v==='Regular'?'md':'no'}">${esc(v||'—')}</td>`).join('')}</tr></table>
+
+    <div class="sec">5. Evidencia Fotográfica de Entrega</div>
+    <div class="fotos">${FOTOS_DEF.map(f=>celdaFoto(fotos[f.k], f.lab)).join('')}</div>
+
+    ${hayDev?`
+    <div class="sec">6. Devolución de la Unidad</div>
+    <table class="t2">
+      ${fila('Fecha de devolución', a.devFecha)}${fila('Chofer que devuelve', a.devChofer)}
+      ${fila('Recibido por', a.devRecibidoPor)}${fila('Estado de la unidad', a.devEstado)}
+      ${fila('Nivel de tanque', a.devTanque)}${fila('KM final', km(a.devKmFinal))}
+      ${fila('Kilómetros del recorrido', km(a.kmRecorrido))}${fila('Estado del registro', a.estadoRegistro)}
+    </table>
+    ${a.devComentarios?`<p class="obs"><b>Comentarios de devolución:</b> ${esc(a.devComentarios)}</p>`:''}
+    ${Object.keys(fotosDev).length?`<div class="sec sub">Evidencia Fotográfica de Devolución</div>
+      <div class="fotos">${FOTOS_DEF.map(f=>celdaFoto(fotosDev[f.k], f.lab)).join('')}</div>`:''}
+    `:''}
+
+    <div class="salto"></div>
+    <div class="sec">${hayDev?'7':'6'}. Carta Responsiva</div>
+    <p class="carta">${esc(CARTA_RESPONSIVA)}</p>
+
+    <div class="firmas">
+      <div class="fbox">
+        ${firma?`<img class="fimg" src="${firma}">`:'<div class="fimg vacia"></div>'}
+        <div class="fline"></div>
+        <div class="fnom">${esc(a.firmaRecepcion || a.chofer)}</div>
+        <div class="frol">Chofer responsable · Recibe de conformidad</div>
+      </div>
+      <div class="fbox">
+        <div class="fimg vacia"></div>
+        <div class="fline"></div>
+        <div class="fnom">${esc(a.entregadoPor)}</div>
+        <div class="frol">Por ${RAZON_SOCIAL}</div>
+      </div>
+    </div>
+
+    <div class="pie">
+      Documento generado por el sistema de Control Vehicular · KPI-AFI-01 ·
+      Coordinación de Activos Fijos y Control Vehicular · Folio ${esc(a.bitacora)}
+    </div>
+  </div>`;
+}
+
+const CSS_LEGAL = `
+.doc{font-family:'Times New Roman',Georgia,serif;color:#12181f;background:#fff;padding:6mm 2mm;font-size:10.5pt;line-height:1.5}
+.enc{text-align:center;border-bottom:2.5px solid #12181f;padding-bottom:9px;margin-bottom:15px}
+.enc .tit{font-size:15pt;font-weight:700;letter-spacing:.6px}
+.enc .emp{font-size:9.5pt;margin-top:4px;font-weight:600}
+.enc .fol{font-size:8.5pt;color:#414d5c;margin-top:5px}
+.sec{font-size:10.5pt;font-weight:700;background:#eef2f7;border-left:4px solid #12181f;padding:5px 9px;margin:15px 0 8px}
+.sec.sub{background:#f6f8fb;border-left-color:#8b98a8;font-size:9.5pt}
+table{width:100%;border-collapse:collapse;margin-bottom:6px}
+.t2 th{width:23%;text-align:left;background:#f6f8fb;padding:5px 8px;border:1px solid #ccd4de;font-size:9pt;font-weight:600}
+.t2 td{padding:5px 8px;border:1px solid #ccd4de;font-size:9.5pt;width:27%}
+.inv th{background:#f6f8fb;border:1px solid #ccd4de;padding:5px 4px;font-size:8pt;font-weight:600;text-align:center}
+.inv td{border:1px solid #ccd4de;padding:5px 4px;font-size:9pt;text-align:center;font-weight:600}
+.inv .si{color:#12703f}.inv .md{color:#9a6b00}.inv .no{color:#a41d2c}
+.obs{font-size:9pt;margin:5px 0 0;text-align:justify;padding:6px 9px;background:#f9fafc;border:1px solid #e2e8f0}
+.fotos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:5px}
+.ph{border:1px solid #ccd4de;border-radius:3px;overflow:hidden;background:#f2f5f9}
+.ph img{width:100%;height:74px;object-fit:cover;display:block}
+.ph span{display:block;font-size:7.5pt;padding:3px 5px;background:#eef2f7;text-align:center;font-weight:600}
+.ph.vac{height:96px;display:flex;align-items:center;justify-content:center}
+.ph.vac span{background:none;color:#8b98a8;font-weight:400}
+.carta{text-align:justify;font-size:9.5pt;line-height:1.72;padding:11px 13px;border:1px solid #ccd4de;background:#fcfdfe;margin:0}
+.salto{page-break-before:always}
+.firmas{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:34px}
+.fbox{text-align:center}
+.fimg{height:62px;object-fit:contain;max-width:100%;display:block;margin:0 auto}
+.fimg.vacia{height:62px}
+.fline{border-bottom:1.3px solid #12181f;margin:2px 12px 6px}
+.fnom{font-size:9.5pt;font-weight:700;text-transform:uppercase}
+.frol{font-size:8pt;color:#414d5c;margin-top:3px;line-height:1.35}
+.pie{margin-top:26px;padding-top:8px;border-top:1px solid #ccd4de;font-size:7.5pt;color:#5a6a7d;text-align:center}
+`;
+
+async function descargarPdfLegal(){
+  if(typeof html2pdf === 'undefined'){ toast('La librería de PDF no cargó. Verifique su conexión.','err'); return; }
+  const veh = $('#aVehiculo').value;
+  const u = STORE.unidades.find(x=>x.veh===veh);
+  if(!u){ toast('Unidad no encontrada.','err'); return; }
+
+  const btn = $('#btnPdfLegal'); const txt = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Generando…';
+  try{
+    // Se arma con lo que hay en pantalla: funciona con el checklist abierto o cerrado
+    const num = id => $('#'+id).value===''?null:parseInt($('#'+id).value);
+    const guardado = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
+    const a = {
+      bitacora:$('#aBitacora').value, vehiculo:veh, zona:$('#aZona').value,
+      fechaEntrega:$('#aFechaEntrega').value, chofer:$('#aChofer').value,
+      destino:$('#aDestino').value, entregadoPor:$('#aEntregadoPor').value,
+      estado:$('#aEstado').value, tanque:$('#aTanque').value, kmInicial:num('aKmInicial'),
+      proxServKm:num('aProxServKm'), proxServFecha:$('#aProxServFecha').value,
+      comentarios:$('#aComentarios').value,
+      docPoliza:$('#aPoliza').value, docTarjCirc:$('#aTarjCirc').value, docTarjComb:$('#aTarjComb').value,
+      docPlacaDel:$('#aPlacaDel').value, docPlacaTra:$('#aPlacaTra').value, docImoveqroo:$('#aImoveqroo').value,
+      parAceite:$('#aAceite').value, parAnticong:$('#aAnticong').value,
+      parFrenos:$('#aFrenos').value, parLimpia:$('#aLimpia').value,
+      firmaRecepcion:$('#aFirmaRecepcion').value,
+      devFecha:$('#dFecha').value, devChofer:$('#dChofer').value, devEstado:$('#dEstado').value,
+      devTanque:$('#dTanque').value, devKmFinal:num('dKmFinal'),
+      devRecibidoPor:$('#dEntregadoPor').value, devComentarios:$('#dComentarios').value,
+      estadoRegistro: ($('#dFecha').value && num('dKmFinal')!==null) ? 'Cerrada' : 'Abierta'
+    };
+    a.kmRecorrido = (a.devKmFinal!=null && a.kmInicial!=null) ? a.devKmFinal - a.kmInicial : null;
+
+    const firma = exportaFirma() || (guardado && guardado.firmaCapturada ? evidActual.firma : '');
+    const cont = document.createElement('div');
+    cont.style.cssText = 'position:fixed;left:-99999px;top:0;width:186mm;background:#fff';
+    cont.innerHTML = `<style>${CSS_LEGAL}</style>` + armaHtmlLegal(a, u, evidActual.fotos, evidActual.fotosDev, firma);
+    document.body.appendChild(cont);
+
+    const nombre = `Prestamo-${(a.bitacora||'SIN-FOLIO')}-${veh}.pdf`.replace(/[^\w\-.]/g,'_');
+    await html2pdf().set({
+      margin: [10,9,11,9],
+      filename: nombre,
+      image: {type:'jpeg', quality:0.9},
+      html2canvas: {scale:2, useCORS:true, allowTaint:false, backgroundColor:'#ffffff', logging:false},
+      jsPDF: {unit:'mm', format:'a4', orientation:'portrait'},
+      pagebreak: {mode:['css','legacy']}
+    }).from(cont).save();
+
+    document.body.removeChild(cont);
+    toast('PDF legal generado.');
+    if(editingAsigId) await logChange(veh,'PDF_LEGAL','documento','', a.bitacora||'');
+  }catch(e){ toast('Error al generar el PDF: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.textContent=txt; }
+}
+
+/* ============ EXPORTACIÓN DIARIA EN ZIP ============ */
+async function exportacionDiariaZip(){
+  if(typeof JSZip === 'undefined'){ toast('La librería de compresión no cargó.','err'); return; }
+  const btn = $('#btnZipDiario'); const txt = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Preparando…';
+  try{
+    const hoy = hoyISO();
+    const desde = $('#zipDesde').value || hoy;
+    const hasta = $('#zipHasta').value || hoy;
+    const enRango = f => f && f>=desde && f<=hasta;
+
+    const zip = new JSZip();
+    const stamp = new Date().toLocaleString('es-MX');
+
+    // Movimientos del período
+    const pres = STORE.asignaciones.filter(a=>enRango(a.fechaEntrega) || enRango(a.devFecha));
+    const incs = STORE.incidencias.filter(i=>enRango(i.fecha));
+    const comb = STORE.combustibles.filter(c=>enRango(c.fechaIni) || enRango(c.fechaFin));
+    const tars = todasLasTareas().filter(t=>enRango(t.fecha));
+
+    const csv = (rows) => rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+
+    zip.file('01_Prestamos.csv', csv([
+      ['FOLIO','UNIDAD','ZONA','CHOFER','DESTINO','F.ENTREGA','KM INICIAL','ENTREGÓ',
+       'F.DEVOLUCIÓN','KM FINAL','KM RECORRIDO','RECIBIÓ','ESTADO','EVID.ENT','EVID.DEV'],
+      ...pres.map(a=>[a.bitacora,a.vehiculo,a.zona,a.chofer,a.destino,a.fechaEntrega,a.kmInicial,a.entregadoPor,
+        a.devFecha,a.devKmFinal,a.kmRecorrido,a.devRecibidoPor,a.estadoRegistro,
+        a.evidenciasCount??0, a.evidenciasDevCount??0])
+    ]));
+    zip.file('02_Incidencias.csv', csv([
+      ['FECHA','UNIDAD','TIPO','ESTATUS','CHOFER','DEPTO','PLATAFORMA','ID/LIGA','NOTAS','TAREAS'],
+      ...incs.map(i=>{const t=tareasDe(i);return [i.fecha,i.unidad,i.tipo,i.estatus,i.chofer,i.depto,
+        i.tipoLiga,i.idLiga,i.notas,t.length?`${t.filter(x=>x.hecha).length}/${t.length}`:''];})
+    ]));
+    zip.file('03_Combustibles.csv', csv([
+      ['UNIDAD','DESDE','HASTA','DÍAS','KM','LITROS','KM/L','DESCUENTO MXN','OBSERVACIONES'],
+      ...comb.map(c=>[c.unidad,c.fechaIni,c.fechaFin,c.dias,c.km,c.litros,
+        c.litros>0?(c.km/c.litros).toFixed(2):'',c.descuento,c.notas])
+    ]));
+    zip.file('04_Tareas.csv', csv([
+      ['F.COMPROMISO','UNIDAD','TAREA','ESTADO','TIPO INCIDENCIA','CUMPLIÓ'],
+      ...tars.map(t=>[t.fecha,t.unidad,t.texto,t.hecha?'Cumplida':(esVencida(t)?'VENCIDA':'Pendiente'),t.tipo,t.completadoPor])
+    ]));
+    zip.file('05_Flotilla.csv', csv([
+      ['VEHÍCULO','ZONA','DEPARTAMENTO','ESTATUS','CHOFER','PLACAS','KM ACTUAL','KM PRÓX.SERV','KM RESTANTES'],
+      ...STORE.unidades.map(u=>[u.veh,u.zona,u.depto,u.estatus,u.chofer,u.placas,
+        u.kmActual,u.kmProximoServicio,kmRestantes(u)])
+    ]));
+
+    // Evidencias de los préstamos del período
+    btn.textContent = 'Empaquetando evidencias…';
+    const dirEv = zip.folder('Evidencias');
+    let arch = 0, fallos = 0;
+    for(const a of pres){
+      const ev = await cargaEvidencias(a.id);
+      const carpeta = `${(a.bitacora||a.id)}_${a.vehiculo||''}`.replace(/[^\w\-]/g,'_');
+      const d = dirEv.folder(carpeta);
+      const vuelca = async (obj, pre) => {
+        for(const [k,f] of Object.entries(obj||{})){
+          try{
+            if(typeof f.valor==='string' && f.valor.startsWith('data:')) d.file(`${pre}${k}.jpg`, b64aBlob(f.valor));
+            else if(f.valor){ const r = await fetch(f.valor); if(!r.ok) throw new Error('HTTP '+r.status); d.file(`${pre}${k}.jpg`, await r.blob()); }
+            arch++;
+          }catch(e){ fallos++; }
+        }
+      };
+      await vuelca(ev.fotos, 'entrega_');
+      await vuelca(ev.fotosDev, 'devolucion_');
+      if(ev.firma){ try{ d.file('firma.png', b64aBlob(ev.firma)); arch++; }catch(e){ fallos++; } }
+    }
+
+    zip.file('LEEME.txt',
+      `Exportación de Control Vehicular\n`+
+      `Período: ${desde} a ${hasta}\nGenerado: ${stamp}\nPerfil: ${session.rol}\n\n`+
+      `Préstamos: ${pres.length}\nIncidencias: ${incs.length}\n`+
+      `Períodos de combustible: ${comb.length}\nTareas: ${tars.length}\n`+
+      `Archivos de evidencia: ${arch}${fallos?` (fallidos: ${fallos})`:''}\n\n`+
+      `Los CSV abren directamente en Excel. La carpeta Evidencias contiene una subcarpeta\n`+
+      `por folio de préstamo, con las fotos de entrega, las de devolución y la firma.\n`);
+
+    btn.textContent = 'Comprimiendo…';
+    const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = (desde===hasta)
+      ? `Control-Vehicular-${desde}.zip`
+      : `Control-Vehicular-${desde}_a_${hasta}.zip`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast(`Exportación generada: ${pres.length} préstamo(s), ${incs.length} incidencia(s), ${arch} archivo(s).`);
+  }catch(e){ toast('Error en la exportación: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.textContent=txt; }
+}
+
+/* ============ CIERRE DE DÍA (ZIP COMPLETO) ============ */
+function selloArchivo(){
+  const d = new Date(), z = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}`;
+}
+/* Recupera una evidencia como Blob, venga de Storage (URL) o de RTDB (base64) */
+async function evidenciaABlob(f){
+  if(!f || !f.valor) throw new Error('Evidencia vacía');
+  if(typeof f.valor==='string' && f.valor.startsWith('data:')) return b64aBlob(f.valor);
+  const r = await fetch(f.valor);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return await r.blob();
+}
+
+async function cierreDeDia(){
+  if(typeof JSZip === 'undefined'){ toast('La librería de compresión no cargó. Verifique su conexión.','err'); return; }
+  const btn = $('#btnCierreDia'); const txt = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Preparando…';
+  try{
+    const zip = new JSZip();
+    const stamp = new Date().toLocaleString('es-MX');
+    const {flot, inc, comb, bit, tar, asig} = datosReporte();
+
+    /* --- 1. Reporte general en Excel dentro del ZIP --- */
+    btn.textContent = 'Generando Excel…';
+    if(typeof XLSX !== 'undefined'){
+      const wb = XLSX.utils.book_new();
+      const hoja = (nombre, subtitulo, rows) => {
+        const ws = XLSX.utils.aoa_to_sheet([[TITULO_REPORTE],[subtitulo],
+          ['Generado: '+stamp+'  ·  Rol: '+(session.rol||'—')],[]]);
+        if(rows.length) XLSX.utils.sheet_add_json(ws, rows, {origin:'A5'});
+        else XLSX.utils.sheet_add_aoa(ws, [['Sin registros.']], {origin:'A5'});
+        const cols = rows.length?Object.keys(rows[0]):['A'];
+        ws['!cols'] = cols.map(k=>({wch: Math.min(38, Math.max(12, k.length+4))}));
+        XLSX.utils.book_append_sheet(wb, ws, nombre);
+      };
+      hoja('Flotilla','Detalle de flotilla · estatus y servicio', flot);
+      hoja('Préstamos','Checklist de préstamo y devolución', asig);
+      hoja('Incidencias','Incidencias vehiculares registradas', inc);
+      hoja('Tareas','Tareas de seguimiento por incidencia', tar);
+      hoja('Combustibles','Consumo de combustible por período', comb);
+      hoja('Bitácora','Trazabilidad de cambios', bit);
+      const buf = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+      zip.file(`Reporte_General_IES_${selloArchivo()}.xlsx`, buf);
+    }
+
+    /* --- 2. Los mismos datos en CSV, por si se abren desde otro sistema --- */
+    const csv = rows => rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const aCsv = (rows) => {
+      if(!rows.length) return 'Sin registros.';
+      const cols = Object.keys(rows[0]);
+      return csv([cols, ...rows.map(r=>cols.map(c=>r[c]))]);
+    };
+    const dirCsv = zip.folder('CSV');
+    dirCsv.file('01_Flotilla.csv',     aCsv(flot));
+    dirCsv.file('02_Prestamos.csv',    aCsv(asig));
+    dirCsv.file('03_Incidencias.csv',  aCsv(inc));
+    dirCsv.file('04_Tareas.csv',       aCsv(tar));
+    dirCsv.file('05_Combustibles.csv', aCsv(comb));
+    dirCsv.file('06_Bitacora.csv',     aCsv(bit));
+
+    /* --- 3. Evidencias y firmas de todos los préstamos --- */
+    btn.textContent = 'Empaquetando evidencias…';
+    const snap = await fbDb.ref(`${FB_ROOT}/evidencias`).get();
+    const evid = snap.val() || {};
+    const ids = Object.keys(evid);
+    const dirEv = zip.folder('Evidencias');
+    const idx = [['FOLIO','UNIDAD','CHOFER','F. ENTREGA','ESTADO','ARCHIVO','TIPO','ORIGEN']];
+    let arch = 0, fallos = 0, n = 0;
+
+    for(const id of ids){
+      n++;
+      btn.textContent = `Empaquetando ${n}/${ids.length}…`;
+      const a = STORE.asignaciones.find(x=>x.id===id) || {};
+      const carpeta = `${(a.bitacora||id)}_${(a.vehiculo||'SIN-UNIDAD')}`.replace(/[^\w\-]/g,'_');
+      const d = dirEv.folder(carpeta);
+      const vuelca = async (obj, pre, tipo) => {
+        for(const [k,f] of Object.entries(obj||{})){
+          const nombre = `${pre}${k}.jpg`;
+          try{
+            d.file(nombre, await evidenciaABlob(f));
+            idx.push([a.bitacora||id, a.vehiculo||'', a.chofer||'', a.fechaEntrega||'',
+                      a.estadoRegistro||'', `${carpeta}/${nombre}`, tipo,
+                      f.modo==='storage'?'Storage':'Base de datos']);
+            arch++;
+          }catch(e){ fallos++; }
+        }
+      };
+      await vuelca(evid[id].fotos,    'entrega_',    'Evidencia de entrega');
+      await vuelca(evid[id].fotosDev, 'devolucion_', 'Evidencia de devolución');
+      if(evid[id].firma){
+        try{
+          d.file('firma.png', b64aBlob(evid[id].firma));
+          idx.push([a.bitacora||id, a.vehiculo||'', a.chofer||'', a.fechaEntrega||'',
+                    a.estadoRegistro||'', `${carpeta}/firma.png`, 'Firma de conformidad','Base de datos']);
+          arch++;
+        }catch(e){ fallos++; }
+      }
+    }
+    dirEv.file('INDICE_EVIDENCIAS.csv', csv(idx));
+
+    /* --- 4. Documentos anexos referenciados por URL (responsivas, PDF) --- */
+    const anexos = [];
+    STORE.asignaciones.forEach(a=>{ if(a.documentoUrl) anexos.push({a, url:a.documentoUrl}); });
+    if(anexos.length){
+      const dirDoc = zip.folder('Documentos');
+      for(const {a,url} of anexos){
+        try{
+          const r = await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status);
+          dirDoc.file(`${(a.bitacora||a.id)}.pdf`, await r.blob());
+          arch++;
+        }catch(e){ fallos++; }
+      }
+    }
+
+    zip.file('LEEME.txt',
+      `RESPALDO GENERAL · Control Vehicular IES\n`+
+      `${'='.repeat(52)}\n`+
+      `Generado: ${stamp}\nPerfil: ${session.rol}\n`+
+      `Motor de evidencias: ${storageModo==='storage'?'Firebase Storage':'Realtime Database'}\n\n`+
+      `CONTENIDO\n`+
+      `  Reporte_General_IES_*.xlsx  Libro con 6 hojas de todo el sistema\n`+
+      `  CSV/                        Los mismos datos en texto plano\n`+
+      `  Evidencias/                 Una carpeta por folio de préstamo\n`+
+      `  Documentos/                 Anexos en PDF, si existen\n\n`+
+      `RESUMEN\n`+
+      `  Unidades: ${flot.length}\n  Préstamos: ${asig.length}\n`+
+      `  Incidencias: ${inc.length}\n  Tareas: ${tar.length}\n`+
+      `  Períodos de combustible: ${comb.length}\n`+
+      `  Archivos de evidencia: ${arch}${fallos?`\n  No recuperados: ${fallos}`:''}\n\n`+
+      `Conserve este paquete antes de ejecutar "Limpiar Archivos y Evidencias".\n`);
+
+    btn.textContent = 'Comprimiendo…';
+    const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Respaldo_IES_${selloArchivo()}.zip`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    await logChange('—','CIERRE_DIA','respaldo','', `${arch} archivo(s) · ${(blob.size/1048576).toFixed(1)} MB`);
+    toast(`Cierre de día generado: ${arch} archivo(s), ${(blob.size/1048576).toFixed(1)} MB${fallos?` · ${fallos} no recuperados`:''}.`);
+  }catch(e){ toast('Error en el cierre de día: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.textContent=txt; }
+}
+
+/* ============ LIMPIEZA SEGURA DE ARCHIVOS Y EVIDENCIAS ============
+   Elimina ÚNICAMENTE archivos multimedia. Conserva íntegramente zonas,
+   estatus, departamentos, parque vehicular, flotilla, combustibles, tareas,
+   bitácoras y todos los datos de texto de los préstamos. */
+async function limpiarArchivosYEvidencias(){
+  const uso = await calculaUsoEvidencias();
+  const mb = (uso.bytes/1048576).toFixed(1);
+
+  // --- Primera confirmación: qué se borra y qué se conserva ---
+  const aviso =
+    `LIMPIEZA DE ARCHIVOS Y EVIDENCIAS\n`+
+    `${'='.repeat(44)}\n\n`+
+    `SE ELIMINARÁ (solo multimedia):\n`+
+    `  · ${uso.fotos} fotografía(s) de entrega y devolución\n`+
+    `  · ${uso.firmas} firma(s) digitalizada(s)\n`+
+    `  · Aproximadamente ${mb} MB\n\n`+
+    `SE CONSERVA ÍNTEGRAMENTE:\n`+
+    `  · Parque vehicular y detalle de flotilla\n`+
+    `  · Zonas, estatus y departamentos\n`+
+    `  · Préstamos: folios, fechas, choferes, kilómetros y firmantes\n`+
+    `  · Incidencias y sus tareas\n`+
+    `  · Períodos de combustible\n`+
+    `  · Bitácora de cambios\n\n`+
+    `¿Descargó ya el "Cierre de Día (ZIP)"?\n`+
+    `Los archivos eliminados NO se pueden recuperar.\n\n`+
+    `¿Continuar?`;
+  if(!confirm(aviso)) return;
+
+  // --- Segunda confirmación: escribir la palabra exacta ---
+  const clave = prompt('Confirmación final.\n\nEscriba LIMPIAR (en mayúsculas) para eliminar los archivos multimedia:');
+  if(clave !== 'LIMPIAR'){ toast('Limpieza cancelada.','warn'); return; }
+
+  const btn = $('#btnLimpiarArchivos'); const txt = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Limpiando…';
+  try{
+    const snap = await fbDb.ref(`${FB_ROOT}/evidencias`).get();
+    const evid = snap.val() || {};
+    const ids = Object.keys(evid);
+    let borradosStorage = 0, fallosStorage = 0, n = 0;
+
+    // 1) Liberar espacio en Firebase Storage
+    for(const id of ids){
+      n++;
+      btn.textContent = `Liberando ${n}/${ids.length}…`;
+      const todas = [...Object.values(evid[id].fotos||{}), ...Object.values(evid[id].fotosDev||{})];
+      for(const f of todas){
+        if(f.modo==='storage' && f.valor && fbStorage){
+          try{ await fbStorage.refFromURL(f.valor).delete(); borradosStorage++; }
+          catch(e){ fallosStorage++; }
+        }
+      }
+    }
+    // Documentos anexos en Storage
+    for(const a of STORE.asignaciones){
+      if(a.documentoUrl && fbStorage){
+        try{ await fbStorage.refFromURL(a.documentoUrl).delete(); borradosStorage++; }
+        catch(e){ fallosStorage++; }
+      }
+    }
+
+    // 2) Vaciar SOLO los campos multimedia en Realtime Database
+    btn.textContent = 'Actualizando registros…';
+    const updates = {};
+    updates[`${FB_ROOT}/evidencias`] = null;          // nodo exclusivo de multimedia
+    STORE.asignaciones.forEach(a=>{
+      updates[`${FB_ROOT}/asignaciones/${a.id}/fotos`] = null;
+      updates[`${FB_ROOT}/asignaciones/${a.id}/fotosDev`] = null;
+      updates[`${FB_ROOT}/asignaciones/${a.id}/documentoUrl`] = null;
+      updates[`${FB_ROOT}/asignaciones/${a.id}/evidenciasCount`] = 0;
+      updates[`${FB_ROOT}/asignaciones/${a.id}/evidenciasDevCount`] = 0;
+      updates[`${FB_ROOT}/asignaciones/${a.id}/firmaCapturada`] = false;
+      updates[`${FB_ROOT}/asignaciones/${a.id}/evidenciasPurgadas`] = nowISO();
+      // firmaRecepcion (nombre en texto), fechas, km, choferes y folio NO se tocan
+    });
+    await fbDb.ref().update(updates);
+    evidCache = {};
+    evidActual = { fotos:{}, fotosDev:{}, firma:'' };
+
+    await logChange('—','LIMPIEZA_ARCHIVOS','multimedia',
+      `${uso.fotos} foto(s) · ${uso.firmas} firma(s) · ${mb} MB`,
+      `Storage: ${borradosStorage} eliminado(s)${fallosStorage?`, ${fallosStorage} no localizado(s)`:''}`);
+
+    toast(`Limpieza completada: ${uso.fotos} foto(s) y ${uso.firmas} firma(s) eliminadas. Los datos operativos permanecen intactos.`,'warn');
+    pintaResumenEvidencias();
+    refrescarTodo();
+  }catch(e){ toast('Error durante la limpieza: '+e.message,'err'); }
+  finally{ btn.disabled=false; btn.textContent=txt; }
+}
+
 /* ============ ASIGNACIÓN / DEVOLUCIÓN (CHECKLIST PHVA) ============ */
 const FOTOS_DEF = [
   {k:'frontal',    lab:'Vista frontal'},
@@ -2174,8 +2927,15 @@ const FOTOS_DEF = [
   {k:'latDet',     lab:'Detalle lateral'},
   {k:'diagTra',    lab:'Diagonal trasera'},
   {k:'diagTraOp',  lab:'Diagonal trasera opuesta'},
-  {k:'trasera',    lab:'Trasera'}
+  {k:'trasera',    lab:'Trasera'},
+  {k:'intFrontal', lab:'Interior frontal'},
+  {k:'intTrasero', lab:'Interior trasero'},
+  {k:'tablero',    lab:'Tablero / consola'}
 ];
+const TOTAL_FOTOS = FOTOS_DEF.length;   // 9
+const ENTREGADORES = ['Marcos Xool Cortés','José Rejón Kinil','Uroy Acosta August'];
+const RAZON_SOCIAL = 'INNOVACIONES TECNOLÓGICAS EN TRATAMIENTO DEL AGUA S.A. DE C.V.';
+const CARTA_RESPONSIVA = 'Por medio de la presente hago constar que recibo de INNOVACIONES TECNOLÓGICAS EN TRATAMIENTO DEL AGUA SA DE CV como parte del equipo de trabajo; el vehículo descrito en la presente carta responsiva por medio de la cual me obligo a devolver dicho vehículo cuando lo solicite INNOVACIONES TECNOLOGICAS EN TRATAMIENTO DEL AGUA SA DE CV o cuando termine mi relación laboral. El vehículo, así como el equipo, accesorios, documentos e instructivos, me fueron entregados de acuerdo al presente inventario del vehículo. Me responsabilizo de su buen uso, estoy enterado y de acuerdo que el vehículo es exclusivamente para las funciones propias de la empresa, a la vez, me comprometo a dar aviso inmediatamente a la empresa en caso de descompostura, accidente o robo del vehículo. Por lo anterior, asumo la responsabilidad jurídica por cualquier daño causado al vehículo por negligencia, omisión, descuido inexcusable, pericia o incumplimiento a las leyes de tránsito, por lo que de causar cualquier daño, al vehículo y/o pérdida total del mismo que me sea atribuible, me comprometo a resarcir los daños a la empresa así como a terceras personas que resultaran afectadas. Quedo enterado que los vehículos utilitarios se encuentran asegurados y en caso de siniestro el deducible será con cargo a mi persona. Manifiesto que la dirección que se indica en este documento es el lugar donde se guardará el vehículo, confirmando que dicho domicilio cumple con la seguridad necesaria para el resguardo de la unidad, así mismo me comprometo a informar de manera inmediata en caso de existir algún cambio de domicilio del lugar de resguardo.';
 let editingAsigId = null;
 
 /* --- Acceso a Firebase (nodo independiente: no satura la ficha del vehículo) --- */
@@ -2212,7 +2972,7 @@ function pintaSelects(){
   });
   // Resumen de documentos faltantes
   const docs = [['aPoliza','Póliza'],['aTarjCirc','T. circulación'],['aTarjComb','T. combustible'],
-                ['aPlacaDel','Placa del.'],['aPlacaTra','Placa tras.']];
+                ['aPlacaDel','Placa del.'],['aPlacaTra','Placa tras.'],['aImoveqroo','Permiso IMOVEQROO']];
   const falt = docs.filter(([id])=>$('#'+id).value!=='Tiene').map(([,lab])=>lab);
   const res = $('#aDocResumen');
   res.value = falt.length ? falt.join(', ') : 'Sin faltantes';
@@ -2302,13 +3062,18 @@ window.abrirModalAsignacion = async function(veh, asigId){
   $('#aFechaEntrega').value  = a.fechaEntrega || new Date().toISOString().slice(0,10);
   buildChoferSelect(a.chofer ?? u.chofer ?? '');
   buildZonaSelectAsig(a.zona ?? u.zona ?? '');
-  $('#aBitacora').value      = a.bitacora || generaFolio(a.fechaEntrega);
+  buildEntregadorSelect('#aEntregadoPor', a.entregadoPor || '');
+  $('#cartaTexto').textContent = CARTA_RESPONSIVA;
+  if(a.bitacora){ $('#aBitacora').value = a.bitacora; }
+  else {
+    $('#aBitacora').value = 'Generando folio…';
+    reservaFolio($('#aFechaEntrega').value || new Date().toISOString().slice(0,10), draftAsigId)
+      .then(f=>{ if(!$('#aBitacora').value || $('#aBitacora').value==='Generando folio…') $('#aBitacora').value = f; });
+  }
   $('#aEstado').value        = a.estado || 'Bueno';
   $('#aTanque').value        = a.tanque || 'Lleno';
   $('#aKmInicial').value     = a.kmInicial ?? (u.kmActual ?? '');
   $('#aDestino').value       = a.destino || '';
-  $('#aEntregadoPor').value  = a.entregadoPor || '';
-  $('#aFotoKmIni').value     = a.fotoKmInicial || '';
   $('#aComentarios').value   = a.comentarios || '';
 
   // Sección 2
@@ -2323,6 +3088,7 @@ window.abrirModalAsignacion = async function(veh, asigId){
   $('#aTarjComb').value = a.docTarjComb || 'Tiene';
   $('#aPlacaDel').value = a.docPlacaDel || 'Tiene';
   $('#aPlacaTra').value = a.docPlacaTra || 'Tiene';
+  $('#aImoveqroo').value = a.docImoveqroo || 'Tiene';
 
   // Sección 4
   $('#aAceite').value   = a.parAceite   || 'Bueno';
@@ -2331,9 +3097,10 @@ window.abrirModalAsignacion = async function(veh, asigId){
   $('#aLimpia').value   = a.parLimpia   || 'Bueno';
 
   // Sección 5 y 6: las evidencias viven en un nodo aparte y se cargan bajo demanda
-  const ev = editingAsigId ? await cargaEvidencias(editingAsigId) : {fotos:{}, firma:''};
-  evidActual = { fotos:{}, firma: ev.firma || '' };
+  const ev = editingAsigId ? await cargaEvidencias(editingAsigId) : {fotos:{}, fotosDev:{}, firma:''};
+  evidActual = { fotos:{}, fotosDev:{}, firma: ev.firma || '' };
   buildFotoGrid(ev.fotos && Object.keys(ev.fotos).length ? ev.fotos : (a.fotos || {}));
+  buildComparador(ev.fotosDev || {});
   pintaNotaStorage();
 
   // Sección 6
@@ -2344,11 +3111,11 @@ window.abrirModalAsignacion = async function(veh, asigId){
   // Sección 7
   $('#dVehiculo').value      = veh;
   $('#dFecha').value         = a.devFecha || '';
-  $('#dChofer').value        = a.devChofer || '';
+  buildChoferSelect(a.devChofer || a.chofer || '', '#dChofer');
+  buildEntregadorSelect('#dEntregadoPor', a.devRecibidoPor || '');
   $('#dEstado').value        = a.devEstado || '';
   $('#dTanque').value        = a.devTanque || '';
   $('#dKmFinal').value       = a.devKmFinal ?? '';
-  $('#dEntregadoPor').value  = a.devRecibidoPor || '';
   $('#dComentarios').value   = a.devComentarios || '';
   $('#dActualizarKm').checked = true;
 
@@ -2365,13 +3132,12 @@ function validaAsignacion(a){
   const errs = {};
   if(!a.fechaEntrega) errs.aFechaEntrega = 'Seleccione la fecha de entrega.';
   if(!a.chofer || !RX.chofer.test(a.chofer)) errs.aChofer = 'Solo letras, espacios y acentos (2-60 caracteres).';
-  if(!a.entregadoPor || !RX.chofer.test(a.entregadoPor)) errs.aEntregadoPor = 'Capture quién entrega la unidad.';
+  if(!a.entregadoPor) errs.aEntregadoPor = 'Seleccione quién entrega la unidad.';
   if(a.kmInicial===null || isNaN(a.kmInicial)) errs.aKmInicial = 'Capture el kilometraje inicial.';
   else if(a.kmInicial < 0 || a.kmInicial > 9999999) errs.aKmInicial = 'Rango válido: 0 a 9,999,999.';
   if(!a.destino || a.destino.length < 3) errs.aDestino = 'Indique el destino (mínimo 3 caracteres).';
   else if(!RX.notas.test(a.destino)) errs.aDestino = 'No se permiten los caracteres < ni >.';
   if(!a.zona) errs.aZona = 'Seleccione la zona del préstamo.';
-  if(a.fotoKmInicial && !RX.notas.test(a.fotoKmInicial)) errs.aFotoKmIni = 'No se permiten los caracteres < ni >.';
   if(a.comentarios && !RX.notas.test(a.comentarios)) errs.aComentarios = 'No se permiten los caracteres < ni >.';
   if(a.proxServKm!==null && !isNaN(a.proxServKm)){
     if(a.proxServKm < 0 || a.proxServKm > 9999999) errs.aProxServKm = 'Rango válido: 0 a 9,999,999.';
@@ -2389,7 +3155,7 @@ function validaAsignacion(a){
     else if(a.devKmFinal < 0 || a.devKmFinal > 9999999) errs.dKmFinal = 'Rango válido: 0 a 9,999,999.';
     else if(!isNaN(a.kmInicial) && a.devKmFinal < a.kmInicial) errs.dKmFinal = 'El KM final no puede ser menor al KM inicial.';
     if(!a.devChofer || !RX.chofer.test(a.devChofer)) errs.dChofer = 'Capture quién devuelve la unidad.';
-    if(!a.devRecibidoPor || !RX.chofer.test(a.devRecibidoPor)) errs.dEntregadoPor = 'Capture quién recibe la unidad.';
+    if(!a.devRecibidoPor) errs.dEntregadoPor = 'Seleccione quién recibe la unidad.';
     if(!a.devEstado) errs.dEstado = 'Seleccione el estado de la unidad.';
     if(a.devComentarios && !RX.notas.test(a.devComentarios)) errs.dComentarios = 'No se permiten los caracteres < ni >.';
   }
@@ -2415,8 +3181,7 @@ async function guardarAsignacion(){
     tanque:       $('#aTanque').value,
     kmInicial:    num('aKmInicial'),
     destino:      $('#aDestino').value.trim(),
-    entregadoPor: $('#aEntregadoPor').value.trim().toUpperCase(),
-    fotoKmInicial:$('#aFotoKmIni').value.trim(),
+    entregadoPor: $('#aEntregadoPor').value.trim(),
     comentarios:  $('#aComentarios').value.trim(),
     // Sección 2
     kmUltimoServicio: u.kmUltimoServicio ?? null,
@@ -2425,7 +3190,7 @@ async function guardarAsignacion(){
     // Sección 3
     docPoliza:   $('#aPoliza').value,   docTarjCirc: $('#aTarjCirc').value,
     docTarjComb: $('#aTarjComb').value, docPlacaDel: $('#aPlacaDel').value,
-    docPlacaTra: $('#aPlacaTra').value,
+    docPlacaTra: $('#aPlacaTra').value, docImoveqroo: $('#aImoveqroo').value,
     // Sección 4
     parAceite: $('#aAceite').value,   parAnticong: $('#aAnticong').value,
     parFrenos: $('#aFrenos').value,   parLimpia:   $('#aLimpia').value,
@@ -2441,7 +3206,7 @@ async function guardarAsignacion(){
     devEstado:      $('#dEstado').value,
     devTanque:      $('#dTanque').value,
     devKmFinal:     num('dKmFinal'),
-    devRecibidoPor: $('#dEntregadoPor').value.trim().toUpperCase(),
+    devRecibidoPor: $('#dEntregadoPor').value.trim(),
     devComentarios: $('#dComentarios').value.trim()
   };
 
@@ -2451,7 +3216,7 @@ async function guardarAsignacion(){
     // Llevar al usuario a la primera sección con error
     const mapa = {
       aFechaEntrega:'s1', aChofer:'s1', aEntregadoPor:'s1', aKmInicial:'s1', aDestino:'s1',
-      aZona:'s1', aFotoKmIni:'s1', aComentarios:'s1',
+      aZona:'s1', aComentarios:'s1',
       aProxServKm:'s2', aProxServFecha:'s2', aFirmaRecepcion:'s6',
       dFecha:'s7', dKmFinal:'s7', dChofer:'s7', dEntregadoPor:'s7', dEstado:'s7', dComentarios:'s7'
     };
@@ -2466,12 +3231,18 @@ async function guardarAsignacion(){
   if(a.aceptaCondiciones || exportaFirma()) a.firmaAt = a.firmaAt || nowISO();
 
   // Índice ligero de evidencias dentro del registro (sin las imágenes)
-  const fotosFull = leerFotos();
-  a.fotos = {};
-  Object.entries(fotosFull).forEach(([k,f])=>{
-    a.fotos[k] = { modo:f.modo||'rtdb', peso:f.peso||0, at:f.at||nowISO(),
-                   valor: f.modo==='storage' ? f.valor : '' };
-  });
+  const fotosFull = leerFotos(), fotosDevFull = leerFotosDev();
+  const indice = obj => {
+    const o = {};
+    Object.entries(obj).forEach(([k,f])=>{
+      o[k] = { modo:f.modo||'rtdb', peso:f.peso||0, at:f.at||nowISO(),
+               valor: f.modo==='storage' ? f.valor : '' };
+    });
+    return o;
+  };
+  a.fotos = indice(fotosFull);
+  a.fotosDev = indice(fotosDevFull);
+  a.evidenciasDevCount = Object.keys(fotosDevFull).length;
   a.firmaCapturada = !!exportaFirma();
 
   const orig = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
@@ -2485,7 +3256,8 @@ async function guardarAsignacion(){
   // Imágenes y firma en su propio nodo (no viajan en el listener principal)
   const firmaFinal = exportaFirma();
   evidActual.firma = firmaFinal;
-  if(Object.keys(fotosFull).length || firmaFinal) await guardaEvidencias(reg.id, fotosFull, firmaFinal);
+  if(Object.keys(fotosFull).length || Object.keys(fotosDevFull).length || firmaFinal)
+    await guardaEvidencias(reg.id, fotosFull, fotosDevFull, firmaFinal);
 
   // --- Actualización cruzada: KM final → KM actual de la unidad ---
   let sincronizado = false;
@@ -2519,10 +3291,11 @@ async function eliminarAsignacion(){
   const a = STORE.asignaciones.find(x=>x.id===editingAsigId);
   try{
     const ev = await cargaEvidencias(editingAsigId);
-    for(const f of Object.values(ev.fotos||{})){
+    for(const f of [...Object.values(ev.fotos||{}), ...Object.values(ev.fotosDev||{})]){
       if(f.modo==='storage' && f.ruta && fbStorage) await fbStorage.ref(f.ruta).delete().catch(()=>{});
     }
     await fbDb.ref(`${FB_ROOT}/evidencias/${editingAsigId}`).remove();
+    await liberaFolio(a && a.bitacora);
     delete evidCache[editingAsigId];
   }catch(e){}
   const ok = await fbDeleteAsignacion(editingAsigId);
@@ -2859,14 +3632,14 @@ function chartDescuento(per){
       return `<b>${c.etiqueta}</b><br>${c.fechaIni} → ${c.fechaFin}<br>Descuento: <b>${money(c.descuento)}</b><br>${c.dias} días · ${fmt(c.km)} km`;
     }},
     xAxis:{type:'category',data:per.map(c=>'P'+c.nPeriodo),axisLabel:{color:C.muted,fontSize:11}},
-    yAxis:{type:'value',name:'MXN',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted,formatter:v=>'$'+v.toLocaleString('es-MX')},splitLine:{lineStyle:{color:'#27345c'}}},
+    yAxis:{type:'value',name:'MXN',nameTextStyle:{color:C.muted},axisLabel:{color:C.muted,formatter:v=>'$'+v.toLocaleString('es-MX')},splitLine:{lineStyle:{color:'#cfe0f2'}}},
     series:[{
       type:'bar', barMaxWidth:52,
       data: vals.map(v=>({ value:v, itemStyle:{
         color: (vals.length>1 && v===max) ? C.red : (vals.length>1 && v===min) ? C.green : C.blue,
         borderRadius:[4,4,0,0]
       }})),
-      label:{show:true,position:'top',color:'#e8edf7',fontSize:10,formatter:p=>'$'+Number(p.value).toLocaleString('es-MX',{maximumFractionDigits:0})}
+      label:{show:true,position:'top',color:'#000000',fontSize:10,formatter:p=>'$'+Number(p.value).toLocaleString('es-MX',{maximumFractionDigits:0})}
     }]
   }, true);
 }
@@ -2887,7 +3660,7 @@ function chartComparativo(per){
     }},
     xAxis:{type:'category',data:per.map(c=>'P'+c.nPeriodo),axisLabel:{color:C.muted,fontSize:11}},
     yAxis:[
-      {type:'value',name:'km',position:'left',nameTextStyle:{color:C.blue},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#27345c'}}},
+      {type:'value',name:'km',position:'left',nameTextStyle:{color:C.blue},axisLabel:{color:C.muted},splitLine:{lineStyle:{color:'#cfe0f2'}}},
       {type:'value',name:'L',position:'right',nameTextStyle:{color:C.gold},axisLabel:{color:C.muted},splitLine:{show:false}},
       {type:'value',name:'MXN',position:'right',offset:56,nameTextStyle:{color:C.purple},axisLabel:{color:C.muted,formatter:v=>'$'+v},splitLine:{show:false}}
     ],
@@ -3070,11 +3843,12 @@ function datosReporte(){
       'F. DEVOLUCIÓN': a.devFecha||'', 'KM FINAL': a.devKmFinal ?? '',
       'KM RECORRIDO': a.kmRecorrido ?? '', 'TANQUE DEV.': a.devTanque||'', 'EDO. DEV.': a.devEstado||'',
       'ENTREGÓ': a.entregadoPor||'', 'RECIBIÓ': a.devRecibidoPor||'', 'FIRMA RECEPCIÓN': a.firmaRecepcion||'',
-      'DOCS. FALTANTES': [['docPoliza','Póliza'],['docTarjCirc','T.Circ'],['docTarjComb','T.Comb'],['docPlacaDel','PlacaDel'],['docPlacaTra','PlacaTra']]
+      'DOCS. FALTANTES': [['docPoliza','Póliza'],['docTarjCirc','T.Circ'],['docTarjComb','T.Comb'],['docPlacaDel','PlacaDel'],['docPlacaTra','PlacaTra'],['docImoveqroo','IMOVEQROO']]
         .filter(([k])=>a[k] && a[k]!=='Tiene').map(([,l])=>l).join(', ') || 'Ninguno',
       'PARÁM. NO ÓPTIMOS': [['parAceite','Aceite'],['parAnticong','Anticong'],['parFrenos','Frenos'],['parLimpia','Limpia']]
         .filter(([k])=>a[k] && a[k]!=='Bueno').map(([,l])=>l).join(', ') || 'Ninguno',
-      'EVIDENCIAS': (a.evidenciasCount!=null?a.evidenciasCount:(a.fotos?Object.keys(a.fotos).length:0))+'/6',
+      'EVIDENCIAS': (a.evidenciasCount!=null?a.evidenciasCount:(a.fotos?Object.keys(a.fotos).length:0))+'/'+TOTAL_FOTOS,
+      'EVID. DEVOLUCIÓN': (a.evidenciasDevCount||0)+'/'+TOTAL_FOTOS,
       'FIRMA': a.firmaCapturada?'Sí':'No'
     }));
   const bit = STORE.bitacora.slice(0,400).map(b=>({
@@ -3466,6 +4240,7 @@ function abrirConfig(){
   $('#s_comb').textContent = STORE.combustibles.length;
   $('#s_asig').textContent = `${STORE.asignaciones.length} (${STORE.asignaciones.filter(a=>a.estadoRegistro==='Abierta').length} abiertas)`;
   $('#s_updated').textContent = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : '—';
+  if(!$('#zipDesde').value){ $('#zipDesde').value = hoyISO(); $('#zipHasta').value = hoyISO(); }
   pintaResumenEvidencias();
   $('#modalConfig').classList.add('open');
 }
@@ -3498,7 +4273,7 @@ async function importarJSON(file){
       (d.asignaciones||[]).forEach(a=>{ if(a.id) updates[`${FB_ROOT}/asignaciones/${a.id}`] = a; });
       if(d.evidencias) updates[`${FB_ROOT}/evidencias`] = d.evidencias;
       if(d.choferesExtra) updates[`${FB_ROOT}/choferesExtra`] = d.choferesExtra;
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.5 };
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.6 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
@@ -3592,6 +4367,24 @@ $('#aAceptaCond').onchange = e=>{ $('#aFirmaSello').value = e.target.checked ? f
 $('#aChofer').onchange = onChoferChange;
 $('#btnLimpiarFirma').onclick = limpiaFirma;
 $('#btnRespaldoEvid').onclick = respaldoEvidencias;
+$('#btnPdfLegal').onclick = descargarPdfLegal;
+$('#btnCierreDia').onclick = cierreDeDia;
+$('#btnCierreDiaCfg').onclick = ()=>{ cerrarModal('modalConfig'); setTimeout(cierreDeDia, 250); };
+$('#btnLimpiarArchivos').onclick = limpiarArchivosYEvidencias;
+$('#btnZipDiario').onclick = exportacionDiariaZip;
+$('#btnZipHoy').onclick = ()=>{ $('#zipDesde').value = hoyISO(); $('#zipHasta').value = hoyISO(); };
+$('#btnZipSemana').onclick = ()=>{
+  const d = new Date(); const h = hoyISO();
+  d.setDate(d.getDate()-6);
+  $('#zipDesde').value = toISO(d); $('#zipHasta').value = h;
+};
+$('#btnZipMes').onclick = ()=>{
+  const d = new Date();
+  $('#zipDesde').value = toISO(new Date(d.getFullYear(), d.getMonth(), 1));
+  $('#zipHasta').value = hoyISO();
+};
+$('#lightbox').onclick = e=>{ if(e.target.id==='lightbox') cerrarVisor(); };
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarVisor(); });
 $('#btnPurgarEvid').onclick = purgarEvidenciasCerradas;
 // El canvas se remide al rotar el dispositivo o cambiar el tamaño
 window.addEventListener('resize', ()=>{
