@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 :root{
   --bg:#eef5fd; --panel:#ffffff; --panel2:#e3eefb; --line:#c2d8ef;
@@ -2539,10 +2539,50 @@ async function inlineEvidencias(obj){
 }
 
 /* ===== Generador principal ===== */
+/* Localiza jsPDF sin importar cómo lo exponga el CDN; si no está, lo inyecta.
+   Evita el fallo "La librería de PDF no cargó" cuando un bloqueador, la caché
+   o un CDN lento impiden la carga inicial del script. */
+function resuelveJsPDF(){
+  return (window.jspdf && window.jspdf.jsPDF) ||
+         (window.jsPDF && window.jsPDF.jsPDF) ||
+         (typeof window.jsPDF === 'function' ? window.jsPDF : null);
+}
+function cargaScript(url){
+  return new Promise((res,rej)=>{
+    const sc = document.createElement('script');
+    sc.src = url; sc.async = true;
+    sc.onload = ()=>res(true);
+    sc.onerror = ()=>rej(new Error('No se pudo cargar '+url));
+    document.head.appendChild(sc);
+  });
+}
+async function obtenJsPDF(avisar){
+  let J = resuelveJsPDF();
+  if(J) return J;
+  const espejos = [
+    'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js',
+    'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+  ];
+  for(const url of espejos){
+    try{
+      if(avisar) avisar('Cargando librería…');
+      await cargaScript(url);
+      await new Promise(r=>setTimeout(r,120));
+      J = resuelveJsPDF();
+      if(J) return J;
+    }catch(e){ /* se intenta el siguiente espejo */ }
+  }
+  return null;
+}
+
 async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
-  const JSPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-  if(!JSPDF){ toast('La librería de PDF no cargó. Verifique su conexión.','err'); return false; }
   const paso = m => { if(avisar) avisar(m); };
+  const JSPDF = await obtenJsPDF(paso);
+  if(!JSPDF){
+    toast('No se pudo cargar la librería de PDF. Revise su conexión o si un bloqueador está impidiendo el acceso a jsdelivr.net.','err');
+    return false;
+  }
 
   paso('Preparando imágenes…');
   const F   = await inlineEvidencias(fotos);
@@ -2579,7 +2619,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
     doc.text('PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES', ML, 7.2);
     doc.setFont('helvetica','normal'); doc.setFontSize(8);
-    doc.text('Folio '+val(a.bitacora), W-MR, 7.2, {align:'right'});
+    doc.text(a.bitacora ? 'Folio '+sane(a.bitacora) : 'Registro sin folio', W-MR, 7.2, {align:'right'});
     doc.setTextColor(...TXT);
     y = 17;
   }
@@ -2604,7 +2644,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
     doc.setFillColor(...AZUL_C); doc.setDrawColor(...LINEA);
     doc.roundedRect(ML, y, CW, 11, 1.4, 1.4, 'FD');
     doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...AZUL);
-    doc.text('FOLIO: '+val(a.bitacora), ML+4, y+7);
+    doc.text('FOLIO: '+(a.bitacora ? sane(a.bitacora) : 'SIN FOLIO ASIGNADO'), ML+4, y+7);
     doc.setFont('helvetica','normal'); doc.setFontSize(8);
     doc.setTextColor(...(a.estadoRegistro==='Cerrada'?VERDE:AZUL));
     doc.text('Estado: '+val(a.estadoRegistro), ML+CW/2, y+7, {align:'center'});
@@ -2718,6 +2758,17 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
   }
 
   /* --- Rejilla simple de 3 columnas (solo entrega) --- */
+  function sinEvidenciasAviso(){
+    reserva(16);
+    doc.setFillColor(251,238,205); doc.setDrawColor(220,178,87); doc.setLineWidth(0.2);
+    doc.roundedRect(ML, y, CW, 12, 1.4, 1.4, 'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.4); doc.setTextColor(125,86,6);
+    doc.text('Este préstamo no tiene evidencia fotográfica registrada.', ML+5, y+5.4);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.4);
+    doc.text('Capture las tomas desde el checklist para que aparezcan en este documento.', ML+5, y+9.2);
+    doc.setTextColor(...TXT);
+    y += 16;
+  }
   function rejillaFotos(mapa){
     const cols=3, gap=4, bw=(CW-gap*(cols-1))/cols, bh=bw*0.74;
     for(let i=0;i<FOTOS_DEF.length;i+=cols){
@@ -2841,7 +2892,12 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
   }
 
   paso('Incrustando evidencias…');
-  if(hayDev){
+  const totalEvid = Object.keys(F).length + Object.keys(FD).length;
+  if(totalEvid === 0){
+    // Sin fotos no se abre una página nueva: se deja constancia y se continúa
+    seccion((hayDev?'6':'5')+'. Evidencia fotográfica');
+    sinEvidenciasAviso();
+  } else if(hayDev){
     doc.addPage(); encabezadoContinuacion();
     seccion('6. Evidencia fotográfica · comparativa entrega vs. devolución');
     comparativa();
@@ -2882,11 +2938,12 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
     doc.setDrawColor(...LINEA); doc.setLineWidth(0.2);
     doc.line(ML, H-11, W-MR, H-11);
     doc.setFont('helvetica','normal'); doc.setFontSize(6.6); doc.setTextColor(...SUAVE);
-    doc.text('Control Vehicular · KPI-AFI-01 · Folio '+val(a.bitacora)+' · Unidad '+val(a.vehiculo), ML, H-7);
+    doc.text('Control Vehicular · KPI-AFI-01 · '+(a.bitacora?'Folio '+sane(a.bitacora):'Sin folio')+' · Unidad '+val(a.vehiculo), ML, H-7);
     doc.text('Página '+i+' de '+tot, W-MR, H-7, {align:'right'});
   }
 
-  const nombre = ('Prestamo-'+(a.bitacora||'SIN-FOLIO')+'-'+(a.vehiculo||'')+'.pdf').replace(/[^\w\-.]/g,'_');
+  const ref = a.bitacora || ('S-F-'+String(a.id||'').slice(-6).toUpperCase());
+  const nombre = ('Prestamo-'+ref+'-'+(a.vehiculo||'')+'.pdf').replace(/[^\w\-.]/g,'_');
   doc.save(nombre);
   return true;
 }
