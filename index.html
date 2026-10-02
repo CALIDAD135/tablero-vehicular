@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v2.9</title>
+<title>Control Vehicular · KPI-AFI-01 v3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -34,7 +34,7 @@ h1{font-size:20px;font-weight:700;letter-spacing:.2px;color:var(--accent)}
 .btn-danger{background:var(--red);border-color:var(--red);color:#fff}
 .btn-danger:hover{background:#d02b3d}
 .btn-ghost{background:transparent}
-input[type="text"],input[type="number"],input[type="date"],input[type="url"],input[type="password"],select,textarea{
+input[type="text"],input[type="number"],input[type="date"],input[type="time"],input[type="url"],input[type="password"],select,textarea{
   background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 10px;border-radius:8px;font-size:13px;font-family:inherit;width:100%
 }
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
@@ -285,7 +285,7 @@ tbody tr:hover{background:#d6e8fb}
 .u-circ{background:#7ddcb4;border:1px solid #46b98a} .u-tall{background:#f7da8f;border:1px solid #dcae3a}
 .u-resg{background:#bdaef5;border:1px solid #8a72e0} .u-sin{background:#f5a3ad;border:1px solid #dd6a79}
 #fleetDetail{margin-top:14px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:0;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
-#fleetDetail.open{max-height:800px;padding:16px 18px}
+#fleetDetail.open{max-height:1400px;padding:16px 18px}
 #fleetDetail h4{font-size:16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .fd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
 .fd-item{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
@@ -305,6 +305,43 @@ tbody tr:hover{background:#d6e8fb}
 .sync-err{background:#fbdade;color:#8f1826;border:1px solid #e08694}
 .pulse{animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ===== MANTENIMIENTOS PROGRAMADOS (v3.0) ===== */
+.mt-tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.2px;white-space:nowrap;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.mt-prog{background:#1565c0;color:#ffffff;border:1px solid #1565c0}
+.mt-ing{background:#f4c20d;color:#3d2e00;border:1px solid #d4a106}
+.mt-ent{background:#0f7a4e;color:#ffffff;border:1px solid #0f7a4e}
+.mt-tag.mt-late{outline:2px dashed var(--red);outline-offset:1px}
+.wk-mant{border-radius:7px;padding:7px 8px;margin-bottom:6px;font-size:11.5px;cursor:pointer;transition:.12s;line-height:1.35}
+.wk-mant:hover{transform:translateX(2px);box-shadow:0 3px 10px rgba(11,79,158,.25)}
+.wk-mant.mt-late{outline:2px dashed var(--red);outline-offset:-3px}
+.wk-mant .wm-top{font-weight:700;white-space:normal;word-break:break-word}
+.wk-mant .wm-tall{font-size:10.5px;opacity:.92;white-space:normal;word-break:break-word}
+.wk-mant .wm-st{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.mant-chip{display:block;padding:1px 6px;border-radius:5px;font-size:10.5px;font-weight:700;margin:1px 0;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mant-chip.mt-late{outline:2px dashed var(--red);outline-offset:-2px}
+.mt-sub{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.mt-sub:first-of-type{margin-top:4px}
+.mt-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:600px){.mt-steps{grid-template-columns:1fr}}
+.mt-step{display:flex;align-items:flex-start;gap:9px;background:var(--panel2);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:9px;padding:9px 10px;cursor:pointer;transition:.15s;user-select:none}
+.mt-step:focus{outline:2px solid var(--accent);outline-offset:1px}
+.mt-step b{display:block;font-size:12.5px}
+.mt-step small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.mt-step.s-prog{border-left-color:#1565c0}.mt-step.s-ing{border-left-color:#f4c20d}.mt-step.s-ent{border-left-color:#0f7a4e}
+.mt-step.s-prog.on{background:#e3eefb}.mt-step.s-ing.on{background:#fff6d1}.mt-step.s-ent.on{background:#ddf3e8}
+.mt-step.s-prog .chk.on{background:#1565c0;border-color:#1565c0;color:#fff}
+.mt-step.s-ing .chk.on{background:#f4c20d;border-color:#d4a106;color:#3d2e00}
+.mt-step.s-ent .chk.on{background:#0f7a4e;border-color:#0f7a4e;color:#fff}
+.unit .mant-ico{position:absolute;top:3px;left:4px;font-size:9px;line-height:1;padding:2px 3px;border-radius:4px;border:1.5px solid #fff}
+.cat-row{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid var(--line);font-size:12.5px}
+.cat-row:last-child{border-bottom:none}
+.cat-row .n{flex:1;font-weight:600}
+.cat-row .u{color:var(--muted);font-size:11px}
+.cal-legend .grp{display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cal-legend .grp b{color:var(--txt);font-weight:600}
+.cal-legend i.lg-task{background:var(--panel);border:1px solid var(--line);border-left:3px solid}
+.cal-legend i.lg-late{background:#1565c0;outline:1.5px dashed var(--red);outline-offset:1px}
 
 /* Overlay login */
 .overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -482,10 +519,27 @@ tbody tr:hover{background:#d6e8fb}
   <div id="presBody"></div>
 </div>
 
+<!-- ============ MANTENIMIENTOS PROGRAMADOS (v3.0) ============ -->
+<div class="card col-12" id="cardMant">
+  <h3>Mantenimientos Programados
+    <span class="hint" style="font-weight:400">· agenda de taller por unidad</span>
+    <span id="mantBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
+    <button class="btn" id="btnImprimirMant" style="font-size:12px;padding:5px 12px" title="Imprimir o guardar en PDF el listado de la pestaña activa">🖨 Imprimir listado</button>
+  </h3>
+  <div class="tabs">
+    <div class="tab active" data-mant="activos">Activos</div>
+    <div class="tab" data-mant="prog">Programados</div>
+    <div class="tab" data-mant="ing">En taller</div>
+    <div class="tab" data-mant="ent">Entregados</div>
+    <div class="tab" data-mant="todos">Todos</div>
+  </div>
+  <div id="mantBody"></div>
+</div>
+
 <!-- ============ CALENDARIO DE TAREAS (admin + auxiliar) ============ -->
 <div class="card col-12 hidden" id="cardCalendario">
-  <h3>Calendario de Tareas
-    <span class="hint" style="font-weight:400">· seguimiento de tareas derivadas de incidencias vehiculares</span>
+  <h3>Calendario de Tareas y Mantenimientos
+    <span class="hint" style="font-weight:400">· tareas derivadas de incidencias y agenda de taller por unidad</span>
     <span id="calBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
   </h3>
   <div class="cal-toolbar">
@@ -500,9 +554,17 @@ tbody tr:hover{background:#d6e8fb}
     </div>
     <div class="cal-title" id="calTitle">—</div>
     <div class="cal-legend">
-      <span><i style="background:var(--accent)"></i>Pendiente</span>
-      <span><i style="background:var(--red)"></i>Vencida</span>
-      <span><i style="background:var(--green)"></i>Cumplida</span>
+      <span class="grp"><b>Tareas:</b>
+        <span><i class="lg-task" style="border-left-color:var(--accent)"></i>Pendiente</span>
+        <span><i class="lg-task" style="border-left-color:var(--red)"></i>Vencida</span>
+        <span><i class="lg-task" style="border-left-color:var(--green)"></i>Cumplida</span>
+      </span>
+      <span class="grp"><b>🔧 Mantenimiento:</b>
+        <span><i style="background:#1565c0"></i>Programado</span>
+        <span><i style="background:#f4c20d"></i>Ingreso</span>
+        <span><i style="background:#0f7a4e"></i>Entregado</span>
+        <span><i class="lg-late"></i>Atrasado</span>
+      </span>
     </div>
   </div>
   <div id="calBody"></div>
@@ -694,6 +756,69 @@ tbody tr:hover{background:#d6e8fb}
       <button class="btn btn-danger hidden" id="btnEliminarInc">Eliminar</button>
       <button class="btn" data-close-modal="modalInc">Cancelar</button>
       <button class="btn btn-primary" id="btnGuardarInc">Guardar incidencia</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: MANTENIMIENTO PROGRAMADO (v3.0) ============ -->
+<div class="modal-overlay" id="modalMant">
+  <div class="modal">
+    <h3 id="mtTitle">Agregar mantenimiento</h3>
+    <div class="modal-sub">Los datos de la unidad se toman automáticamente de su ficha. Capture los datos del taller y marque el estatus conforme avance el servicio.</div>
+
+    <div class="mt-sub">Datos de la unidad</div>
+    <div class="form-grid">
+      <div><label>Unidad</label><input type="text" id="mtUnidad" readonly style="opacity:.7"></div>
+      <div><label>Placas</label><input type="text" id="mtPlacas" readonly style="opacity:.7"></div>
+      <div><label>Zona</label><input type="text" id="mtZona" readonly style="opacity:.7"></div>
+      <div><label>Departamento</label><input type="text" id="mtDepto" readonly style="opacity:.7"></div>
+      <div><label>Chofer</label><input type="text" id="mtChofer" readonly style="opacity:.7"></div>
+      <div><label>Próximo servicio</label><input type="text" id="mtKm" readonly style="font-weight:600"></div>
+      <div class="full"><label>Incidencia vinculada</label><input type="text" id="mtIncRef" readonly style="opacity:.7"></div>
+    </div>
+
+    <div class="mt-sub">Datos del taller</div>
+    <div class="form-grid">
+      <div class="full">
+        <label>Taller</label>
+        <input type="text" id="mtTaller" list="dlTalleres" maxlength="60" autocomplete="off" placeholder="Escriba o elija un taller del catálogo">
+        <datalist id="dlTalleres"></datalist>
+        <div class="field-msg" id="e_mtTaller"></div>
+      </div>
+      <div>
+        <label>Fecha</label>
+        <input type="date" id="mtFecha">
+        <div class="field-msg" id="e_mtFecha"></div>
+      </div>
+      <div>
+        <label>Hora</label>
+        <input type="time" id="mtHora" step="300">
+        <div class="field-msg" id="e_mtHora"></div>
+      </div>
+      <div class="full">
+        <label>Tipo de mantenimiento</label>
+        <select id="mtTipo">
+          <option value="Preventivo">Preventivo</option>
+          <option value="Correctivo">Correctivo</option>
+          <option value="Revisión">Revisión</option>
+        </select>
+      </div>
+      <div class="full">
+        <label>Observaciones (opcional)</label>
+        <textarea id="mtNotas" rows="2" maxlength="300" placeholder="Servicio solicitado, refacciones o indicaciones al taller"></textarea>
+        <div class="field-msg" id="e_mtNotas"></div>
+      </div>
+    </div>
+
+    <div class="mt-sub">Estatus del servicio</div>
+    <div class="mt-steps" id="mtSteps"></div>
+    <div id="mtEstatusTxt" style="color:var(--muted);font-size:11.5px;margin-top:9px"></div>
+    <div style="color:var(--muted);font-size:11px;margin-top:4px;line-height:1.5">Las etapas son secuenciales: al marcar una etapa se marcan las anteriores y se registra fecha, hora y rol de quien la captura.</div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger hidden" id="btnEliminarMant">Eliminar</button>
+      <button class="btn" data-close-modal="modalMant">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardarMant">Guardar mantenimiento</button>
     </div>
   </div>
 </div>
@@ -1107,8 +1232,13 @@ tbody tr:hover{background:#d6e8fb}
       <div class="status-line"><span>Incidencias sincronizadas</span><span id="s_incs">—</span></div>
       <div class="status-line"><span>Períodos de combustible</span><span id="s_comb">—</span></div>
       <div class="status-line"><span>Checklists de préstamo</span><span id="s_asig">—</span></div>
+      <div class="status-line"><span>Mantenimientos programados</span><span id="s_mant">—</span></div>
       <div class="status-line"><span>Última actualización</span><span id="s_updated">—</span></div>
     </div>
+
+    <h4 style="font-size:13px;margin:22px 0 8px;color:var(--accent)">Catálogo de talleres</h4>
+    <div class="setup-note">Los talleres se agregan automáticamente al guardar un mantenimiento y se ofrecen como sugerencia en el campo “Taller”. Quitar un taller del catálogo no modifica los mantenimientos ya registrados.</div>
+    <div id="catTalleres"></div>
 
     <h4 style="font-size:13px;margin:22px 0 8px;color:var(--accent)">Respaldo local</h4>
     <div class="setup-note">Los respaldos JSON sirven como copia de seguridad manual. Al importar, se sobrescribe toda la base en Firebase.</div>
@@ -1125,7 +1255,7 @@ tbody tr:hover{background:#d6e8fb}
     </div>
 
     <h4 style="font-size:13px;margin:22px 0 8px;color:var(--accent)">Exportación por período (ZIP)</h4>
-    <div class="setup-note">Genera un paquete con los movimientos del período en CSV (préstamos, incidencias, combustibles, tareas y flotilla) más las evidencias fotográficas de cada folio. Por omisión exporta el día de hoy.</div>
+    <div class="setup-note">Genera un paquete con los movimientos del período en CSV (préstamos, incidencias, combustibles, tareas, mantenimientos y flotilla) más las evidencias fotográficas de cada folio. Por omisión exporta el día de hoy.</div>
     <div class="form-grid" style="margin-bottom:10px">
       <div><label>Desde</label><input type="date" id="zipDesde"></div>
       <div><label>Hasta</label><input type="date" id="zipHasta"></div>
@@ -1179,7 +1309,7 @@ tbody tr:hover{background:#d6e8fb}
 
 <script>
 /* ==================================================================
-   TABLERO EJECUTIVO · CONTROL VEHICULAR · v2.2
+   TABLERO EJECUTIVO · CONTROL VEHICULAR · v3.0
    Coordinación de Activos Fijos y Control Vehicular
    Backend: Firebase Realtime Database (sincronización en tiempo real)
    ================================================================== */
@@ -1205,9 +1335,9 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:2.9 } };
+let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:3.0 }, mantenimientos:[], catalogoTalleres:{} };
 let ALL=[], DATA=[];
-let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'', presTab:'vigentes' };
+let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'', presTab:'vigentes', mantTab:'activos', mantFiltroUnidad:null };
 let session = { rol:null, loggedAt:null };
 let editingVeh = null;
 let editingIncId = null;
@@ -1247,7 +1377,9 @@ const RX = {
   chofer: /^[A-ZÁÉÍÓÚÜÑ .'\-]{2,60}$/i,
   url:    /^https?:\/\/[^\s]+$/i,
   idliga: /^[A-Za-z0-9_\-\/:.?=&#]{1,200}$/,
-  notas:  /^[^<>]{0,500}$/s
+  notas:  /^[^<>]{0,500}$/s,
+  taller: /^[^<>]{2,60}$/,
+  hora:   /^([01]\d|2[0-3]):[0-5]\d$/
 };
 function clearErrs(){ $$('.field-msg').forEach(e=>e.textContent=''); $$('input,select,textarea').forEach(e=>e.classList.remove('err')); }
 function setErr(id, msg){ const inp=$('#'+id); const el=$('#e_'+id); if(el) el.textContent=msg; if(inp) inp.classList.add('err'); }
@@ -1302,6 +1434,8 @@ function fbInit(){
       STORE.combustibles = d.combustibles ? Object.values(d.combustibles) : [];
       STORE.asignaciones = d.asignaciones ? Object.values(d.asignaciones) : [];
       STORE.choferesExtra = d.choferesExtra ? Object.values(d.choferesExtra) : [];
+      STORE.mantenimientos = d.mantenimientos ? Object.values(d.mantenimientos) : [];
+      STORE.catalogoTalleres = d.catalogoTalleres || {};
       STORE.bitacora   = d.bitacora ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
       STORE.meta       = d.meta || STORE.meta;
       fbInitialLoad = true;
@@ -1357,12 +1491,37 @@ async function fbDeleteIncidencia(id){
     return true;
   }catch(e){ toast('Error al eliminar incidencia: '+e.message, 'err'); return false; }
 }
+async function fbWriteMantenimiento(m){
+  try{
+    await fbDb.ref(`${FB_ROOT}/mantenimientos/${m.id}`).set(m);
+    await fbUpdateMeta();
+    return true;
+  }catch(e){ toast('Error al guardar mantenimiento: '+e.message, 'err'); return false; }
+}
+async function fbDeleteMantenimiento(id){
+  try{
+    await fbDb.ref(`${FB_ROOT}/mantenimientos/${id}`).remove();
+    await fbUpdateMeta();
+    return true;
+  }catch(e){ toast('Error al eliminar mantenimiento: '+e.message, 'err'); return false; }
+}
+async function fbGuardaCatalogoTaller(nombre){
+  const n = normalizaNombre(nombre); if(!n) return false;
+  try{
+    await fbDb.ref(`${FB_ROOT}/catalogoTalleres/${claveCatalogo(n)}`).set({ nombre:n, alta:nowISO(), por:session.rol||'' });
+    return true;
+  }catch(e){ console.error('fbGuardaCatalogoTaller', e); return false; }
+}
+async function fbBorraCatalogoTaller(clave){
+  try{ await fbDb.ref(`${FB_ROOT}/catalogoTalleres/${clave}`).remove(); return true; }
+  catch(e){ toast('Error al actualizar el catálogo: '+e.message, 'err'); return false; }
+}
 async function fbAppendBitacora(entry){
   try{ await fbDb.ref(`${FB_ROOT}/bitacora/${entry.id}`).set(entry); return true; }
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 2.9 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.0 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -1497,6 +1656,8 @@ function renderKPIs(){
   const cnt = s => DATA.filter(r=>r.estatus===s).length;
   const servVenc = DATA.filter(r=>{const k=kmRestantes(r); return k!==null && k<0;}).length;
   const servWarn = DATA.filter(r=>{const k=kmRestantes(r); return k!==null && k>=0 && k<=1500;}).length;
+  const vehsVis = new Set(DATA.map(r=>r.veh));
+  const mantAct = STORE.mantenimientos.filter(m=>m.estatus!=='Entregado' && vehsVis.has(m.unidad)).length;
   const cards = [
     ['b-blue',   n,                   'Unidades totales'],
     ['b-green',  cnt('CIRCULACION'),  'En circulación'],
@@ -1505,6 +1666,7 @@ function renderKPIs(){
     ['b-red',    cnt('SINIESTRADO'),  'Siniestrado'],
     ['b-red',    servVenc,            'Servicio vencido'],
     ['b-orange', servWarn,            'Serv. ≤ 1,500 km'],
+    ['b-blue',   mantAct,             'Mant. activos'],
   ];
   $('#kpis').innerHTML = cards.map(c =>
     `<div class="kpi ${c[0]}"><div class="bar"></div><div class="v">${c[1]}</div><div class="l">${c[2]}</div></div>`
@@ -1521,7 +1683,9 @@ function renderFleet(){
     const sel = state.selVeh===r.veh?' sel':'';
     const pendientes = STORE.incidencias.filter(i=>i.unidad===r.veh && i.estatus!=='Resuelto').length;
     const pendDot = pendientes>0?`<span class="pend-dot" title="${pendientes} incidencia(s) pendiente(s)"></span>`:'';
-    return `<div class="unit ${cls}${sel}" data-veh="${r.veh}">${pendDot}<span>${r.veh}</span><small>${r.estatus.slice(0,4)}</small></div>`;
+    const ma = mantActivoDe(r.veh);
+    const mIco = ma ? `<span class="mant-ico ${MT_CLASS[ma.estatus]||'mt-prog'}" title="Mantenimiento ${escapa(ma.estatus.toLowerCase())} · ${escapa(ma.taller||'')} · ${fFechaMx(ma.fecha)} ${escapa(ma.hora||'')}">🔧</span>` : '';
+    return `<div class="unit ${cls}${sel}" data-veh="${r.veh}">${pendDot}${mIco}<span>${r.veh}</span><small>${r.estatus.slice(0,4)}</small></div>`;
   }).join('');
   el.querySelectorAll('.unit').forEach(u=>u.onclick=()=>mostrarUnidad(u.dataset.veh));
   if(state.selVeh && !d.some(r=>r.veh===state.selVeh)){
@@ -1561,6 +1725,8 @@ function renderFleetDetail(){
   const combUnidad = STORE.combustibles.filter(c=>c.unidad===r.veh);
   const asigUnidad = asignacionesDe(r.veh);
   const asigAbierta = asigUnidad.find(a=>a.estadoRegistro==='Abierta');
+  const mantUnidad = mantenimientosDe(r.veh);
+  const mantAct = mantActivoDe(r.veh);
 
   const esEditor = session.rol==='admin' || session.rol==='auxiliar';
 
@@ -1585,14 +1751,21 @@ function renderFleetDetail(){
           ? `<span class="asig-state st-abierta">ABIERTA</span><div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${asigAbierta.chofer||'—'} · desde ${asigAbierta.fechaEntrega||'—'}</div>`
           : `<span style="font-size:13px;color:var(--muted)">Sin préstamo activo</span>${asigUnidad.length?`<div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${asigUnidad.length} checklist(s) en historial</div>`:''}`
       }</div></div>
+      <div class="fd-item"><div class="lab">Mantenimiento</div><div class="val">${
+        mantAct
+          ? `${mtTag(mantAct)}<div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${escapa(mantAct.taller||'—')} · ${fFechaMx(mantAct.fecha)} ${escapa(mantAct.hora||'')}</div>`
+          : `<span style="font-size:13px;color:var(--muted)">Sin mantenimiento activo</span>${mantUnidad.length?`<div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${mantUnidad.length} registro(s) en historial</div>`:''}`
+      }</div></div>
     </div>
     <div class="fd-actions">
       ${esEditor?`<button class="btn btn-primary" onclick="abrirModalUnidad('${r.veh}')">✎ Editar unidad</button>`:''}
       ${esEditor?`<button class="btn btn-success" onclick="abrirModalIncidencia('${r.veh}')">+ Incidencia vehicular</button>`:''}
+      ${esEditor?`<button class="btn" onclick="abrirModalMant('${r.veh}')">🔧 Agregar mantenimiento</button>`:''}
       <button class="btn" onclick="verCombustibles('${r.veh}')">⛽ Combustibles${combUnidad.length?` (${combUnidad.length})`:''}</button>
       ${esEditor?`<button class="btn ${asigAbierta?'btn-success':''}" onclick="abrirModalAsignacion('${r.veh}')">📋 Préstamo / Checklist${asigAbierta?' · abierta':''}</button>`:''}
       ${asigUnidad.length>0?`<button class="btn" onclick="verHistorialAsig('${r.veh}')">Historial (${asigUnidad.length})</button>`:''}
       ${incsUnidad.length>0?`<button class="btn" onclick="filtrarIncidenciasPor('${r.veh}')">Ver ${incsUnidad.length} incidencia(s)</button>`:''}
+      ${mantUnidad.length>0?`<button class="btn" onclick="filtrarMantPor('${r.veh}')">Ver ${mantUnidad.length} mantenimiento(s)</button>`:''}
     </div>`;
   det.classList.add('open');
 }
@@ -1701,7 +1874,7 @@ function renderTable(){
 
 /* ============ INCIDENCIAS ============ */
 function renderIncidencias(){
-  const cols = ['FECHA','UNIDAD','TIPO','ESTATUS','TAREAS','CHOFER','DEPTO','ID/LIGA','NOTAS',''];
+  const cols = ['FECHA','UNIDAD','TIPO','ESTATUS','TAREAS','CHOFER','DEPTO','ID/LIGA','NOTAS','ACCIONES'];
   $('#tblInc thead').innerHTML = '<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
   let incs = [...STORE.incidencias];
   if(state.incTab==='pend') incs = incs.filter(i=>i.estatus==='Pendiente');
@@ -1739,7 +1912,15 @@ function renderIncidencias(){
       <td>${i.depto||'—'}</td>
       <td>${liga}</td>
       <td title="${(i.notas||'').replace(/"/g,'&quot;')}">${notasC}</td>
-      <td>${esEditor?`<button class="btn" style="padding:3px 8px;font-size:11px" onclick="editarIncidencia('${i.id}')">Editar</button>`:''}</td>
+      <td style="white-space:nowrap">${(()=>{
+        const ml = mantDeIncidencia(i.id)[0];
+        const late = ml && mtAtrasado(ml);
+        const chip = ml ? `<span class="mt-tag ${MT_CLASS[ml.estatus]||'mt-prog'}${late?' mt-late':''}" style="font-size:10px;margin-right:4px;${esEditor?'cursor:pointer':''}" ${esEditor?`onclick="editarMantenimiento('${ml.id}')"`:''} title="Mantenimiento vinculado · ${escapa(ml.taller||'')} · ${fFechaMx(ml.fecha)} ${escapa(ml.hora||'')}">🔧 ${late?'Atrasado':escapa(ml.estatus)}</span>` : '';
+        const acc = esEditor
+          ? `<button class="btn" style="padding:3px 8px;font-size:11px" onclick="editarIncidencia('${i.id}')">Editar</button> <button class="btn" style="padding:3px 8px;font-size:11px" onclick="abrirModalMant('${i.unidad}',null,'${i.id}')">🔧 Agregar mantenimiento</button>`
+          : '';
+        return chip + acc;
+      })()}</td>
     </tr>`;
   }).join('');
 }
@@ -3020,6 +3201,8 @@ async function exportacionDiariaZip(){
     const incs = STORE.incidencias.filter(i=>enRango(i.fecha));
     const comb = STORE.combustibles.filter(c=>enRango(c.fechaIni) || enRango(c.fechaFin));
     const tars = todasLasTareas().filter(t=>enRango(t.fecha));
+    const fLoc = iso => iso ? toISO(new Date(iso)) : '';
+    const mants = STORE.mantenimientos.filter(m=>enRango(m.fecha) || enRango(fLoc(m.ingresoAt)) || enRango(fLoc(m.entregadoAt)));
 
     const csv = (rows) => rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
 
@@ -3048,6 +3231,13 @@ async function exportacionDiariaZip(){
       ['VEHÍCULO','ZONA','DEPARTAMENTO','ESTATUS','CHOFER','PLACAS','KM ACTUAL','KM PRÓX.SERV','KM RESTANTES'],
       ...STORE.unidades.map(u=>[u.veh,u.zona,u.depto,u.estatus,u.chofer,u.placas,
         u.kmActual,u.kmProximoServicio,kmRestantes(u)])
+    ]));
+    zip.file('06_Mantenimientos.csv', csv([
+      ['FECHA','HORA','UNIDAD','PLACAS','TALLER','TIPO','ESTATUS','F.INGRESO','F.ENTREGA','DÍAS EN TALLER','INCIDENCIA','OBSERVACIONES'],
+      ...mants.map(m=>[m.fecha,m.hora,m.unidad,m.placas,m.taller,m.tipo,
+        mtAtrasado(m)?'Programado (ATRASADO)':m.estatus,
+        m.ingresoAt?fechaCorta(m.ingresoAt):'', m.entregadoAt?fechaCorta(m.entregadoAt):'',
+        diasEnTaller(m)??'', incRefTxt(m.incId), m.notas])
     ]));
 
     // Evidencias de los préstamos del período
@@ -3078,6 +3268,7 @@ async function exportacionDiariaZip(){
       `Período: ${desde} a ${hasta}\nGenerado: ${stamp}\nPerfil: ${session.rol}\n\n`+
       `Préstamos: ${pres.length}\nIncidencias: ${incs.length}\n`+
       `Períodos de combustible: ${comb.length}\nTareas: ${tars.length}\n`+
+      `Mantenimientos: ${mants.length}\n`+
       `Archivos de evidencia: ${arch}${fallos?` (fallidos: ${fallos})`:''}\n\n`+
       `Los CSV abren directamente en Excel. La carpeta Evidencias contiene una subcarpeta\n`+
       `por folio de préstamo, con las fotos de entrega, las de devolución y la firma.\n`);
@@ -3118,7 +3309,7 @@ async function cierreDeDia(){
   try{
     const zip = new JSZip();
     const stamp = new Date().toLocaleString('es-MX');
-    const {flot, inc, comb, bit, tar, asig} = datosReporte();
+    const {flot, inc, comb, bit, tar, asig, mant} = datosReporte();
 
     /* --- 1. Reporte general en Excel dentro del ZIP --- */
     btn.textContent = 'Generando Excel…';
@@ -3136,6 +3327,7 @@ async function cierreDeDia(){
       hoja('Flotilla','Detalle de flotilla · estatus y servicio', flot);
       hoja('Préstamos','Checklist de préstamo y devolución', asig);
       hoja('Incidencias','Incidencias vehiculares registradas', inc);
+      hoja('Mantenimientos','Mantenimientos programados · agenda de taller', mant);
       hoja('Tareas','Tareas de seguimiento por incidencia', tar);
       hoja('Combustibles','Consumo de combustible por período', comb);
       hoja('Bitácora','Trazabilidad de cambios', bit);
@@ -3157,6 +3349,7 @@ async function cierreDeDia(){
     dirCsv.file('04_Tareas.csv',       aCsv(tar));
     dirCsv.file('05_Combustibles.csv', aCsv(comb));
     dirCsv.file('06_Bitacora.csv',     aCsv(bit));
+    dirCsv.file('07_Mantenimientos.csv', aCsv(mant));
 
     /* --- 3. Evidencias y firmas de todos los préstamos --- */
     btn.textContent = 'Empaquetando evidencias…';
@@ -3219,7 +3412,7 @@ async function cierreDeDia(){
       `Generado: ${stamp}\nPerfil: ${session.rol}\n`+
       `Motor de evidencias: ${storageModo==='storage'?'Firebase Storage':'Realtime Database'}\n\n`+
       `CONTENIDO\n`+
-      `  Reporte_General_IES_*.xlsx  Libro con 6 hojas de todo el sistema\n`+
+      `  Reporte_General_IES_*.xlsx  Libro con 7 hojas de todo el sistema\n`+
       `  CSV/                        Los mismos datos en texto plano\n`+
       `  Evidencias/                 Una carpeta por folio de préstamo\n`+
       `  Documentos/                 Anexos en PDF, si existen\n\n`+
@@ -3227,6 +3420,7 @@ async function cierreDeDia(){
       `  Unidades: ${flot.length}\n  Préstamos: ${asig.length}\n`+
       `  Incidencias: ${inc.length}\n  Tareas: ${tar.length}\n`+
       `  Períodos de combustible: ${comb.length}\n`+
+      `  Mantenimientos: ${mant.length}\n`+
       `  Archivos de evidencia: ${arch}${fallos?`\n  No recuperados: ${fallos}`:''}\n\n`+
       `Conserve este paquete antes de ejecutar "Limpiar Archivos y Evidencias".\n`);
 
@@ -3279,6 +3473,7 @@ async function limpiarArchivosYEvidencias(){
     `  · Zonas, estatus y departamentos\n`+
     `  · Préstamos: folios, fechas, choferes, kilómetros y firmantes\n`+
     `  · Incidencias y sus tareas\n`+
+    `  · Mantenimientos programados y catálogo de talleres\n`+
     `  · Períodos de combustible\n`+
     `  · Bitácora de cambios\n\n`+
     `¿Descargó ya el "Cierre de Día (ZIP)"?\n`+
@@ -3881,9 +4076,13 @@ function renderCalendario(){
   const pend = tareas.filter(t=>!t.hecha).length;
   const venc = tareas.filter(esVencida).length;
   const hechas = tareas.filter(t=>t.hecha).length;
-  $('#calBadge').innerHTML = `<b style="color:var(--accent)">${pend}</b> pendientes · <b style="color:var(--red)">${venc}</b> vencidas · <b style="color:var(--green)">${hechas}</b> cumplidas`;
+  const mants = eventosMantenimiento();
+  const mProg = mants.filter(m=>m.estatus==='Programado').length;
+  const mIng  = mants.filter(m=>m.estatus==='Ingreso').length;
+  $('#calBadge').innerHTML = `<b style="color:var(--accent)">${pend}</b> pendientes · <b style="color:var(--red)">${venc}</b> vencidas · <b style="color:var(--green)">${hechas}</b> cumplidas`
+    + ` · 🔧 <b style="color:#1565c0">${mProg}</b> programados · <b style="color:#a37d00">${mIng}</b> en taller`;
 
-  if(calVista==='semana') renderSemana(conFecha); else renderMes(conFecha);
+  if(calVista==='semana') renderSemana(conFecha, mants); else renderMes(conFecha, mants);
 
   const sf = $('#calSinFecha');
   sf.innerHTML = sinFecha.length
@@ -3893,7 +4092,7 @@ function renderCalendario(){
     : '';
 }
 
-function renderSemana(tareas){
+function renderSemana(tareas, mants=[]){
   const ini = lunesDe(calRef);
   const fin = new Date(ini); fin.setDate(fin.getDate()+6);
   $('#calTitle').textContent = ini.getMonth()===fin.getMonth()
@@ -3907,10 +4106,12 @@ function renderSemana(tareas){
     const iso = toISO(d);
     const delDia = tareas.filter(t=>t.fecha===iso)
       .sort((a,b)=>(a.hecha?1:0)-(b.hecha?1:0) || a.unidad.localeCompare(b.unidad));
+    const mDia = mants.filter(m=>m.fecha===iso)
+      .sort((a,b)=>(a.hora||'').localeCompare(b.hora||'') || (a.unidad||'').localeCompare(b.unidad||''));
     html += `<div class="wk-day ${iso===hoy?'today':''}">
       <div class="dh">${DIAS_L[i]}</div>
       <div class="dn">${d.getDate()}</div>
-      ${delDia.length===0?'<div style="color:var(--muted);font-size:11px">Sin tareas</div>':delDia.map(t=>`
+      ${(delDia.length+mDia.length)===0?'<div style="color:var(--muted);font-size:11px">Sin actividades</div>':''}${mDia.map(wkMantHtml).join('')}${delDia.map(t=>`
         <div class="wk-task ${t.hecha?'done':esVencida(t)?'late':''}" onclick="abrirIncDesdeCal('${t.incId}')" title="Clic para abrir la incidencia">
           <div class="wt-top">
             <button type="button" class="chk ${t.hecha?'on':''}" style="width:16px;height:16px;font-size:10px"
@@ -3924,7 +4125,7 @@ function renderSemana(tareas){
   $('#calBody').innerHTML = html + '</div>';
 }
 
-function renderMes(tareas){
+function renderMes(tareas, mants=[]){
   const y = calRef.getFullYear(), m = calRef.getMonth();
   $('#calTitle').textContent = `${MESES[m]} ${y}`;
   const primero = new Date(y,m,1);
@@ -3938,9 +4139,13 @@ function renderMes(tareas){
     const fuera = cur.getMonth()!==m;
     const delDia = tareas.filter(t=>t.fecha===iso)
       .sort((a,b)=>(a.hecha?1:0)-(b.hecha?1:0));
-    const vis = delDia.slice(0,3), resto = delDia.length-vis.length;
+    const mDia = mants.filter(m=>m.fecha===iso).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+    const mVis = mDia.slice(0,3);
+    const vis = delDia.slice(0, Math.max(0, 3-mVis.length));
+    const resto = (mDia.length+delDia.length) - (mVis.length+vis.length);
     html += `<div class="mo-day ${fuera?'out':''} ${iso===hoy?'today':''}">
       <div class="dn">${cur.getDate()}</div>
+      ${mVis.map(mantChipHtml).join('')}
       ${vis.map(t=>`<span class="task-chip ${t.hecha?'done':esVencida(t)?'late':''}" style="cursor:pointer"
           onclick="abrirIncDesdeCal('${t.incId}')" title="${escapa(t.unidad)} · ${escapa(t.texto)}">${escapa(t.unidad)}: ${escapa(t.texto.slice(0,16))}${t.texto.length>16?'…':''}</span>`).join('')}
       ${resto>0?`<div class="mo-more" onclick="irASemana('${iso}')">+${resto} más</div>`:''}
@@ -3958,6 +4163,500 @@ window.irASemana = function(iso){
   $$('[data-cal]').forEach(b=>b.classList.toggle('active', b.dataset.cal==='semana'));
   renderCalendario();
 };
+
+/* ==================================================================
+   MANTENIMIENTOS PROGRAMADOS · v3.0
+   Nodo: tableros/vehicular/mantenimientos/{id}
+   Catálogo: tableros/vehicular/catalogoTalleres/{clave} = {nombre, alta, por}
+   Etapas secuenciales: Programado (azul) → Ingreso (amarillo) → Entregado (verde)
+   ================================================================== */
+const MT_ETAPAS = [
+  {k:'prog', campo:'programado', label:'Programado', cls:'s-prog'},
+  {k:'ing',  campo:'ingreso',    label:'Ingreso',    cls:'s-ing'},
+  {k:'ent',  campo:'entregado',  label:'Entregado',  cls:'s-ent'}
+];
+const MT_RANK  = {Programado:0, Ingreso:1, Entregado:2};
+const MT_CLASS = {Programado:'mt-prog', Ingreso:'mt-ing', Entregado:'mt-ent'};
+const MT_TAB_TXT = {activos:'Activos (programados y en taller)', prog:'Programados', ing:'En taller (ingreso)', ent:'Entregados', todos:'Todos los registros'};
+let editingMantId = null;
+let mtCtx = { veh:null, incId:null };
+let mtDraft = null;
+
+const fFechaMx = iso => iso ? String(iso).split('-').reverse().join('/') : '—';
+const normalizaNombre = v => String(v||'').replace(/\s+/g,' ').trim().toUpperCase();
+const claveCatalogo = n => (normalizaNombre(n).normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^A-Z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,60)) || ('T_'+Date.now().toString(36));
+
+function mtAtrasado(m){
+  if(!m || m.estatus!=='Programado' || !m.fecha) return false;
+  const d = new Date(m.fecha+'T'+(m.hora||'00:00'));
+  return !isNaN(d.getTime()) && d < new Date();
+}
+function diasEnTaller(m){
+  if(!m || !m.ingresoAt) return null;
+  const ini = toISO(new Date(m.ingresoAt));
+  const fin = m.entregadoAt ? toISO(new Date(m.entregadoAt)) : hoyISO();
+  return diasEntreFechas(ini, fin);
+}
+function mantenimientosDe(veh){ return STORE.mantenimientos.filter(m=>m.unidad===veh); }
+function mantActivoDe(veh){
+  return mantenimientosDe(veh).filter(m=>m.estatus!=='Entregado')
+    .sort((a,b)=>((a.fecha||'')+(a.hora||'')).localeCompare((b.fecha||'')+(b.hora||'')))[0] || null;
+}
+function mantDeIncidencia(incId){
+  return STORE.mantenimientos.filter(m=>m.incId===incId)
+    .sort((a,b)=>((b.fecha||'')+(b.hora||'')).localeCompare((a.fecha||'')+(a.hora||'')));
+}
+function incRefTxt(incId){
+  if(!incId) return '';
+  const i = STORE.incidencias.find(x=>x.id===incId);
+  return i ? `${fFechaMx(i.fecha)} · ${i.tipo}` : 'Incidencia eliminada';
+}
+function mtTag(m){
+  const late = mtAtrasado(m);
+  return `<span class="mt-tag ${MT_CLASS[m.estatus]||'mt-prog'}${late?' mt-late':''}" title="${late?'Programado con fecha y hora vencidas sin ingreso':escapa(m.estatus)}">${late?'Atrasado':escapa(m.estatus)}</span>`;
+}
+function eventosMantenimiento(){ return STORE.mantenimientos.filter(m=>m && m.fecha); }
+
+/* --- Piezas del calendario --- */
+function wkMantHtml(m){
+  const late = mtAtrasado(m);
+  return `<div class="wk-mant ${MT_CLASS[m.estatus]||'mt-prog'}${late?' mt-late':''}" onclick="editarMantenimiento('${m.id}')" title="Clic para abrir el mantenimiento">
+      <div class="wm-top">🔧 ${escapa(m.hora||'--:--')} · ${escapa(m.unidad)}</div>
+      <div class="wm-tall">${escapa(m.taller||'')}</div>
+      <div class="wm-st">${late?'Atrasado':escapa(m.estatus)}${m.tipo?' · '+escapa(m.tipo):''}</div>
+    </div>`;
+}
+function mantChipHtml(m){
+  const late = mtAtrasado(m);
+  return `<span class="mant-chip ${MT_CLASS[m.estatus]||'mt-prog'}${late?' mt-late':''}" onclick="editarMantenimiento('${m.id}')"
+    title="${escapa(m.unidad)} · ${escapa(m.taller||'')} · ${escapa(m.hora||'')} · ${late?'ATRASADO':escapa(m.estatus)}">🔧 ${escapa(m.hora||'')} ${escapa(m.unidad)}</span>`;
+}
+
+/* --- Catálogo de talleres --- */
+function talleresConocidos(){
+  const set = new Set();
+  Object.values(STORE.catalogoTalleres||{}).forEach(t=>{ const n = normalizaNombre(t && (t.nombre||t)); if(n) set.add(n); });
+  return [...set].sort((a,b)=>a.localeCompare(b,'es'));
+}
+const enCatalogo = nombre => talleresConocidos().includes(normalizaNombre(nombre));
+function pintaDatalistTalleres(){
+  $('#dlTalleres').innerHTML = talleresConocidos().map(t=>`<option value="${escapa(t)}"></option>`).join('');
+}
+function renderCatalogoTalleres(){
+  const el = $('#catTalleres'); if(!el) return;
+  const ent = Object.entries(STORE.catalogoTalleres||{})
+    .map(([k,v])=>({k, n: normalizaNombre(v && (v.nombre||v))}))
+    .filter(x=>x.n).sort((a,b)=>a.n.localeCompare(b.n,'es'));
+  if(!ent.length){
+    el.innerHTML = '<div class="tasks-empty">Sin talleres en el catálogo. Se agregan automáticamente al guardar un mantenimiento.</div>';
+    return;
+  }
+  el.innerHTML = `<div class="tasks-wrap" style="padding:4px 12px;max-height:220px;overflow:auto">${ent.map(x=>{
+    const usos = STORE.mantenimientos.filter(m=>normalizaNombre(m.taller)===x.n).length;
+    return `<div class="cat-row"><span class="n">${escapa(x.n)}</span><span class="u">${usos} registro(s)</span>
+      <button class="t-del" title="Quitar del catálogo" onclick="quitarTallerCatalogo('${x.k}')">×</button></div>`;
+  }).join('')}</div>`;
+}
+window.quitarTallerCatalogo = async function(k){
+  if(session.rol!=='admin') return;
+  const v = (STORE.catalogoTalleres||{})[k];
+  const n = normalizaNombre(v && (v.nombre||v));
+  if(!confirm(`¿Quitar "${n}" del catálogo de talleres?\nLos mantenimientos ya registrados no se modifican.`)) return;
+  const ok = await fbBorraCatalogoTaller(k);
+  if(ok){ await logChange('—','BAJA_CAT_TALLER','catalogoTalleres', n, ''); toast(`Taller "${n}" quitado del catálogo.`,'warn'); }
+};
+
+/* --- Validación --- */
+function validaMantenimiento(m){
+  const errs = {};
+  if(!m.taller || !RX.taller.test(m.taller)) errs.mtTaller = 'Capture el nombre del taller (2-60 caracteres, sin < ni >).';
+  if(!m.fecha || isNaN(new Date(m.fecha+'T00:00:00').getTime())) errs.mtFecha = 'Seleccione una fecha válida.';
+  if(!m.hora || !RX.hora.test(m.hora)) errs.mtHora = 'Capture una hora válida (HH:MM).';
+  if(m.notas && !RX.notas.test(m.notas)) errs.mtNotas = 'No se permiten los caracteres < ni >.';
+  return errs;
+}
+function accionEstatusMant(antes, despues){
+  if((MT_RANK[despues]??0) < (MT_RANK[antes]??0)) return 'MANT_REVERTIDO';
+  return despues==='Entregado' ? 'MANT_ENTREGADO' : despues==='Ingreso' ? 'MANT_INGRESO' : 'EDIT_MANT';
+}
+
+/* --- Modal --- */
+window.abrirModalMant = function(veh, mantId=null, incId=null){
+  if(!(session.rol==='admin' || session.rol==='auxiliar')) return;
+  clearErrs();
+  const m = mantId ? STORE.mantenimientos.find(x=>x.id===mantId) : null;
+  if(mantId && !m){ toast('Mantenimiento no encontrado.','err'); return; }
+  const unidad = m ? m.unidad : veh;
+  const u = STORE.unidades.find(x=>x.veh===unidad);
+  if(!m && !u){ toast('Unidad no encontrada.','err'); return; }
+  editingMantId = m ? m.id : null;
+  mtCtx = { veh:unidad, incId: m ? (m.incId||null) : (incId||null) };
+  const ref = m || u || {};
+
+  $('#mtTitle').textContent = (m ? 'Editar mantenimiento · ' : 'Agregar mantenimiento · ') + unidad;
+  $('#mtUnidad').value = unidad;
+  $('#mtPlacas').value = ref.placas || '—';
+  $('#mtZona').value   = ref.zona   || '—';
+  $('#mtDepto').value  = ref.depto  || '—';
+  $('#mtChofer').value = ref.chofer || '—';
+  const km = u ? kmRestantes(u) : null;
+  $('#mtKm').value = km===null ? 'Sin captura de kilometraje'
+    : (km<0 ? `VENCIDO por ${fmt(Math.abs(km))} km` : `${fmt(km)} km restantes`);
+  $('#mtKm').style.color = km===null?'var(--muted)':km<0?'var(--red)':km<=1500?'var(--orange)':'var(--green)';
+  $('#mtIncRef').value = mtCtx.incId ? incRefTxt(mtCtx.incId) : 'Sin incidencia vinculada';
+
+  $('#mtTaller').value = m ? (m.taller||'') : '';
+  $('#mtFecha').value  = m ? (m.fecha||hoyISO()) : hoyISO();
+  $('#mtHora').value   = m ? (m.hora||'09:00') : '09:00';
+  $('#mtTipo').value   = m ? (m.tipo||'Preventivo') : 'Preventivo';
+  $('#mtNotas').value  = m ? (m.notas||'') : '';
+
+  mtDraft = {};
+  const rank = m ? (MT_RANK[m.estatus]??0) : 0;
+  MT_ETAPAS.forEach((e,idx)=>{
+    if(m){
+      const on = idx<=rank;
+      mtDraft[e.k] = { on, at: on ? (m[e.campo+'At']||null) : null, por: on ? (m[e.campo+'Por']||null) : null };
+    } else {
+      mtDraft[e.k] = idx===0 ? { on:true, at:nowISO(), por:session.rol } : { on:false, at:null, por:null };
+    }
+  });
+  pintaDatalistTalleres();
+  renderEtapasMant();
+  $('#btnEliminarMant').classList.toggle('hidden', !m || session.rol!=='admin');
+  $('#modalMant').classList.add('open');
+};
+window.editarMantenimiento = function(id){ abrirModalMant(null, id); };
+
+function estatusDeDraft(){ return mtDraft.ent.on ? 'Entregado' : mtDraft.ing.on ? 'Ingreso' : 'Programado'; }
+
+function renderEtapasMant(){
+  if(!mtDraft) return;
+  $('#mtSteps').innerHTML = MT_ETAPAS.map(e=>{
+    const st = mtDraft[e.k];
+    const sello = st.on ? (st.at ? `${fechaCorta(st.at)} · ${escapa(st.por||'—')}` : 'Registrado') : 'Sin registrar';
+    return `<div class="mt-step ${e.cls}${st.on?' on':''}" data-mtstep="${e.k}" role="checkbox" aria-checked="${st.on}" tabindex="0">
+        <span class="chk${st.on?' on':''}">${st.on?'✓':''}</span>
+        <div><b>${e.label}</b><small>${sello}</small></div>
+      </div>`;
+  }).join('');
+  $('#mtSteps').querySelectorAll('[data-mtstep]').forEach(el=>{
+    el.onclick = ()=>toggleEtapaMant(el.dataset.mtstep);
+    el.onkeydown = ev=>{ if(ev.key===' '||ev.key==='Enter'){ ev.preventDefault(); toggleEtapaMant(el.dataset.mtstep); } };
+  });
+  $('#mtEstatusTxt').innerHTML = 'Estatus resultante: ' +
+    mtTag({ estatus:estatusDeDraft(), fecha:$('#mtFecha').value, hora:$('#mtHora').value });
+}
+
+function toggleEtapaMant(k){
+  const idx = MT_ETAPAS.findIndex(e=>e.k===k);
+  if(idx<0 || !mtDraft) return;
+  if(mtDraft[k].on){
+    if(k==='prog'){ toast('Todo mantenimiento conserva la etapa “Programado”.','warn'); return; }
+    for(let i=idx;i<MT_ETAPAS.length;i++) mtDraft[MT_ETAPAS[i].k] = { on:false, at:null, por:null };
+  } else {
+    for(let i=0;i<=idx;i++){
+      const kk = MT_ETAPAS[i].k;
+      if(!mtDraft[kk].on) mtDraft[kk] = { on:true, at:nowISO(), por:session.rol };
+    }
+  }
+  renderEtapasMant();
+}
+
+/* Al ingresar a taller / entregar, ofrece sincronizar el estatus operativo de la unidad */
+async function sincronizaEstatusUnidad(veh, antes, despues){
+  if(!veh || antes===despues) return;
+  const u = STORE.unidades.find(x=>x.veh===veh); if(!u) return;
+  let destino = null, msg = '';
+  if(despues==='Ingreso' && u.estatus!=='TALLER'){
+    destino = 'TALLER';
+    msg = `La unidad ${veh} ingresó a taller.\n\n¿Cambiar su estatus operativo de ${u.estatus} a TALLER?`;
+  } else if(despues==='Entregado' && u.estatus==='TALLER'){
+    destino = 'CIRCULACION';
+    msg = `El taller entregó la unidad ${veh}.\n\n¿Regresar su estatus operativo de TALLER a CIRCULACION?`;
+  }
+  if(!destino || !confirm(msg)) return;
+  const ok = await fbWriteUnidad({ ...u, estatus:destino, updatedAt:nowISO() });
+  if(ok){ await logChange(veh,'EDIT','estatus',u.estatus,destino); toast(`Estatus de ${veh} actualizado a ${destino}.`); }
+}
+
+async function guardarMantenimiento(){
+  if(!(session.rol==='admin' || session.rol==='auxiliar')) return;
+  clearErrs();
+  const m = {
+    taller: normalizaNombre($('#mtTaller').value),
+    fecha:  $('#mtFecha').value,
+    hora:   ($('#mtHora').value||'').slice(0,5),
+    tipo:   $('#mtTipo').value,
+    notas:  $('#mtNotas').value.trim()
+  };
+  const errs = validaMantenimiento(m);
+  if(Object.keys(errs).length){
+    Object.entries(errs).forEach(([k,v])=>setErr(k,v));
+    toast('Corrija los campos marcados.','err');
+    return;
+  }
+  const veh = mtCtx.veh;
+  const dup = STORE.mantenimientos.find(x=>x.id!==editingMantId && x.unidad===veh && x.fecha===m.fecha && x.estatus!=='Entregado');
+  if(dup && !confirm(`La unidad ${veh} ya tiene un mantenimiento activo el ${fFechaMx(m.fecha)} a las ${dup.hora||'—'} en ${dup.taller||'—'}.\n\n¿Registrar de todos modos?`)) return;
+
+  m.estatus = estatusDeDraft();
+  MT_ETAPAS.forEach(e=>{
+    const st = mtDraft[e.k];
+    m[e.campo+'At']  = st.on ? (st.at  || nowISO())   : null;
+    m[e.campo+'Por'] = st.on ? (st.por || session.rol) : null;
+  });
+
+  const btn = $('#btnGuardarMant');
+  btn.disabled = true;
+  try{
+    let estatusAntes = 'Programado', ok = false;
+    if(editingMantId){
+      const orig = STORE.mantenimientos.find(x=>x.id===editingMantId);
+      if(!orig){ toast('Mantenimiento no encontrado.','err'); return; }
+      estatusAntes = orig.estatus;
+      ok = await fbWriteMantenimiento({ ...orig, ...m, updatedAt:nowISO() });
+      if(ok){
+        for(const k of ['taller','fecha','hora','tipo','notas']){
+          if(String(orig[k]??'') !== String(m[k]??'')) await logChange(orig.unidad,'EDIT_MANT','mant.'+k, orig[k], m[k]);
+        }
+        if(orig.estatus!==m.estatus) await logChange(orig.unidad, accionEstatusMant(orig.estatus, m.estatus), 'mant.estatus', orig.estatus, m.estatus);
+      }
+    } else {
+      const u = STORE.unidades.find(x=>x.veh===veh) || {};
+      const nuevo = {
+        id: uid(), unidad: veh,
+        placas: u.placas||'', zona: u.zona||'', depto: u.depto||'', chofer: u.chofer||'',
+        kmActualAlProgramar: (u.kmActual===undefined || u.kmActual===null) ? null : u.kmActual,
+        incId: mtCtx.incId || null,
+        ...m,
+        createdBy: session.rol, createdAt: nowISO(), updatedAt: nowISO()
+      };
+      ok = await fbWriteMantenimiento(nuevo);
+      if(ok){
+        await logChange(veh,'ALTA_MANT', m.taller, '', `${fFechaMx(m.fecha)} ${m.hora} · ${m.tipo} · ${m.estatus}`);
+        if(m.estatus!=='Programado') await logChange(veh, accionEstatusMant('Programado', m.estatus), 'mant.estatus', 'Programado', m.estatus);
+      }
+    }
+    if(!ok) return;
+    let catTxt = '';
+    if(!enCatalogo(m.taller) && await fbGuardaCatalogoTaller(m.taller)) catTxt = ' · taller agregado al catálogo';
+    toast(`${editingMantId?'Mantenimiento actualizado':'Mantenimiento registrado'} · ${veh} · ${fFechaMx(m.fecha)} ${m.hora} · ${m.estatus}${catTxt}.`);
+    cerrarModal('modalMant');
+    await sincronizaEstatusUnidad(veh, estatusAntes, m.estatus);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function eliminarMantenimiento(){
+  if(!editingMantId || session.rol!=='admin') return;
+  const m = STORE.mantenimientos.find(x=>x.id===editingMantId);
+  if(!m) return;
+  if(!confirm(`¿Eliminar el mantenimiento de ${m.unidad} en ${m.taller} (${fFechaMx(m.fecha)} ${m.hora})?\nEsta acción no se puede deshacer.`)) return;
+  const ok = await fbDeleteMantenimiento(m.id);
+  if(ok){ await logChange(m.unidad,'BAJA_MANT', m.taller, `${fFechaMx(m.fecha)} ${m.hora} · ${m.estatus}`, ''); toast('Mantenimiento eliminado.','warn'); }
+  cerrarModal('modalMant');
+}
+
+/* Avance rápido desde el listado: Programado → Ingreso → Entregado */
+window.avanzarMant = async function(id){
+  if(!(session.rol==='admin' || session.rol==='auxiliar')) return;
+  const m = STORE.mantenimientos.find(x=>x.id===id); if(!m) return;
+  const sig = m.estatus==='Programado' ? 'Ingreso' : m.estatus==='Ingreso' ? 'Entregado' : null;
+  if(!sig) return;
+  if(!confirm(`¿Registrar "${sig}" para ${m.unidad} en ${m.taller}?\nSe registrará la fecha y hora actuales.`)) return;
+  const ahora = nowISO();
+  const upd = { ...m, estatus:sig, updatedAt:ahora };
+  if(sig==='Ingreso'){ upd.ingresoAt = ahora; upd.ingresoPor = session.rol; }
+  else {
+    if(!upd.ingresoAt){ upd.ingresoAt = ahora; upd.ingresoPor = session.rol; }
+    upd.entregadoAt = ahora; upd.entregadoPor = session.rol;
+  }
+  const ok = await fbWriteMantenimiento(upd);
+  if(ok){
+    await logChange(m.unidad, accionEstatusMant(m.estatus, sig), 'mant.estatus', m.estatus, sig);
+    toast(`${m.unidad} · ${sig==='Ingreso'?'ingreso a taller registrado':'entrega registrada'}.`);
+    await sincronizaEstatusUnidad(m.unidad, m.estatus, sig);
+  }
+};
+
+window.filtrarMantPor = function(veh){
+  state.mantFiltroUnidad = veh;
+  state.mantTab = 'todos';
+  $$('.tab[data-mant]').forEach(t=>t.classList.toggle('active', t.dataset.mant==='todos'));
+  renderMantenimientos();
+  toast(`Filtro aplicado: mantenimientos de ${veh}. Use "Restablecer" para limpiar.`);
+  $('#cardMant').scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+/* --- Listado independiente --- */
+function listaMantVista(){
+  const v = state.mantTab || 'activos';
+  let l = [...STORE.mantenimientos];
+  if(v==='activos')   l = l.filter(m=>m.estatus!=='Entregado');
+  else if(v==='prog') l = l.filter(m=>m.estatus==='Programado');
+  else if(v==='ing')  l = l.filter(m=>m.estatus==='Ingreso');
+  else if(v==='ent')  l = l.filter(m=>m.estatus==='Entregado');
+  if(state.mantFiltroUnidad) l = l.filter(m=>m.unidad===state.mantFiltroUnidad);
+  const clave = m => (m.fecha||'9999-99-99')+' '+(m.hora||'99:99');
+  l.sort((a,b)=>{
+    const ea = a.estatus==='Entregado'?1:0, eb = b.estatus==='Entregado'?1:0;
+    if(ea!==eb) return ea-eb;
+    if(ea) return (b.entregadoAt||clave(b)).localeCompare(a.entregadoAt||clave(a));
+    return clave(a).localeCompare(clave(b));
+  });
+  return l;
+}
+
+function renderMantenimientos(){
+  const body = $('#mantBody'); if(!body) return;
+  const esEditor = session.rol==='admin' || session.rol==='auxiliar';
+  const todos = STORE.mantenimientos;
+  const nProg = todos.filter(m=>m.estatus==='Programado').length;
+  const nIng  = todos.filter(m=>m.estatus==='Ingreso').length;
+  const nEnt  = todos.filter(m=>m.estatus==='Entregado').length;
+  const nLate = todos.filter(mtAtrasado).length;
+  $('#mantBadge').innerHTML =
+    `<b style="color:#1565c0">${nProg}</b> programados · <b style="color:#a37d00">${nIng}</b> en taller · <b style="color:var(--green)">${nEnt}</b> entregados`+
+    (nLate?` · <b style="color:var(--red)">${nLate}</b> atrasados`:'')+
+    (state.mantFiltroUnidad?` · filtro: <b>${escapa(state.mantFiltroUnidad)}</b>`:'');
+
+  const lista = listaMantVista();
+  if(!lista.length){
+    const msgs = {
+      activos:'Sin mantenimientos activos. Prográmelos con “🔧 Agregar mantenimiento” desde Incidencias Vehiculares o desde el detalle de la unidad.',
+      prog:'Sin mantenimientos programados pendientes de ingreso.',
+      ing:'No hay unidades en taller por mantenimiento.',
+      ent:'Sin mantenimientos entregados.',
+      todos:'Sin mantenimientos registrados.'
+    };
+    body.innerHTML = `<div class="pres-empty">${msgs[state.mantTab]||msgs.todos}${state.mantFiltroUnidad?`<br>Filtro activo: ${escapa(state.mantFiltroUnidad)}.`:''}</div>`;
+    return;
+  }
+  body.innerHTML = `
+    <div class="tablewrap" style="max-height:400px">
+      <table><thead><tr>
+        <th>ESTATUS</th><th>FECHA</th><th>HORA</th><th>UNIDAD</th><th>PLACAS</th><th>TALLER</th><th>TIPO</th>
+        <th>DÍAS EN TALLER</th><th>INCIDENCIA</th><th>OBSERVACIONES</th><th>ACCIONES</th>
+      </tr></thead><tbody>${lista.map(m=>{
+        const d = diasEnTaller(m);
+        const dCls = d===null?'':d<=3?'d-ok':d<=10?'d-mid':'d-long';
+        const incExiste = m.incId && STORE.incidencias.some(i=>i.id===m.incId);
+        const inc = !m.incId ? '<span style="color:var(--muted)">—</span>'
+          : (esEditor && incExiste
+              ? `<a href="javascript:void(0)" onclick="editarIncidencia('${m.incId}')" style="color:var(--accent)">${escapa(incRefTxt(m.incId))} ↗</a>`
+              : escapa(incRefTxt(m.incId)));
+        const notas = m.notas||'';
+        const notasC = notas.length>60 ? notas.slice(0,60)+'…' : (notas||'—');
+        const sig = m.estatus==='Programado' ? '▶ Ingresó' : m.estatus==='Ingreso' ? '✔ Entregado' : '';
+        return `<tr${m.estatus==='Entregado'?' style="opacity:.82"':''}>
+          <td>${mtTag(m)}</td>
+          <td>${fFechaMx(m.fecha)}</td>
+          <td style="font-variant-numeric:tabular-nums">${escapa(m.hora||'—')}</td>
+          <td><b>${escapa(m.unidad)}</b></td>
+          <td>${escapa(m.placas||'—')}</td>
+          <td>${escapa(m.taller||'—')}</td>
+          <td>${escapa(m.tipo||'—')}</td>
+          <td>${d===null?'<span style="color:var(--muted)">—</span>':`<span class="dias-badge ${dCls}">${d} ${d===1?'día':'días'}</span>`}</td>
+          <td>${inc}</td>
+          <td title="${escapa(notas)}">${escapa(notasC)}</td>
+          <td style="white-space:nowrap">${esEditor
+            ? `<button class="btn" style="padding:3px 9px;font-size:11px" onclick="editarMantenimiento('${m.id}')">Editar</button>`+
+              (sig?` <button class="btn ${m.estatus==='Ingreso'?'btn-success':'btn-primary'}" style="padding:3px 9px;font-size:11px" onclick="avanzarMant('${m.id}')">${sig}</button>`:'')
+            : '<span style="color:var(--muted)">—</span>'}</td>
+        </tr>`;
+      }).join('')}</tbody></table>
+    </div>
+    <div class="legend-note">
+      <b>Código de color:</b> <span class="mt-tag mt-prog">Programado</span> <span class="mt-tag mt-ing">Ingreso</span>
+      <span class="mt-tag mt-ent">Entregado</span> <span class="mt-tag mt-prog mt-late">Atrasado</span> = programado con fecha y hora vencidas sin ingreso a taller.
+      Los días en taller se cuentan desde el registro de ingreso hasta la entrega (o hasta hoy).
+    </div>`;
+}
+
+/* --- Impresión del listado (pestaña activa) --- */
+function imprimirMantenimientos(){
+  const lista = listaMantVista();
+  const stamp = new Date().toLocaleString('es-MX');
+  const todos = STORE.mantenimientos;
+  const n = st => todos.filter(m=>m.estatus===st).length;
+  const nLate = todos.filter(mtAtrasado).length;
+  const COL = {Programado:['#1565c0','#ffffff'], Ingreso:['#f4c20d','#3d2e00'], Entregado:['#0f7a4e','#ffffff']};
+  const filtro = MT_TAB_TXT[state.mantTab||'activos'] + (state.mantFiltroUnidad?` · Unidad: ${state.mantFiltroUnidad}`:'');
+  const filas = lista.map(m=>{
+    const [bg,fg] = COL[m.estatus] || COL.Programado;
+    const late = mtAtrasado(m), d = diasEnTaller(m);
+    return `<tr>
+      <td><span class="st" style="background:${bg};color:${fg};${late?'outline:1.5px dashed #b81f30;outline-offset:1px':''}">${late?'ATRASADO':escapa(m.estatus)}</span></td>
+      <td>${fFechaMx(m.fecha)}</td><td>${escapa(m.hora||'')}</td><td><b>${escapa(m.unidad)}</b></td><td>${escapa(m.placas||'')}</td>
+      <td>${escapa(m.taller||'')}</td><td>${escapa(m.tipo||'')}</td>
+      <td>${m.ingresoAt?fechaCorta(m.ingresoAt):'—'}</td><td>${m.entregadoAt?fechaCorta(m.entregadoAt):'—'}</td>
+      <td class="n">${d===null?'—':d}</td><td>${escapa(incRefTxt(m.incId)||'—')}</td><td>${escapa(m.notas||'')}</td>
+    </tr>`;
+  }).join('');
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>Programa de Mantenimientos Vehiculares</title>
+<style>
+@page{size:A4 landscape;margin:12mm 10mm}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;color:#1a2233;font-size:9.5pt;margin:0;padding:0}
+.hdr{border-bottom:3px solid #1f4e79;padding-bottom:8px;margin-bottom:14px}
+h1{font-size:17pt;color:#1f4e79;margin:0 0 3px}
+.meta{font-size:8.5pt;color:#5a6a85;line-height:1.5}
+.resumen{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px}
+.rk{border:1px solid #c8d2e0;border-radius:5px;padding:7px 13px;min-width:110px;background:#f5f8fc;border-left-width:5px}
+.rk .l{font-size:7.5pt;color:#5a6a85;text-transform:uppercase;letter-spacing:.4px}
+.rk .v{font-size:15pt;font-weight:700;color:#1f4e79;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:8pt}
+thead{display:table-header-group}
+tr{page-break-inside:avoid}
+th{background:#1f4e79;color:#fff;padding:5px 6px;text-align:left;font-weight:600;font-size:7.5pt;text-transform:uppercase;letter-spacing:.3px}
+td{padding:4px 6px;border-bottom:1px solid #dfe6f0;vertical-align:top}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:nth-child(even){background:#f7fafd}
+.st{display:inline-block;padding:2px 8px;border-radius:10px;font-weight:700;font-size:7.5pt;white-space:nowrap}
+.vacio{font-size:9pt;color:#8a97ab;font-style:italic}
+.firmas{display:flex;gap:60px;justify-content:center;margin-top:46px;page-break-inside:avoid}
+.firmas div{text-align:center;font-size:8.5pt;min-width:230px}
+.firmas .ln{border-top:1px solid #1a2233;margin-bottom:5px}
+.firmas small{color:#5a6a85}
+.pie{margin-top:18px;padding-top:8px;border-top:1px solid #c8d2e0;font-size:7.5pt;color:#5a6a85;text-align:center}
+@media print{.noprint{display:none}}
+.noprint{position:fixed;top:10px;right:10px;background:#1f4e79;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:11pt;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+</style></head><body>
+<button class="noprint" onclick="window.print()">Imprimir / Guardar como PDF</button>
+<div class="hdr">
+  <h1>Programa de Mantenimientos Vehiculares</h1>
+  <div class="meta">
+    KPI-AFI-01 · Coordinación de Activos Fijos y Control Vehicular<br>
+    Generado: ${stamp} · Perfil: ${(session.rol||'—').toUpperCase()} · Vista: ${escapa(filtro)} · ${lista.length} registro(s)
+  </div>
+</div>
+<div class="resumen">
+  <div class="rk" style="border-left-color:#1565c0"><div class="l">Programados</div><div class="v">${n('Programado')}</div></div>
+  <div class="rk" style="border-left-color:#f4c20d"><div class="l">En taller</div><div class="v">${n('Ingreso')}</div></div>
+  <div class="rk" style="border-left-color:#0f7a4e"><div class="l">Entregados</div><div class="v">${n('Entregado')}</div></div>
+  <div class="rk" style="border-left-color:#b81f30"><div class="l">Atrasados</div><div class="v">${nLate}</div></div>
+</div>
+${lista.length ? `<table>
+  <thead><tr><th>Estatus</th><th>Fecha</th><th>Hora</th><th>Unidad</th><th>Placas</th><th>Taller</th><th>Tipo</th>
+  <th>Ingreso</th><th>Entrega</th><th>Días taller</th><th>Incidencia</th><th>Observaciones</th></tr></thead>
+  <tbody>${filas}</tbody></table>` : '<p class="vacio">Sin registros en la vista seleccionada.</p>'}
+<div class="firmas">
+  <div><div class="ln"></div>Elaboró<br><small>Coordinación de Activos Fijos y Control Vehicular</small></div>
+  <div><div class="ln"></div>Revisó<br><small>Nombre y firma</small></div>
+</div>
+<div class="pie">Documento generado automáticamente por el sistema de Control Vehicular · Uso interno</div>
+</body></html>`;
+  const w = window.open('', '_blank');
+  if(!w){ toast('El navegador bloqueó la ventana emergente. Habilite pop-ups para este sitio.','err'); return; }
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} }, 700);
+  toast('Listado abierto. Use “Guardar como PDF” en el diálogo de impresión si lo requiere.');
+}
 
 /* ============ COMBUSTIBLES ============ */
 const money = n => n==null||isNaN(n)?'—':'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -4313,13 +5012,24 @@ function datosReporte(){
     'FECHA': fechaCorta(b.ts), 'UNIDAD': b.unidad, 'ACCIÓN': b.accion,
     'CAMPO': b.campo, 'ANTES': b.antes, 'DESPUÉS': b.despues, 'ROL': b.rol
   }));
-  return {flot, inc, comb, bit, tar, asig};
+  const mant = [...STORE.mantenimientos]
+    .sort((a,b)=>((b.fecha||'')+(b.hora||'')).localeCompare((a.fecha||'')+(a.hora||'')))
+    .map(m=>({
+      'FECHA': m.fecha||'', 'HORA': m.hora||'', 'UNIDAD': m.unidad, 'PLACAS': m.placas||'',
+      'TALLER': m.taller||'', 'TIPO': m.tipo||'',
+      'ESTATUS': mtAtrasado(m) ? 'Programado (ATRASADO)' : (m.estatus||''),
+      'F. INGRESO': m.ingresoAt ? fechaCorta(m.ingresoAt) : '',
+      'F. ENTREGA': m.entregadoAt ? fechaCorta(m.entregadoAt) : '',
+      'DÍAS EN TALLER': diasEnTaller(m) ?? '',
+      'INCIDENCIA': incRefTxt(m.incId), 'OBSERVACIONES': m.notas||'', 'REGISTRÓ': m.createdBy||''
+    }));
+  return {flot, inc, comb, bit, tar, asig, mant};
 }
 
 function exportarExcel(){
   try{
     if(typeof XLSX==='undefined'){ toast('La librería de Excel no cargó. Verifique su conexión.','err'); return; }
-    const {flot, inc, comb, bit, tar, asig} = datosReporte();
+    const {flot, inc, comb, bit, tar, asig, mant} = datosReporte();
     const wb = XLSX.utils.book_new();
     const stamp = new Date().toLocaleString('es-MX');
 
@@ -4336,6 +5046,7 @@ function exportarExcel(){
     addSheet('Flotilla',     'Detalle de flotilla · estatus y servicio', flot);
     addSheet('Incidencias',  'Incidencias vehiculares registradas',      inc);
     addSheet('Préstamos','Checklist de préstamo y devolución',      asig);
+    addSheet('Mantenimientos','Mantenimientos programados · agenda de taller por unidad', mant);
     addSheet('Combustibles', 'Consumo de combustible por período',       comb);
     if(session.rol!=='gerencia') addSheet('Tareas','Tareas de seguimiento por incidencia', tar);
     if(session.rol==='admin') addSheet('Bitácora','Trazabilidad de cambios (últimos 400)', bit);
@@ -4346,7 +5057,7 @@ function exportarExcel(){
 }
 
 function exportarPDF(){
-  const {flot, inc, comb, bit, tar, asig} = datosReporte();
+  const {flot, inc, comb, bit, tar, asig, mant} = datosReporte();
   const stamp = new Date().toLocaleString('es-MX');
   const esc = v => String(v??'').replace(/[<>&]/g, m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]));
 
@@ -4373,6 +5084,7 @@ function exportarPDF(){
 
   const cnt = s => DATA.filter(r=>r.estatus===s).length;
   const pendInc = STORE.incidencias.filter(i=>i.estatus!=='Resuelto').length;
+  const mantActN = STORE.mantenimientos.filter(m=>m.estatus!=='Entregado').length;
 
   const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
 <title>${TITULO_REPORTE}</title>
@@ -4417,10 +5129,12 @@ tbody tr:nth-child(even){background:#f7fafd}
   <div class="rk"><div class="l">Resguardo</div><div class="v">${cnt('RESGUARDO')}</div></div>
   <div class="rk"><div class="l">Siniestrado</div><div class="v">${cnt('SINIESTRADO')}</div></div>
   <div class="rk"><div class="l">Incid. abiertas</div><div class="v">${pendInc}</div></div>
+  <div class="rk"><div class="l">Mant. activos</div><div class="v">${mantActN}</div></div>
 </div>
 ${tabla('Detalle de Flotilla', flot)}
 ${tabla('Incidencias Vehiculares', inc)}
 ${tabla('Préstamos y Devoluciones', asig, 'Checklist PHVA de préstamo y devolución de unidades.')}
+${tabla('Mantenimientos Programados', mant, 'Estatus: Programado → Ingreso → Entregado. Días en taller desde el ingreso hasta la entrega o la fecha de emisión.')}
 ${tabla('Consumo de Combustible por Período', comb, 'KM/L = Kilómetros recorridos ÷ Litros consumidos.')}
 ${session.rol!=='gerencia'?tabla('Tareas de Seguimiento', tar, 'Ordenadas por fecha compromiso. Las tareas sin fecha aparecen al final.'):''}
 ${session.rol==='admin'?tabla('Bitácora de Cambios', bit, 'Últimos 400 movimientos registrados.'):''}
@@ -4476,6 +5190,7 @@ function refrescarTodo(rebuild=true){
   pie('cEstatus', ec, 'estatus');
   barDepto(); barServicio(); renderTable();
   renderIncidencias(); renderBitacora(); renderFleetDetail(); renderCombustibles(); renderCalendario(); renderPrestamos();
+  renderMantenimientos(); renderCatalogoTalleres();
   const upd = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : hoyStr();
   $('#updateBadge').textContent = 'Actualizado: '+upd;
 }
@@ -4698,6 +5413,8 @@ function abrirConfig(){
   $('#s_incs').textContent = STORE.incidencias.length;
   $('#s_comb').textContent = STORE.combustibles.length;
   $('#s_asig').textContent = `${STORE.asignaciones.length} (${STORE.asignaciones.filter(a=>a.estadoRegistro==='Abierta').length} abiertas)`;
+  $('#s_mant').textContent = `${STORE.mantenimientos.length} (${STORE.mantenimientos.filter(m=>m.estatus!=='Entregado').length} activos)`;
+  renderCatalogoTalleres();
   $('#s_updated').textContent = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : '—';
   if(!$('#zipDesde').value){ $('#zipDesde').value = hoyISO(); $('#zipHasta').value = hoyISO(); }
   pintaResumenEvidencias();
@@ -4719,20 +5436,20 @@ async function importarJSON(file){
     try{
       const d = JSON.parse(e.target.result);
       if(!d.unidades || !Array.isArray(d.unidades)) throw new Error('Formato inválido: falta "unidades".');
-      if(!confirm(`El archivo contiene ${d.unidades.length} unidades y ${(d.incidencias||[]).length} incidencias. ¿REEMPLAZAR todos los datos actuales en Firebase? Esta acción no se puede deshacer.`)) return;
+      if(!confirm(`El archivo contiene ${d.unidades.length} unidades, ${(d.incidencias||[]).length} incidencias y ${(d.mantenimientos||[]).length} mantenimientos. ¿REEMPLAZAR todos los datos actuales en Firebase? Esta acción no se puede deshacer.`)) return;
+      // Firebase rechaza un update() que mezcla una ruta y sus descendientes:
+      // cada colección se escribe completa como objeto { id: registro }.
+      const aObj = arr => { const o = {}; (arr||[]).forEach(x=>{ if(x && x.id) o[x.id] = x; }); return Object.keys(o).length ? o : null; };
       const updates = {};
-      updates[`${FB_ROOT}/unidades`] = null;
-      updates[`${FB_ROOT}/incidencias`] = null;
-      updates[`${FB_ROOT}/combustibles`] = null;
-      updates[`${FB_ROOT}/asignaciones`] = null;
-      updates[`${FB_ROOT}/evidencias`] = null;
-      d.unidades.forEach(u=>{ if(u.id) updates[`${FB_ROOT}/unidades/${u.id}`] = u; });
-      (d.incidencias||[]).forEach(i=>{ if(i.id) updates[`${FB_ROOT}/incidencias/${i.id}`] = i; });
-      (d.combustibles||[]).forEach(c=>{ if(c.id) updates[`${FB_ROOT}/combustibles/${c.id}`] = c; });
-      (d.asignaciones||[]).forEach(a=>{ if(a.id) updates[`${FB_ROOT}/asignaciones/${a.id}`] = a; });
-      if(d.evidencias) updates[`${FB_ROOT}/evidencias`] = d.evidencias;
+      updates[`${FB_ROOT}/unidades`]       = aObj(d.unidades);
+      updates[`${FB_ROOT}/incidencias`]    = aObj(d.incidencias);
+      updates[`${FB_ROOT}/combustibles`]   = aObj(d.combustibles);
+      updates[`${FB_ROOT}/asignaciones`]   = aObj(d.asignaciones);
+      updates[`${FB_ROOT}/mantenimientos`] = aObj(d.mantenimientos);
+      updates[`${FB_ROOT}/evidencias`]     = d.evidencias || null;
+      if(d.catalogoTalleres) updates[`${FB_ROOT}/catalogoTalleres`] = d.catalogoTalleres;
       if(d.choferesExtra) updates[`${FB_ROOT}/choferesExtra`] = d.choferesExtra;
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:2.9 };
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:3.0 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
@@ -4749,7 +5466,7 @@ async function purgarBitacora(){
 }
 async function resetTodo(){
   if(!confirm('⚠ ¿BORRAR TODAS las unidades, incidencias y bitácora en Firebase? Esta acción no se puede deshacer.')) return;
-  if(!confirm('Confirmación final: se borrarán '+STORE.unidades.length+' unidades, '+STORE.incidencias.length+' incidencias, '+STORE.combustibles.length+' períodos de combustible y '+STORE.asignaciones.length+' checklists. ¿Continuar?')) return;
+  if(!confirm('Confirmación final: se borrarán '+STORE.unidades.length+' unidades, '+STORE.incidencias.length+' incidencias, '+STORE.combustibles.length+' períodos de combustible y '+STORE.asignaciones.length+' checklists y '+STORE.mantenimientos.length+' mantenimientos. ¿Continuar?')) return;
   await fbDb.ref(FB_ROOT).remove();
   toast('Base de datos vacía. Use "Cargar datos iniciales" para reiniciar.', 'warn');
   cerrarModal('modalConfig');
@@ -4778,7 +5495,7 @@ $('#fZona').onchange    = e=>{state.zona=e.target.value; state.depto=''; syncSel
 $('#fEstatus').onchange = e=>{state.estatus=e.target.value; state.depto=''; syncSelects(); applyFilters();};
 $('#fDepto').onchange   = e=>{state.depto=e.target.value; syncSelects(); applyFilters();};
 $('#resetBtn').onclick  = ()=>{
-  state.zona=''; state.estatus=''; state.depto=''; state.selVeh=''; state.incFiltroUnidad=null;
+  state.zona=''; state.estatus=''; state.depto=''; state.selVeh=''; state.incFiltroUnidad=null; state.mantFiltroUnidad=null;
   $('#fleetDetail').classList.remove('open');
   syncSelects(); applyFilters();
 };
@@ -4796,12 +5513,14 @@ $('#btnActualizar').onclick = async ()=>{
     STORE.combustibles= d.combustibles? Object.values(d.combustibles): [];
     STORE.asignaciones = d.asignaciones ? Object.values(d.asignaciones) : [];
     STORE.choferesExtra= d.choferesExtra? Object.values(d.choferesExtra): [];
+    STORE.mantenimientos = d.mantenimientos ? Object.values(d.mantenimientos) : [];
+    STORE.catalogoTalleres = d.catalogoTalleres || {};
     evidCache = {};
     STORE.bitacora    = d.bitacora    ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
     STORE.meta        = d.meta || STORE.meta;
     refrescarTodo();
     checkSeedBox();
-    toast(`Tablero actualizado · ${STORE.unidades.length} unidades · ${STORE.incidencias.length} incidencias · ${STORE.combustibles.length} períodos · ${STORE.asignaciones.length} checklists.`);
+    toast(`Tablero actualizado · ${STORE.unidades.length} unidades · ${STORE.incidencias.length} incidencias · ${STORE.combustibles.length} períodos · ${STORE.asignaciones.length} checklists · ${STORE.mantenimientos.length} mantenimientos.`);
   }catch(e){
     toast('No se pudo recargar desde Firebase: '+e.message,'err');
   }finally{
@@ -4894,6 +5613,19 @@ $('#btnEliminarUnidad').onclick = eliminarUnidad;
 // Incidencias
 $('#btnGuardarInc').onclick = guardarIncidencia;
 $('#btnEliminarInc').onclick = eliminarIncidencia;
+
+// Mantenimientos programados
+$('#btnGuardarMant').onclick  = guardarMantenimiento;
+$('#btnEliminarMant').onclick = eliminarMantenimiento;
+$('#btnImprimirMant').onclick = imprimirMantenimientos;
+document.addEventListener('change', e=>{ if((e.target.id==='mtFecha' || e.target.id==='mtHora') && mtDraft) renderEtapasMant(); });
+$$('.tab[data-mant]').forEach(t=>t.onclick=()=>{
+  $$('.tab[data-mant]').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  state.mantTab = t.dataset.mant;
+  state.mantFiltroUnidad = null;
+  renderMantenimientos();
+});
 
 // Tabs de préstamos
 $$('.tab[data-pres]').forEach(t=>t.onclick=()=>{
