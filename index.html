@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.1</title>
+<title>Control Vehicular · KPI-AFI-01 v3.2</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -333,6 +333,15 @@ tbody tr:hover{background:#d6e8fb}
 .mt-step.s-prog .chk.on{background:#1565c0;border-color:#1565c0;color:#fff}
 .mt-step.s-ing .chk.on{background:#f4c20d;border-color:#d4a106;color:#3d2e00}
 .mt-step.s-ent .chk.on{background:#0f7a4e;border-color:#0f7a4e;color:#fff}
+.mt-chk{width:16px;height:16px;cursor:pointer;accent-color:var(--accent);vertical-align:middle;margin:0}
+.mt-chk:disabled{cursor:not-allowed;opacity:.45}
+th.mt-chkcol,td.mt-chkcol{width:36px;text-align:center;padding-left:6px;padding-right:6px}
+tbody tr.mt-aut td{background:rgba(21,101,192,.07)}
+tbody tr.mt-aut:hover td{background:#d6e8fb}
+tfoot tr.mt-total td{position:sticky;bottom:0;z-index:2;background:#e3eefb;border-top:2px solid var(--accent);border-bottom:none;padding-top:9px;padding-bottom:9px}
+tfoot tr.mt-total .lbl{text-align:right;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.4px;font-size:11.5px}
+tfoot tr.mt-total .tot{color:var(--accent);font-weight:700;font-size:14.5px}
+tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0}
 .unit .mant-ico{position:absolute;top:3px;left:4px;font-size:9px;line-height:1;padding:2px 3px;border-radius:4px;border:1.5px solid #fff}
 .cat-row{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid var(--line);font-size:12.5px}
 .cat-row:last-child{border-bottom:none}
@@ -784,6 +793,16 @@ tbody tr:hover{background:#d6e8fb}
         <input type="text" id="mtTaller" list="dlTalleres" maxlength="60" autocomplete="off" placeholder="Escriba o elija un taller del catálogo">
         <datalist id="dlTalleres"></datalist>
         <div class="field-msg" id="e_mtTaller"></div>
+      </div>
+      <div>
+        <label>Folio (comparativo de proveedores)</label>
+        <input type="text" id="mtFolio" maxlength="40" autocomplete="off" placeholder="Ej. 60_CTCUN_01_TORNADO_01">
+        <div class="field-msg" id="e_mtFolio"></div>
+      </div>
+      <div>
+        <label>Monto del servicio (sin IVA)</label>
+        <input type="number" id="mtMonto" min="0" max="9999999.99" step="0.01" inputmode="decimal" placeholder="Ej. 3450.00">
+        <div class="field-msg" id="e_mtMonto"></div>
       </div>
       <div>
         <label>Fecha</label>
@@ -1309,7 +1328,7 @@ tbody tr:hover{background:#d6e8fb}
 
 <script>
 /* ==================================================================
-   TABLERO EJECUTIVO · CONTROL VEHICULAR · v3.1
+   TABLERO EJECUTIVO · CONTROL VEHICULAR · v3.2
    Coordinación de Activos Fijos y Control Vehicular
    Backend: Firebase Realtime Database (sincronización en tiempo real)
    ================================================================== */
@@ -1335,7 +1354,7 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:3.1 }, mantenimientos:[], catalogoTalleres:{} };
+let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:3.2 }, mantenimientos:[], catalogoTalleres:{} };
 let ALL=[], DATA=[];
 let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'', presTab:'vigentes', mantTab:'activos', mantFiltroUnidad:null };
 let session = { rol:null, loggedAt:null };
@@ -1379,6 +1398,7 @@ const RX = {
   idliga: /^[A-Za-z0-9_\-\/:.?=&#]{1,200}$/,
   notas:  /^[^<>]{0,500}$/s,
   taller: /^[^<>]{2,60}$/,
+  folio:  /^[^<>]{1,40}$/,
   hora:   /^([01]\d|2[0-3]):[0-5]\d$/
 };
 function clearErrs(){ $$('.field-msg').forEach(e=>e.textContent=''); $$('input,select,textarea').forEach(e=>e.classList.remove('err')); }
@@ -1521,7 +1541,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.1 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.2 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -3244,8 +3264,8 @@ async function exportacionDiariaZip(){
         u.kmActual,u.kmProximoServicio,kmRestantes(u)])
     ]));
     zip.file('06_Mantenimientos.csv', csv([
-      ['FECHA','HORA','UNIDAD','PLACAS','TALLER','TIPO','ESTATUS','F.INGRESO','F.ENTREGA','DÍAS EN TALLER','INCIDENCIA','OBSERVACIONES'],
-      ...mants.map(m=>[m.fecha,m.hora,m.unidad,m.placas,m.taller,m.tipo,
+      ['FECHA','HORA','UNIDAD','PLACAS','TALLER','FOLIO COMPARATIVO','TIPO','MONTO SIN IVA','AUTORIZADO','ESTATUS','F.INGRESO','F.ENTREGA','DÍAS EN TALLER','INCIDENCIA','OBSERVACIONES'],
+      ...mants.map(m=>[m.fecha,m.hora,m.unidad,m.placas,m.taller,m.folio||'',m.tipo,m.monto??'',m.autorizado?'Sí':'No',
         mtAtrasado(m)?'Programado (ATRASADO)':m.estatus,
         m.ingresoAt?fechaCorta(m.ingresoAt):'', m.entregadoAt?fechaCorta(m.entregadoAt):'',
         diasEnTaller(m)??'', incRefTxt(m.incId), m.notas])
@@ -4322,6 +4342,8 @@ function validaMantenimiento(m){
   if(!m.fecha || isNaN(new Date(m.fecha+'T00:00:00').getTime())) errs.mtFecha = 'Seleccione una fecha válida.';
   if(!m.hora || !RX.hora.test(m.hora)) errs.mtHora = 'Capture una hora válida (HH:MM).';
   if(m.notas && !RX.notas.test(m.notas)) errs.mtNotas = 'No se permiten los caracteres < ni >.';
+  if(m.folio && !RX.folio.test(m.folio)) errs.mtFolio = 'Folio inválido (máximo 40 caracteres, sin < ni >).';
+  if(m.monto!==null && (isNaN(m.monto) || m.monto<0 || m.monto>9999999.99)) errs.mtMonto = 'Capture un monto entre 0 y 9,999,999.99.';
   return errs;
 }
 function accionEstatusMant(antes, despues){
@@ -4355,6 +4377,8 @@ window.abrirModalMant = function(veh, mantId=null, incId=null){
   $('#mtIncRef').value = mtCtx.incId ? incRefTxt(mtCtx.incId) : 'Sin incidencia vinculada';
 
   $('#mtTaller').value = m ? (m.taller||'') : '';
+  $('#mtFolio').value  = m ? (m.folio||'') : '';
+  $('#mtMonto').value  = (m && m.monto!=null) ? Number(m.monto).toFixed(2) : '';
   $('#mtFecha').value  = m ? (m.fecha||hoyISO()) : hoyISO();
   $('#mtHora').value   = m ? (m.hora||'09:00') : '09:00';
   $('#mtTipo').value   = m ? (m.tipo||'Preventivo') : 'Preventivo';
@@ -4434,12 +4458,15 @@ async function guardarMantenimiento(){
   clearErrs();
   const m = {
     taller: normalizaNombre($('#mtTaller').value),
+    folio:  $('#mtFolio').value.replace(/\s+/g,' ').trim(),
+    monto:  $('#mtMonto').value==='' ? null : Math.round(parseFloat($('#mtMonto').value)*100)/100,
     fecha:  $('#mtFecha').value,
     hora:   ($('#mtHora').value||'').slice(0,5),
     tipo:   $('#mtTipo').value,
     notas:  $('#mtNotas').value.trim()
   };
   const errs = validaMantenimiento(m);
+  if($('#mtMonto').validity && $('#mtMonto').validity.badInput) errs.mtMonto = 'Capture un monto numérico válido (ej. 3450.00).';
   if(Object.keys(errs).length){
     Object.entries(errs).forEach(([k,v])=>setErr(k,v));
     toast('Corrija los campos marcados.','err');
@@ -4464,9 +4491,13 @@ async function guardarMantenimiento(){
       const orig = STORE.mantenimientos.find(x=>x.id===editingMantId);
       if(!orig){ toast('Mantenimiento no encontrado.','err'); return; }
       estatusAntes = orig.estatus;
-      ok = await fbWriteMantenimiento({ ...orig, ...m, updatedAt:nowISO() });
+      const upd = { ...orig, ...m, updatedAt:nowISO() };
+      const pierdeAut = upd.monto==null && !!orig.autorizado;
+      if(pierdeAut){ upd.autorizado = false; upd.autorizadoAt = null; upd.autorizadoPor = null; }
+      ok = await fbWriteMantenimiento(upd);
       if(ok){
-        for(const k of ['taller','fecha','hora','tipo','notas']){
+        if(pierdeAut) await logChange(orig.unidad,'MANT_NO_AUTORIZADO','mant.monto', money(orig.monto), 'Sin monto');
+        for(const k of ['taller','folio','monto','fecha','hora','tipo','notas']){
           if(String(orig[k]??'') !== String(m[k]??'')) await logChange(orig.unidad,'EDIT_MANT','mant.'+k, orig[k], m[k]);
         }
         if(orig.estatus!==m.estatus) await logChange(orig.unidad, accionEstatusMant(orig.estatus, m.estatus), 'mant.estatus', orig.estatus, m.estatus);
@@ -4478,6 +4509,7 @@ async function guardarMantenimiento(){
         placas: u.placas||'', zona: u.zona||'', depto: u.depto||'', chofer: u.chofer||'',
         kmActualAlProgramar: (u.kmActual===undefined || u.kmActual===null) ? null : u.kmActual,
         incId: mtCtx.incId || null,
+        autorizado: false,
         ...m,
         createdBy: session.rol, createdAt: nowISO(), updatedAt: nowISO()
       };
@@ -4530,6 +4562,60 @@ window.avanzarMant = async function(id){
   }
 };
 
+/* Casillas del listado: definen qué servicios integran el MONTO TOTAL AUTORIZADO.
+   La selección se guarda en Firebase (compartida por todos los perfiles) y queda en bitácora. */
+window.toggleAutorizadoMant = async function(id, el){
+  const m = STORE.mantenimientos.find(x=>x.id===id);
+  if(!m || !(session.rol==='admin' || session.rol==='auxiliar') || m.monto==null){ if(el) el.checked = !!(m && m.autorizado); return; }
+  const marcar = !!(el ? el.checked : !m.autorizado);
+  const ahora = nowISO();
+  try{
+    await fbDb.ref(`${FB_ROOT}/mantenimientos/${id}`).update({
+      autorizado: marcar, autorizadoAt: marcar ? ahora : null, autorizadoPor: marcar ? session.rol : null, updatedAt: ahora
+    });
+    await fbUpdateMeta();
+    await logChange(m.unidad, marcar?'MANT_AUTORIZADO':'MANT_NO_AUTORIZADO', 'mant.autorizado',
+      marcar ? '' : money(m.monto), marcar ? `${money(m.monto)}${m.folio?' · '+m.folio:''}` : '');
+  }catch(e){
+    toast('No se pudo actualizar la selección: '+e.message,'err');
+    if(el) el.checked = !marcar;
+  }
+};
+window.toggleAutorizadoTodos = async function(el){
+  if(!(session.rol==='admin' || session.rol==='auxiliar')){ renderMantenimientos(); return; }
+  const marcar = !!el.checked;
+  const cambiar = listaMantVista().filter(m=>m.monto!=null && !!m.autorizado!==marcar);
+  if(!cambiar.length){ renderMantenimientos(); return; }
+  const suma = cambiar.reduce((t,m)=>t+Number(m.monto||0),0);
+  if(!confirm(`${marcar?'¿Incluir':'¿Quitar'} ${cambiar.length} servicio(s) ${marcar?'en':'del'} monto total autorizado?\nImporte: ${money(suma)} sin IVA.`)){ renderMantenimientos(); return; }
+  const ahora = nowISO(), up = {};
+  cambiar.forEach(m=>{
+    const b = `${FB_ROOT}/mantenimientos/${m.id}`;
+    up[`${b}/autorizado`]    = marcar;
+    up[`${b}/autorizadoAt`]  = marcar ? ahora : null;
+    up[`${b}/autorizadoPor`] = marcar ? session.rol : null;
+    up[`${b}/updatedAt`]     = ahora;
+  });
+  try{
+    await fbDb.ref().update(up);
+    await fbUpdateMeta();
+    await logChange('—', marcar?'MANT_AUTORIZADO':'MANT_NO_AUTORIZADO', 'mant.autorizado', '',
+      `${cambiar.length} servicio(s) · ${money(suma)} · ${MT_TAB_TXT[state.mantTab||'activos']}`);
+    toast(`${cambiar.length} servicio(s) ${marcar?'incluidos en':'retirados del'} monto total autorizado.`);
+  }catch(e){ toast('No se pudo actualizar la selección: '+e.message,'err'); renderMantenimientos(); }
+};
+/* Totales de la vista activa */
+function totalesMantVista(lista){
+  const conMonto = lista.filter(m=>m.monto!=null && !isNaN(m.monto));
+  const sel = conMonto.filter(m=>m.autorizado);
+  return {
+    conMonto, sel,
+    sinMonto: lista.length - conMonto.length,
+    totalSel:   sel.reduce((t,m)=>t+Number(m.monto),0),
+    totalVista: conMonto.reduce((t,m)=>t+Number(m.monto),0)
+  };
+}
+
 window.filtrarMantPor = function(veh){
   state.mantFiltroUnidad = veh;
   state.mantTab = 'todos';
@@ -4572,6 +4658,7 @@ function renderMantenimientos(){
     (state.mantFiltroUnidad?` · filtro: <b>${escapa(state.mantFiltroUnidad)}</b>`:'');
 
   const lista = listaMantVista();
+  const tot = totalesMantVista(lista);
   if(!lista.length){
     const msgs = {
       activos:'Sin mantenimientos activos. Prográmelos con “🔧 Agregar mantenimiento” desde Incidencias Vehiculares o desde el detalle de la unidad.',
@@ -4586,7 +4673,11 @@ function renderMantenimientos(){
   body.innerHTML = `
     <div class="tablewrap" style="max-height:400px">
       <table><thead><tr>
-        <th>ESTATUS</th><th>FECHA</th><th>HORA</th><th>UNIDAD</th><th>PLACAS</th><th>TALLER</th><th>TIPO</th>
+        <th class="mt-chkcol" title="Seleccionar todos los servicios con monto de esta vista"><input type="checkbox" class="mt-chk" id="mtChkTodos"
+          ${esEditor && tot.conMonto.length ? '' : 'disabled'} ${tot.conMonto.length && tot.sel.length===tot.conMonto.length ? 'checked' : ''}
+          onchange="toggleAutorizadoTodos(this)"></th>
+        <th>ESTATUS</th><th>FECHA</th><th>HORA</th><th>UNIDAD</th><th>PLACAS</th><th>TALLER</th><th>FOLIO</th><th>TIPO</th>
+        <th style="text-align:right">MONTO (SIN IVA)</th>
         <th>DÍAS EN TALLER</th><th>INCIDENCIA</th><th>OBSERVACIONES</th><th>ACCIONES</th>
       </tr></thead><tbody>${lista.map(m=>{
         const d = diasEnTaller(m);
@@ -4599,14 +4690,22 @@ function renderMantenimientos(){
         const notas = m.notas||'';
         const notasC = notas.length>60 ? notas.slice(0,60)+'…' : (notas||'—');
         const sig = m.estatus==='Programado' ? '▶ Ingresó' : m.estatus==='Ingreso' ? '✔ Entregado' : '';
-        return `<tr${m.estatus==='Entregado'?' style="opacity:.82"':''}>
+        const tieneMonto = m.monto!=null && !isNaN(m.monto);
+        const chkTit = !tieneMonto ? 'Capture el monto del servicio para incluirlo en el total'
+          : m.autorizado ? `Incluido en el monto total autorizado${m.autorizadoAt?' · '+fechaCorta(m.autorizadoAt)+' · '+(m.autorizadoPor||''):''}`
+          : 'Marcar para incluir en el monto total autorizado';
+        return `<tr class="${m.autorizado?'mt-aut':''}"${m.estatus==='Entregado'?' style="opacity:.82"':''}>
+          <td class="mt-chkcol"><input type="checkbox" class="mt-chk" ${m.autorizado?'checked':''} ${(!esEditor||!tieneMonto)?'disabled':''}
+            title="${escapa(chkTit)}" onchange="toggleAutorizadoMant('${m.id}', this)"></td>
           <td>${mtTag(m)}</td>
           <td>${fFechaMx(m.fecha)}</td>
           <td style="font-variant-numeric:tabular-nums">${escapa(m.hora||'—')}</td>
           <td><b>${escapa(m.unidad)}</b></td>
           <td>${escapa(m.placas||'—')}</td>
           <td>${escapa(m.taller||'—')}</td>
+          <td style="font-variant-numeric:tabular-nums">${m.folio?escapa(m.folio):'<span style="color:var(--muted)">—</span>'}</td>
           <td>${escapa(m.tipo||'—')}</td>
+          <td class="num">${tieneMonto?money(m.monto):'<span style="color:var(--muted)">—</span>'}</td>
           <td>${d===null?'<span style="color:var(--muted)">—</span>':`<span class="dias-badge ${dCls}">${d} ${d===1?'día':'días'}</span>`}</td>
           <td>${inc}</td>
           <td title="${escapa(notas)}">${escapa(notasC)}</td>
@@ -4615,13 +4714,22 @@ function renderMantenimientos(){
               (sig?` <button class="btn ${m.estatus==='Ingreso'?'btn-success':'btn-primary'}" style="padding:3px 9px;font-size:11px" onclick="avanzarMant('${m.id}')">${sig}</button>`:'')
             : '<span style="color:var(--muted)">—</span>'}</td>
         </tr>`;
-      }).join('')}</tbody></table>
+      }).join('')}</tbody>
+      <tfoot><tr class="mt-total">
+        <td colspan="10" class="lbl">Monto total autorizado (sin IVA)
+          <span class="sub">· ${tot.sel.length} de ${tot.conMonto.length} servicio(s) con monto en esta vista${tot.sinMonto?` · ${tot.sinMonto} sin monto capturado`:''}</span></td>
+        <td class="num tot">${money(tot.totalSel)}</td>
+        <td colspan="4" class="sub">Monto capturado en la vista: <b>${money(tot.totalVista)}</b></td>
+      </tr></tfoot></table>
     </div>
     <div class="legend-note">
       <b>Código de color:</b> <span class="mt-tag mt-prog">Programado</span> <span class="mt-tag mt-ing">Ingreso</span>
       <span class="mt-tag mt-ent">Entregado</span> <span class="mt-tag mt-prog mt-late">Atrasado</span> = programado con fecha y hora vencidas sin ingreso a taller.
       Los días en taller se cuentan desde el registro de ingreso hasta la entrega (o hasta hoy).
+      <b>Monto total autorizado:</b> suma, sin IVA, de los servicios marcados con la casilla en la vista activa; la selección se guarda y la comparten todos los perfiles.
     </div>`;
+  const chkT = $('#mtChkTodos');
+  if(chkT) chkT.indeterminate = tot.sel.length>0 && tot.sel.length<tot.conMonto.length;
 }
 
 /* --- Impresión del listado (pestaña activa) --- */
@@ -4633,13 +4741,16 @@ function imprimirMantenimientos(){
   const nLate = todos.filter(mtAtrasado).length;
   const COL = {Programado:['#1565c0','#ffffff'], Ingreso:['#f4c20d','#3d2e00'], Entregado:['#0f7a4e','#ffffff']};
   const filtro = MT_TAB_TXT[state.mantTab||'activos'] + (state.mantFiltroUnidad?` · Unidad: ${state.mantFiltroUnidad}`:'');
+  const tot = totalesMantVista(lista);
   const filas = lista.map(m=>{
     const [bg,fg] = COL[m.estatus] || COL.Programado;
     const late = mtAtrasado(m), d = diasEnTaller(m);
-    return `<tr>
+    return `<tr${m.autorizado?' class="aut"':''}>
+      <td class="c">${m.autorizado?'✓':''}</td>
       <td><span class="st" style="background:${bg};color:${fg};${late?'outline:1.5px dashed #b81f30;outline-offset:1px':''}">${late?'ATRASADO':escapa(m.estatus)}</span></td>
       <td>${fFechaMx(m.fecha)}</td><td>${escapa(m.hora||'')}</td><td><b>${escapa(m.unidad)}</b></td><td>${escapa(m.placas||'')}</td>
-      <td>${escapa(m.taller||'')}</td><td>${escapa(m.tipo||'')}</td>
+      <td>${escapa(m.taller||'')}</td><td>${escapa(m.folio||'—')}</td><td>${escapa(m.tipo||'')}</td>
+      <td class="n">${m.monto!=null?money(m.monto):'—'}</td>
       <td>${m.ingresoAt?fechaCorta(m.ingresoAt):'—'}</td><td>${m.entregadoAt?fechaCorta(m.entregadoAt):'—'}</td>
       <td class="n">${d===null?'—':d}</td><td>${escapa(incRefTxt(m.incId)||'—')}</td><td>${escapa(m.notas||'')}</td>
     </tr>`;
@@ -4657,17 +4768,21 @@ h1{font-size:17pt;color:#1f4e79;margin:0 0 3px}
 .rk{border:1px solid #c8d2e0;border-radius:5px;padding:7px 13px;min-width:110px;background:#f5f8fc;border-left-width:5px}
 .rk .l{font-size:7.5pt;color:#5a6a85;text-transform:uppercase;letter-spacing:.4px}
 .rk .v{font-size:15pt;font-weight:700;color:#1f4e79;margin-top:2px}
-table{width:100%;border-collapse:collapse;font-size:8pt}
+table{width:100%;border-collapse:collapse;font-size:7.5pt}
 thead{display:table-header-group}
 tr{page-break-inside:avoid}
-th{background:#1f4e79;color:#fff;padding:5px 6px;text-align:left;font-weight:600;font-size:7.5pt;text-transform:uppercase;letter-spacing:.3px}
-td{padding:4px 6px;border-bottom:1px solid #dfe6f0;vertical-align:top}
-td.n{text-align:right;font-variant-numeric:tabular-nums}
+th{background:#1f4e79;color:#fff;padding:5px 5px;text-align:left;font-weight:600;font-size:7pt;text-transform:uppercase;letter-spacing:.3px}
+td{padding:4px 5px;border-bottom:1px solid #dfe6f0;vertical-align:top}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.c{text-align:center;font-weight:700;color:#1565c0}
 tbody tr:nth-child(even){background:#f7fafd}
+tbody tr.aut{background:#e8f0fb}
+tfoot{display:table-row-group}
+tfoot td{background:#e3eefb;border-top:2px solid #1f4e79;font-weight:700;color:#1f4e79;padding:7px 6px}
 .st{display:inline-block;padding:2px 8px;border-radius:10px;font-weight:700;font-size:7.5pt;white-space:nowrap}
 .vacio{font-size:9pt;color:#8a97ab;font-style:italic}
-.firmas{display:flex;gap:60px;justify-content:center;margin-top:46px;page-break-inside:avoid}
-.firmas div{text-align:center;font-size:8.5pt;min-width:230px}
+.firmas{display:flex;gap:40px;justify-content:center;margin-top:46px;page-break-inside:avoid}
+.firmas div{text-align:center;font-size:8.5pt;min-width:210px}
 .firmas .ln{border-top:1px solid #1a2233;margin-bottom:5px}
 .firmas small{color:#5a6a85}
 .pie{margin-top:18px;padding-top:8px;border-top:1px solid #c8d2e0;font-size:7.5pt;color:#5a6a85;text-align:center}
@@ -4687,14 +4802,18 @@ tbody tr:nth-child(even){background:#f7fafd}
   <div class="rk" style="border-left-color:#f4c20d"><div class="l">En taller</div><div class="v">${n('Ingreso')}</div></div>
   <div class="rk" style="border-left-color:#0f7a4e"><div class="l">Entregados</div><div class="v">${n('Entregado')}</div></div>
   <div class="rk" style="border-left-color:#b81f30"><div class="l">Atrasados</div><div class="v">${nLate}</div></div>
+  <div class="rk" style="border-left-color:#1f4e79;min-width:190px"><div class="l">Monto total autorizado (sin IVA)</div><div class="v">${money(tot.totalSel)}</div></div>
 </div>
 ${lista.length ? `<table>
-  <thead><tr><th>Estatus</th><th>Fecha</th><th>Hora</th><th>Unidad</th><th>Placas</th><th>Taller</th><th>Tipo</th>
-  <th>Ingreso</th><th>Entrega</th><th>Días taller</th><th>Incidencia</th><th>Observaciones</th></tr></thead>
-  <tbody>${filas}</tbody></table>` : '<p class="vacio">Sin registros en la vista seleccionada.</p>'}
+  <thead><tr><th>Aut.</th><th>Estatus</th><th>Fecha</th><th>Hora</th><th>Unidad</th><th>Placas</th><th>Taller</th><th>Folio</th><th>Tipo</th>
+  <th style="text-align:right">Monto sin IVA</th><th>Ingreso</th><th>Entrega</th><th>Días taller</th><th>Incidencia</th><th>Observaciones</th></tr></thead>
+  <tbody>${filas}</tbody>
+  <tfoot><tr><td colspan="9" style="text-align:right">MONTO TOTAL AUTORIZADO (SIN IVA) · ${tot.sel.length} de ${tot.conMonto.length} servicio(s) con monto</td>
+  <td class="n">${money(tot.totalSel)}</td><td colspan="5" style="font-weight:400;color:#5a6a85">Monto capturado en la vista: ${money(tot.totalVista)}</td></tr></tfoot></table>` : '<p class="vacio">Sin registros en la vista seleccionada.</p>'}
 <div class="firmas">
   <div><div class="ln"></div>Elaboró<br><small>Coordinación de Activos Fijos y Control Vehicular</small></div>
   <div><div class="ln"></div>Revisó<br><small>Nombre y firma</small></div>
+  <div><div class="ln"></div>Autorizó<br><small>Nombre y firma</small></div>
 </div>
 <div class="pie">Documento generado automáticamente por el sistema de Control Vehicular · Uso interno</div>
 </body></html>`;
@@ -5064,7 +5183,8 @@ function datosReporte(){
     .sort((a,b)=>((b.fecha||'')+(b.hora||'')).localeCompare((a.fecha||'')+(a.hora||'')))
     .map(m=>({
       'FECHA': m.fecha||'', 'HORA': m.hora||'', 'UNIDAD': m.unidad, 'PLACAS': m.placas||'',
-      'TALLER': m.taller||'', 'TIPO': m.tipo||'',
+      'TALLER': m.taller||'', 'FOLIO COMPARATIVO': m.folio||'', 'TIPO': m.tipo||'',
+      'MONTO SIN IVA': m.monto ?? '', 'AUTORIZADO': m.autorizado ? 'Sí' : 'No',
       'ESTATUS': mtAtrasado(m) ? 'Programado (ATRASADO)' : (m.estatus||''),
       'F. INGRESO': m.ingresoAt ? fechaCorta(m.ingresoAt) : '',
       'F. ENTREGA': m.entregadoAt ? fechaCorta(m.entregadoAt) : '',
@@ -5182,7 +5302,7 @@ tbody tr:nth-child(even){background:#f7fafd}
 ${tabla('Detalle de Flotilla', flot)}
 ${tabla('Incidencias Vehiculares', inc)}
 ${tabla('Préstamos y Devoluciones', asig, 'Checklist PHVA de préstamo y devolución de unidades.')}
-${tabla('Mantenimientos Programados', mant, 'Estatus: Programado → Ingreso → Entregado. Días en taller desde el ingreso hasta la entrega o la fecha de emisión.')}
+${tabla('Mantenimientos Programados', mant, 'Estatus: Programado → Ingreso → Entregado. Días en taller desde el ingreso hasta la entrega o la fecha de emisión. Monto total autorizado (sin IVA): '+money(STORE.mantenimientos.filter(m=>m.autorizado && m.monto!=null).reduce((t,m)=>t+Number(m.monto),0))+'.')}
 ${tabla('Consumo de Combustible por Período', comb, 'KM/L = Kilómetros recorridos ÷ Litros consumidos.')}
 ${session.rol!=='gerencia'?tabla('Tareas de Seguimiento', tar, 'Ordenadas por fecha compromiso. Las tareas sin fecha aparecen al final.'):''}
 ${session.rol==='admin'?tabla('Bitácora de Cambios', bit, 'Últimos 400 movimientos registrados.'):''}
@@ -5497,7 +5617,7 @@ async function importarJSON(file){
       updates[`${FB_ROOT}/evidencias`]     = d.evidencias || null;
       if(d.catalogoTalleres) updates[`${FB_ROOT}/catalogoTalleres`] = d.catalogoTalleres;
       if(d.choferesExtra) updates[`${FB_ROOT}/choferesExtra`] = d.choferesExtra;
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:3.1 };
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:3.2 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
