@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.0</title>
+<title>Control Vehicular · KPI-AFI-01 v3.1</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -1249,7 +1249,7 @@ tbody tr:hover{background:#d6e8fb}
     </div>
 
     <h4 style="font-size:13px;margin:22px 0 8px;color:var(--accent)">Cierre de día · Respaldo general</h4>
-    <div class="setup-note">Empaqueta en un solo archivo el reporte general en Excel, los CSV equivalentes y todas las evidencias fotográficas y firmas de cada folio. Se descarga como <b>Respaldo_IES_AAAAMMDD_HHMM.zip</b>.</div>
+    <div class="setup-note">Empaqueta en un solo archivo el reporte general en Excel, los CSV equivalentes y, por cada folio, sus evidencias fotográficas, firmas y el documento de préstamo en PDF. Se descarga como <b>Respaldo_IES_AAAAMMDD_HHMM.zip</b>.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
       <button class="btn btn-success" id="btnCierreDiaCfg">🗜 Cierre de Día (ZIP)</button>
     </div>
@@ -1309,7 +1309,7 @@ tbody tr:hover{background:#d6e8fb}
 
 <script>
 /* ==================================================================
-   TABLERO EJECUTIVO · CONTROL VEHICULAR · v3.0
+   TABLERO EJECUTIVO · CONTROL VEHICULAR · v3.1
    Coordinación de Activos Fijos y Control Vehicular
    Backend: Firebase Realtime Database (sincronización en tiempo real)
    ================================================================== */
@@ -1335,7 +1335,7 @@ const FB_ROOT = 'tableros/vehicular';   // Ruta donde vive este tablero en la DB
 const CSV_SEED_URL = 'datos.csv';       // Fuente para inicialización
 
 /* ============ ESTADO ============ */
-let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:3.0 }, mantenimientos:[], catalogoTalleres:{} };
+let STORE = { unidades:[], incidencias:[], combustibles:[], asignaciones:[], choferesExtra:[], bitacora:[], meta:{ updatedAt:null, updatedBy:null, version:3.1 }, mantenimientos:[], catalogoTalleres:{} };
 let ALL=[], DATA=[];
 let state = { zona:'', estatus:'', depto:'', sortKey:'', sortDir:1, selVeh:'', incTab:'pend', bitTab:'todos', incFiltroUnidad:null, combVeh:'', presTab:'vigentes', mantTab:'activos', mantFiltroUnidad:null };
 let session = { rol:null, loggedAt:null };
@@ -1521,7 +1521,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.0 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.1 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -2757,7 +2757,7 @@ async function obtenJsPDF(avisar){
   return null;
 }
 
-async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
+async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, comoBlob=false){
   const paso = m => { if(avisar) avisar(m); };
   const JSPDF = await obtenJsPDF(paso);
   if(!JSPDF){
@@ -3125,8 +3125,19 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar){
 
   const ref = a.bitacora || ('S-F-'+String(a.id||'').slice(-6).toUpperCase());
   const nombre = ('Prestamo-'+ref+'-'+(a.vehiculo||'')+'.pdf').replace(/[^\w\-.]/g,'_');
+  if(comoBlob) return { blob: doc.output('blob'), nombre };
   doc.save(nombre);
   return true;
+}
+
+/* Genera el documento "Préstamo / Asignación de Unidades IES" de un folio como
+   archivo (blob) para integrarlo en los paquetes ZIP, sin descargarlo por separado. */
+async function pdfPrestamoBlob(a, ev){
+  const u = STORE.unidades.find(x=>x.veh===a.vehiculo) ||
+            {veh:a.vehiculo, placas:'—', zona:a.zona, depto:'—', estatus:'—'};
+  const e = ev || {};
+  const r = await generaPdfLegal(a, u, e.fotos||{}, e.fotosDev||{}, e.firma||'', e.firmaDev||'', null, true);
+  return (r && r.blob) ? r : null;
 }
 
 /* Desde el modal: toma lo capturado en pantalla, esté guardado o no */
@@ -3243,8 +3254,11 @@ async function exportacionDiariaZip(){
     // Evidencias de los préstamos del período
     btn.textContent = 'Empaquetando evidencias…';
     const dirEv = zip.folder('Evidencias');
-    let arch = 0, fallos = 0;
+    let arch = 0, fallos = 0, pdfs = 0, nF = 0;
+    const hayPdf = !!(await obtenJsPDF());
     for(const a of pres){
+      nF++;
+      btn.textContent = `Empaquetando ${nF}/${pres.length}…`;
       const ev = await cargaEvidencias(a.id);
       const carpeta = `${(a.bitacora||a.id)}_${a.vehiculo||''}`.replace(/[^\w\-]/g,'_');
       const d = dirEv.folder(carpeta);
@@ -3261,6 +3275,10 @@ async function exportacionDiariaZip(){
       await vuelca(ev.fotosDev, 'devolucion_');
       if(ev.firma){ try{ d.file('firma_entrega.png', b64aBlob(ev.firma)); arch++; }catch(e){ fallos++; } }
       if(ev.firmaDev){ try{ d.file('firma_devolucion.png', b64aBlob(ev.firmaDev)); arch++; }catch(e){ fallos++; } }
+      if(hayPdf){
+        try{ const r = await pdfPrestamoBlob(a, ev); if(r){ d.file(r.nombre, r.blob); pdfs++; } else fallos++; }
+        catch(e){ fallos++; }
+      }
     }
 
     zip.file('LEEME.txt',
@@ -3269,9 +3287,10 @@ async function exportacionDiariaZip(){
       `Préstamos: ${pres.length}\nIncidencias: ${incs.length}\n`+
       `Períodos de combustible: ${comb.length}\nTareas: ${tars.length}\n`+
       `Mantenimientos: ${mants.length}\n`+
-      `Archivos de evidencia: ${arch}${fallos?` (fallidos: ${fallos})`:''}\n\n`+
+      `Archivos de evidencia: ${arch}${fallos?` (fallidos: ${fallos})`:''}\nDocumentos de préstamo (PDF): ${pdfs}\n\n`+
       `Los CSV abren directamente en Excel. La carpeta Evidencias contiene una subcarpeta\n`+
-      `por folio de préstamo, con las fotos de entrega, las de devolución y la firma.\n`);
+      `por folio de préstamo, con las fotos de entrega, las de devolución, las firmas\n`+
+      `y el documento de préstamo en PDF.\n`);
 
     btn.textContent = 'Comprimiendo…';
     const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE', compressionOptions:{level:6}});
@@ -3283,7 +3302,7 @@ async function exportacionDiariaZip(){
       : `Control-Vehicular-${desde}_a_${hasta}.zip`;
     link.click();
     URL.revokeObjectURL(url);
-    toast(`Exportación generada: ${pres.length} préstamo(s), ${incs.length} incidencia(s), ${arch} archivo(s).`);
+    toast(`Exportación generada: ${pres.length} préstamo(s), ${incs.length} incidencia(s), ${arch} archivo(s), ${pdfs} PDF.`);
   }catch(e){ toast('Error en la exportación: '+e.message,'err'); }
   finally{ btn.disabled=false; btn.textContent=txt; }
 }
@@ -3358,11 +3377,29 @@ async function cierreDeDia(){
     const ids = Object.keys(evid);
     const dirEv = zip.folder('Evidencias');
     const idx = [['FOLIO','UNIDAD','CHOFER','F. ENTREGA','ESTADO','ARCHIVO','TIPO','ORIGEN']];
-    let arch = 0, fallos = 0, n = 0;
+    let arch = 0, fallos = 0, n = 0, pdfs = 0, pdfFallos = 0;
+
+    // Documento de préstamo en PDF: carpeta de cada folio con evidencias y, además,
+    // folios vigentes (en préstamo o devueltos sin archivar) que aún no tienen fotos.
+    btn.textContent = 'Cargando generador de PDF…';
+    const hayPdf = !!(await obtenJsPDF());
+    const sinEvid = STORE.asignaciones.filter(a=>a && a.id && !evid[a.id] && !a.archivado);
+    const totalFolios = ids.length + (hayPdf ? sinEvid.length : 0);
+    const agregaPdf = async (a, ev, d, carpeta) => {
+      if(!hayPdf || !a || !a.id) return;
+      try{
+        const r = await pdfPrestamoBlob(a, ev);
+        if(!r){ pdfFallos++; return; }
+        d.file(r.nombre, r.blob);
+        idx.push([a.bitacora||a.id, a.vehiculo||'', a.chofer||'', a.fechaEntrega||'',
+                  a.estadoRegistro||'', `${carpeta}/${r.nombre}`, 'Documento de préstamo (PDF)', 'Generado al cierre']);
+        pdfs++;
+      }catch(e){ console.warn('PDF de folio', a.bitacora, e); pdfFallos++; }
+    };
 
     for(const id of ids){
       n++;
-      btn.textContent = `Empaquetando ${n}/${ids.length}…`;
+      btn.textContent = `Empaquetando ${n}/${totalFolios}…`;
       const a = STORE.asignaciones.find(x=>x.id===id) || {};
       const carpeta = `${(a.bitacora||id)}_${(a.vehiculo||'SIN-UNIDAD')}`.replace(/[^\w\-]/g,'_');
       const d = dirEv.folder(carpeta);
@@ -3389,6 +3426,16 @@ async function cierreDeDia(){
           arch++;
         }catch(e){ fallos++; }
       }
+      await agregaPdf(a, evid[id], d, carpeta);
+    }
+    // Folios vigentes sin evidencia: carpeta solo con su documento de préstamo
+    if(hayPdf){
+      for(const a of sinEvid){
+        n++;
+        btn.textContent = `Empaquetando ${n}/${totalFolios}…`;
+        const carpeta = `${(a.bitacora||a.id)}_${(a.vehiculo||'SIN-UNIDAD')}`.replace(/[^\w\-]/g,'_');
+        await agregaPdf(a, null, dirEv.folder(carpeta), carpeta);
+      }
     }
     dirEv.file('INDICE_EVIDENCIAS.csv', csv(idx));
 
@@ -3414,14 +3461,15 @@ async function cierreDeDia(){
       `CONTENIDO\n`+
       `  Reporte_General_IES_*.xlsx  Libro con 7 hojas de todo el sistema\n`+
       `  CSV/                        Los mismos datos en texto plano\n`+
-      `  Evidencias/                 Una carpeta por folio de préstamo\n`+
+      `  Evidencias/                 Una carpeta por folio: fotos, firmas y PDF del préstamo\n`+
       `  Documentos/                 Anexos en PDF, si existen\n\n`+
       `RESUMEN\n`+
       `  Unidades: ${flot.length}\n  Préstamos: ${asig.length}\n`+
       `  Incidencias: ${inc.length}\n  Tareas: ${tar.length}\n`+
       `  Períodos de combustible: ${comb.length}\n`+
       `  Mantenimientos: ${mant.length}\n`+
-      `  Archivos de evidencia: ${arch}${fallos?`\n  No recuperados: ${fallos}`:''}\n\n`+
+      `  Archivos de evidencia: ${arch}${fallos?`\n  No recuperados: ${fallos}`:''}\n`+
+      `  Documentos de préstamo (PDF): ${pdfs}${!hayPdf?' (no se pudo cargar el generador de PDF)':''}${pdfFallos?`\n  PDF no generados: ${pdfFallos}`:''}\n\n`+
       `Conserve este paquete antes de ejecutar "Limpiar Archivos y Evidencias".\n`);
 
     btn.textContent = 'Comprimiendo…';
@@ -3446,8 +3494,8 @@ async function cierreDeDia(){
       try{ await fbDb.ref().update(up); }catch(e){ console.warn('archivado', e); }
     }
 
-    await logChange('—','CIERRE_DIA','respaldo','', `${arch} archivo(s) · ${(blob.size/1048576).toFixed(1)} MB · ${porArchivar.length} préstamo(s) archivado(s)`);
-    toast(`Cierre de día generado: ${arch} archivo(s), ${(blob.size/1048576).toFixed(1)} MB${porArchivar.length?` · ${porArchivar.length} devolución(es) archivada(s)`:''}${fallos?` · ${fallos} no recuperados`:''}.`);
+    await logChange('—','CIERRE_DIA','respaldo','', `${arch} archivo(s) · ${pdfs} PDF · ${(blob.size/1048576).toFixed(1)} MB · ${porArchivar.length} préstamo(s) archivado(s)`);
+    toast(`Cierre de día generado: ${arch} archivo(s) y ${pdfs} documento(s) PDF, ${(blob.size/1048576).toFixed(1)} MB${porArchivar.length?` · ${porArchivar.length} devolución(es) archivada(s)`:''}${(fallos+pdfFallos)?` · ${fallos+pdfFallos} no recuperados`:''}${!hayPdf?' · PDF omitidos: no cargó la librería':''}.`);
   }catch(e){ toast('Error en el cierre de día: '+e.message,'err'); }
   finally{ btn.disabled=false; btn.textContent=txt; }
 }
@@ -5449,7 +5497,7 @@ async function importarJSON(file){
       updates[`${FB_ROOT}/evidencias`]     = d.evidencias || null;
       if(d.catalogoTalleres) updates[`${FB_ROOT}/catalogoTalleres`] = d.catalogoTalleres;
       if(d.choferesExtra) updates[`${FB_ROOT}/choferesExtra`] = d.choferesExtra;
-      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:3.0 };
+      updates[`${FB_ROOT}/meta`] = { updatedAt:nowISO(), updatedBy:session.rol, version:3.1 };
       await fbDb.ref().update(updates);
       await logChange('—','IMPORT','respaldo','',`${d.unidades.length} unidades`);
       toast('Respaldo restaurado.');
@@ -5563,7 +5611,35 @@ $('#btnZipMes').onclick = ()=>{
   $('#zipHasta').value = hoyISO();
 };
 $('#lightbox').onclick = e=>{ if(e.target.id==='lightbox') cerrarVisor(); };
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarVisor(); });
+/* ESC cierra la ventana superior: visor de evidencia → modal abierto más reciente → detalle de unidad.
+   La pila se alimenta observando la clase "open" de cada modal, sin modificar sus funciones de apertura. */
+const pilaModales = [];
+const obsModales = new MutationObserver(muts=>muts.forEach(m=>{
+  const id = m.target.id, i = pilaModales.indexOf(id);
+  if(m.target.classList.contains('open')){ if(i<0) pilaModales.push(id); }
+  else if(i>=0) pilaModales.splice(i,1);
+}));
+$$('.modal-overlay').forEach(el=>obsModales.observe(el, {attributes:true, attributeFilter:['class']}));
+
+document.addEventListener('keydown', e=>{
+  if((e.key!=='Escape' && e.key!=='Esc') || e.isComposing) return;
+  if(!$('#loginOverlay').classList.contains('hidden')) return;          // la pantalla de acceso no se cierra
+  if($('#lightbox').classList.contains('open')){ e.preventDefault(); cerrarVisor(); return; }
+  const enPila = pilaModales.filter(id=>{ const el = document.getElementById(id); return el && el.classList.contains('open'); });
+  const abiertos = [...$$('.modal-overlay.open')].map(el=>el.id);
+  const id = enPila.length ? enPila[enPila.length-1] : abiertos[abiertos.length-1];
+  if(id){
+    e.preventDefault();
+    if(id==='modalAsignacion'){
+      const a = STORE.asignaciones.find(x=>x.id===editingAsigId);
+      const soloConsulta = a && a.estadoRegistro==='Cerrada';
+      if(!soloConsulta && !confirm('¿Cerrar el checklist de préstamo?\nLos datos, fotografías y firmas que no se hayan guardado se perderán.')) return;
+    }
+    cerrarModal(id);
+    return;
+  }
+  if(state.selVeh){ e.preventDefault(); cerrarDetalle(); }
+});
 $('#btnPurgarEvid').onclick = purgarEvidenciasCerradas;
 // El canvas se remide al rotar el dispositivo o cambiar el tamaño
 window.addEventListener('resize', ()=>{
