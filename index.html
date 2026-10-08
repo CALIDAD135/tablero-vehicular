@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.2</title>
+<title>Control Vehicular · KPI-AFI-01 v3.3</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -11,6 +11,8 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<!-- v3.3: códigos QR de la liga de solicitudes -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <style>
 :root{
   --bg:#eef5fd; --panel:#ffffff; --panel2:#e3eefb; --line:#c2d8ef;
@@ -396,6 +398,37 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 .status-line{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:12px}
 .status-line:last-child{border-bottom:none}
 .status-line span:first-child{color:var(--muted)}
+/* ===== v3.3 · Solicitudes de usuarios ===== */
+.tk-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.tk-kpi{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:9px 12px;display:flex;flex-direction:column;background:var(--panel)}
+.tk-kpi b{font-size:22px;line-height:1.1}.tk-kpi span{font-size:12px;font-weight:600}.tk-kpi small{font-size:11px;color:var(--muted)}
+.tk-filtros{display:flex;gap:8px;margin-bottom:10px}.tk-filtros input{max-width:320px}
+.tk-mini{padding:3px 9px;font-size:11px;text-decoration:none;display:inline-block}
+.tk-det{white-space:normal!important;min-width:240px;max-width:380px;font-size:12px;line-height:1.35}
+#tblTk td{vertical-align:top}
+.tk-row-nueva td{background:rgba(184,31,48,.04)}
+.tk-t-pre{background:rgba(11,79,158,.12);color:#0b4f9e}.tk-t-inc{background:rgba(184,31,48,.12);color:#8f1826}.tk-t-chk{background:rgba(15,122,78,.12);color:#0a5e3b}
+.tk-e-nueva{background:#fde3e6;color:#8f1826}.tk-e-rev{background:#fff1db;color:#8a5300}.tk-e-at{background:#ebe6fb;color:#432c94}.tk-e-fin{background:#dcf3e8;color:#0a5e3b}.tk-e-rech{background:#eef1f5;color:#4b5b6e}
+.tk-vinc{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:20px;background:rgba(90,63,184,.12);color:#432c94;font-weight:600;font-size:11px}
+.tk-ref{display:inline-block;padding:1px 6px;border-radius:6px;background:rgba(90,63,184,.12);color:#432c94;font-size:10px;font-weight:700;cursor:pointer;margin-right:4px}
+.tk-cols{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}@media(max-width:700px){.tk-cols{grid-template-columns:1fr}}
+.tk-h{font-size:12px;color:var(--accent);margin:12px 0 6px;text-transform:none}
+.tk-dl{display:grid;grid-template-columns:140px 1fr;gap:8px;font-size:12px;padding:4px 0;border-bottom:1px solid var(--line)}.tk-dl span{color:var(--muted)}.tk-dl b{font-weight:500}
+.tk-obs{font-size:12px;white-space:pre-wrap}
+.tk-tl{list-style:none;border-left:2px solid var(--line);margin:4px 0 0 6px;padding-left:14px}
+.tk-tl li{position:relative;padding:0 0 10px;display:flex;flex-direction:column;font-size:12px}
+.tk-tl li::before{content:'';position:absolute;left:-21px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tk-tl li.tk-tl-culminada::before{background:var(--green)}.tk-tl li.tk-tl-rechazada::before{background:var(--muted)}.tk-tl li.tk-tl-en_atencion::before{background:var(--purple)}.tk-tl li.tk-tl-en_revision::before{background:var(--orange)}
+.tk-tl span{color:var(--muted);font-size:11px}.tk-tl small{font-size:11px}
+.tk-notif{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tk-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:6px 0}
+.tk-gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
+.tk-gal-xl{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+.tk-chk{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;margin:6px 0 10px}
+.tk-ci{display:flex;justify-content:space-between;gap:6px;font-size:12px;border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.tk-ci b{font-size:11px}.tk-ci-bien b{color:var(--green)}.tk-ci-falla{border-color:rgba(184,31,48,.45);background:rgba(184,31,48,.05)}.tk-ci-falla b{color:var(--red)}.tk-ci-na b{color:var(--muted)}
+.tk-chkbox{display:flex;gap:8px;align-items:center;font-size:12px;margin-top:10px}.tk-chkbox input{width:auto}
+.tk-liga-acc{display:flex;gap:8px;margin:10px 0}.tk-qr{display:flex;justify-content:center}.tk-qr-c{width:220px;border:1px solid var(--line);border-radius:10px}
 </style>
 </head>
 <body>
@@ -454,6 +487,26 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 
 <!-- ============ KPIs ============ -->
 <div class="kpis" id="kpis"></div>
+
+<!-- ============ SOLICITUDES DE USUARIOS (v3.3) ============ -->
+<div class="card col-12 hidden" id="cardSolicitudes">
+  <h3>Solicitudes de Usuarios
+    <span class="hint" style="font-weight:400">· préstamos, incidencias y check list recibidos por liga o QR</span>
+    <span id="tkBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
+    <button class="btn" id="tkLiga" style="font-size:12px;padding:5px 12px">Liga y QR</button>
+    <button class="btn hidden" id="tkEtiquetas" style="font-size:12px;padding:5px 12px" title="Hoja imprimible con el QR de cada unidad (respeta los filtros)">Etiquetas QR de la flotilla</button>
+  </h3>
+  <div class="tk-kpis" id="tkKpis"></div>
+  <div class="tabs" id="tkTabs">
+    <div class="tab active" data-tk="pend">Pendientes</div>
+    <div class="tab" data-tk="PRESTAMO">1 · Préstamos</div>
+    <div class="tab" data-tk="INCIDENCIA">2 · Incidencias</div>
+    <div class="tab" data-tk="CHECKLIST">3 · Check list</div>
+    <div class="tab" data-tk="todas">Todas</div>
+  </div>
+  <div class="tk-filtros"><input type="text" id="tkBuscar" placeholder="Buscar folio, solicitante o unidad"></div>
+  <div class="tablewrap" style="max-height:380px"><table id="tblTk"><thead></thead><tbody></tbody></table></div>
+</div>
 
 <!-- ============ PARQUE VEHICULAR ============ -->
 <div class="card col-12">
@@ -1455,6 +1508,7 @@ function fbInit(){
       STORE.asignaciones = d.asignaciones ? Object.values(d.asignaciones) : [];
       STORE.choferesExtra = d.choferesExtra ? Object.values(d.choferesExtra) : [];
       STORE.mantenimientos = d.mantenimientos ? Object.values(d.mantenimientos) : [];
+      STORE.checklists = d.checklists ? Object.values(d.checklists) : [];
       STORE.catalogoTalleres = d.catalogoTalleres || {};
       STORE.bitacora   = d.bitacora ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
       STORE.meta       = d.meta || STORE.meta;
@@ -1469,6 +1523,7 @@ function fbInit(){
       $('#syncBadge').className = 'sync-badge sync-err';
       $('#syncBadge').textContent = '● Error';
     });
+    Tickets.escuchar();   // v3.3: bandeja de solicitudes públicas
     return true;
   }catch(e){
     console.error('fbInit', e);
@@ -1487,6 +1542,7 @@ async function fbWriteUnidad(u){
   try{
     await fbDb.ref(`${FB_ROOT}/unidades/${u.id}`).set(u);
     await fbUpdateMeta();
+    setTimeout(()=>Tickets.publicarCatalogo(), 400);
     return true;
   }catch(e){ toast('Error al guardar unidad: '+e.message, 'err'); return false; }
 }
@@ -1501,6 +1557,7 @@ async function fbWriteIncidencia(i){
   try{
     await fbDb.ref(`${FB_ROOT}/incidencias/${i.id}`).set(i);
     await fbUpdateMeta();
+    Tickets.alGuardarIncidencia(i).catch(e=>console.warn('solicitud vinculada', e));
     return true;
   }catch(e){ toast('Error al guardar incidencia: '+e.message, 'err'); return false; }
 }
@@ -1541,7 +1598,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.2 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.3 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -1931,7 +1988,7 @@ function renderIncidencias(){
       <td>${i.chofer||'—'}</td>
       <td>${i.depto||'—'}</td>
       <td>${liga}</td>
-      <td title="${(i.notas||'').replace(/"/g,'&quot;')}">${notasC}</td>
+      <td title="${(i.notas||'').replace(/"/g,'&quot;')}">${i.solicitudFolio?`<span class="tk-ref" onclick="Tickets.ver('${i.solicitudFolio}')" title="Solicitud de usuario">${i.solicitudFolio}</span>`:''}${notasC}</td>
       <td style="white-space:nowrap">${(()=>{
         const ml = mantDeIncidencia(i.id)[0];
         const late = ml && mtAtrasado(ml);
@@ -1939,7 +1996,8 @@ function renderIncidencias(){
         const acc = esEditor
           ? `<button class="btn" style="padding:3px 8px;font-size:11px" onclick="editarIncidencia('${i.id}')">Editar</button> <button class="btn" style="padding:3px 8px;font-size:11px" onclick="abrirModalMant('${i.unidad}',null,'${i.id}')">🔧 Agregar mantenimiento</button>`
           : '';
-        return chip + acc;
+        const fotos = i.solicitudFolio && i.fotosTicket ? `<button class="btn" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="Tickets.verFotos('${i.solicitudFolio}')" title="Fotografías del reporte del usuario">📷 ${i.fotosTicket}</button>` : '';
+        return fotos + chip + acc;
       })()}</td>
     </tr>`;
   }).join('');
@@ -3370,6 +3428,8 @@ async function cierreDeDia(){
       hoja('Tareas','Tareas de seguimiento por incidencia', tar);
       hoja('Combustibles','Consumo de combustible por período', comb);
       hoja('Bitácora','Trazabilidad de cambios', bit);
+      hoja('Solicitudes','Solicitudes de usuarios', Tickets.filasExcel());
+      hoja('Check list rápido','Check list validados por unidad', Tickets.filasChecklist());
       const buf = XLSX.write(wb, {bookType:'xlsx', type:'array'});
       zip.file(`Reporte_General_IES_${selloArchivo()}.xlsx`, buf);
     }
@@ -3389,6 +3449,8 @@ async function cierreDeDia(){
     dirCsv.file('05_Combustibles.csv', aCsv(comb));
     dirCsv.file('06_Bitacora.csv',     aCsv(bit));
     dirCsv.file('07_Mantenimientos.csv', aCsv(mant));
+    dirCsv.file('08_Solicitudes.csv', aCsv(Tickets.filasExcel()));
+    dirCsv.file('09_Checklist_rapido.csv', aCsv(Tickets.filasChecklist()));
 
     /* --- 3. Evidencias y firmas de todos los préstamos --- */
     btn.textContent = 'Empaquetando evidencias…';
@@ -3473,6 +3535,10 @@ async function cierreDeDia(){
       }
     }
 
+    /* --- 5. Fotografías de solicitudes de usuarios (v3.3) --- */
+    btn.textContent = 'Empaquetando solicitudes…';
+    const fotosSol = await Tickets.aZip(zip);
+
     zip.file('LEEME.txt',
       `RESPALDO GENERAL · Control Vehicular IES\n`+
       `${'='.repeat(52)}\n`+
@@ -3482,7 +3548,8 @@ async function cierreDeDia(){
       `  Reporte_General_IES_*.xlsx  Libro con 7 hojas de todo el sistema\n`+
       `  CSV/                        Los mismos datos en texto plano\n`+
       `  Evidencias/                 Una carpeta por folio: fotos, firmas y PDF del préstamo\n`+
-      `  Documentos/                 Anexos en PDF, si existen\n\n`+
+      `  Documentos/                 Anexos en PDF, si existen\n`+
+      `  Solicitudes/                Fotografías de solicitudes de usuarios (${fotosSol})\n\n`+
       `RESUMEN\n`+
       `  Unidades: ${flot.length}\n  Préstamos: ${asig.length}\n`+
       `  Incidencias: ${inc.length}\n  Tareas: ${tar.length}\n`+
@@ -3599,10 +3666,13 @@ async function limpiarArchivosYEvidencias(){
     await fbDb.ref().update(updates);
     evidCache = {};
     evidActual = { fotos:{}, fotosDev:{}, firma:'', firmaDev:'' };
+    // v3.3: fotografías de solicitudes ya culminadas o rechazadas (respaldadas en el Cierre de Día)
+    let solPurgadas = 0;
+    try{ solPurgadas = await Tickets.purgarFotosCerradas(); }catch(e){ console.warn('fotos de solicitudes', e); }
 
     await logChange('—','LIMPIEZA_ARCHIVOS','multimedia',
       `${uso.fotos} foto(s) · ${uso.firmas} firma(s) · ${mb} MB`,
-      `Storage: ${borradosStorage} eliminado(s)${fallosStorage?`, ${fallosStorage} no localizado(s)`:''}`);
+      `Storage: ${borradosStorage} eliminado(s)${fallosStorage?`, ${fallosStorage} no localizado(s)`:''}${solPurgadas?` · fotos de ${solPurgadas} solicitud(es) cerrada(s)`:''}`);
 
     toast(`Limpieza completada: ${uso.fotos} foto(s) y ${uso.firmas} firma(s) eliminadas. Los datos operativos permanecen intactos.`,'warn');
     pintaResumenEvidencias();
@@ -3631,7 +3701,8 @@ let editingAsigId = null;
 
 /* --- Acceso a Firebase (nodo independiente: no satura la ficha del vehículo) --- */
 async function fbWriteAsignacion(a){
-  try{ await fbDb.ref(`${FB_ROOT}/asignaciones/${a.id}`).set(a); await fbUpdateMeta(); return true; }
+  try{ await fbDb.ref(`${FB_ROOT}/asignaciones/${a.id}`).set(a); await fbUpdateMeta();
+    Tickets.alGuardarPrestamo(a).catch(e=>console.warn('solicitud vinculada', e)); return true; }
   catch(e){ toast('Error al guardar el checklist: '+e.message,'err'); return false; }
 }
 async function fbDeleteAsignacion(id){
@@ -3969,7 +4040,7 @@ async function guardarAsignacion(){
   const orig = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
   const reg = orig
     ? {...orig, ...a, updatedAt:nowISO(), updatedBy:session.rol}
-    : {id:draftAsigId||uid(), ...a, createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO(), updatedBy:session.rol};
+    : {id:draftAsigId||uid(), ...a, ...Tickets.camposVinculo('pres'), createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO(), updatedBy:session.rol};
 
   const ok = await fbWriteAsignacion(reg);
   if(!ok) return;
@@ -5217,6 +5288,8 @@ function exportarExcel(){
     addSheet('Mantenimientos','Mantenimientos programados · agenda de taller por unidad', mant);
     addSheet('Combustibles', 'Consumo de combustible por período',       comb);
     if(session.rol!=='gerencia') addSheet('Tareas','Tareas de seguimiento por incidencia', tar);
+    addSheet('Solicitudes','Solicitudes de usuarios · préstamo, incidencia y check list', Tickets.filasExcel());
+    addSheet('Check list rápido','Check list validados por unidad', Tickets.filasChecklist());
     if(session.rol==='admin') addSheet('Bitácora','Trazabilidad de cambios (últimos 400)', bit);
 
     XLSX.writeFile(wb, `Reporte-Tablero-Vehicular-${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -5358,7 +5431,7 @@ function refrescarTodo(rebuild=true){
   pie('cEstatus', ec, 'estatus');
   barDepto(); barServicio(); renderTable();
   renderIncidencias(); renderBitacora(); renderFleetDetail(); renderCombustibles(); renderCalendario(); renderPrestamos();
-  renderMantenimientos(); renderCatalogoTalleres();
+  renderMantenimientos(); renderCatalogoTalleres(); Tickets.render();
   const upd = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : hoyStr();
   $('#updateBadge').textContent = 'Actualizado: '+upd;
 }
@@ -5547,7 +5620,7 @@ async function guardarIncidencia(){
       toast(`Incidencia actualizada${despT.length?` · ${despT.filter(t=>t.hecha).length}/${despT.length} tareas cumplidas`:''}.`);
     }
   } else {
-    const nueva = { id:uid(), ...inc, createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO() };
+    const nueva = { id:uid(), ...inc, ...Tickets.camposVinculo('inc'), createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO() };
     const ok = await fbWriteIncidencia(nueva);
     if(ok){
       await logChange(inc.unidad, 'ALTA_INC', inc.tipo, '', inc.notas.slice(0,80));
@@ -5568,7 +5641,12 @@ async function eliminarIncidencia(){
 }
 
 /* ============ MODAL HELPERS ============ */
-function cerrarModal(id){ $('#'+id).classList.remove('open'); }
+function cerrarModal(id){
+  const el = $('#'+id); if(el) el.classList.remove('open');
+  // Un préstamo o incidencia cerrado sin guardar no conserva el vínculo con la solicitud
+  if(id==='modalAsignacion') Tickets.vinculo.pres = null;
+  if(id==='modalInc') Tickets.vinculo.inc = null;
+}
 window.cerrarModal = cerrarModal;
 $$('[data-close-modal]').forEach(b=>b.onclick=()=>cerrarModal(b.dataset.closeModal));
 
@@ -5864,6 +5942,481 @@ $('#btnSeed').onclick = async ()=>{
 };
 
 window.addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
+
+/* ============ SOLICITUDES DE USUARIOS · TICKETS (v3.3) ============
+   Bandeja de las solicitudes que los colaboradores envían desde solicitud.html
+   (liga o QR por unidad): 1) Préstamo de unidad, 2) Incidencia vehicular,
+   3) Check list rápido. Cada solicitud se transfiere al módulo existente:
+     · Préstamo   → Préstamo / Check List de la unidad asignada (folio PR-…)
+     · Incidencia → Incidencias vehiculares (con sus 6+ fotografías)
+     · Check list → Validación, actualización de KM y, si hay fallas, incidencia
+   Trazabilidad: gestion (estado vigente) + historial (cada cambio con fecha y rol),
+   visibles para el usuario al consultar su folio.
+   Nodo público: tableros/vehicular_publico/{catalogo, contadores, solicitudes, fotos}
+   ================================================================== */
+const FB_PUB = 'tableros/vehicular_publico';
+const TK_TIPOS = {
+  PRESTAMO:   { l:'Préstamo de unidad',   c:'tk-t-pre' },
+  INCIDENCIA: { l:'Incidencia vehicular', c:'tk-t-inc' },
+  CHECKLIST:  { l:'Check list rápido',    c:'tk-t-chk' }
+};
+const TK_ESTADOS = {
+  NUEVA:       { l:'Nueva',       c:'tk-e-nueva' },
+  EN_REVISION: { l:'En revisión', c:'tk-e-rev' },
+  EN_ATENCION: { l:'En atención', c:'tk-e-at' },
+  CULMINADA:   { l:'Culminada',   c:'tk-e-fin' },
+  RECHAZADA:   { l:'Rechazada',   c:'tk-e-rech' }
+};
+// Mismos rubros que el formulario público (solicitud.html)
+const TK_CHECK = [
+  ['llantas','Llantas y presión'], ['refaccion','Llanta de refacción y herramienta'], ['luces','Luces delanteras y traseras'],
+  ['direccionales','Direccionales e intermitentes'], ['frenos','Frenos'], ['aceite','Nivel de aceite'], ['anticong','Anticongelante'],
+  ['limpia','Limpiaparabrisas'], ['claxon','Claxon'], ['espejos','Espejos'], ['cinturones','Cinturones de seguridad'],
+  ['interior','Limpieza interior'], ['carroceria','Carrocería sin golpes nuevos'], ['poliza','Póliza de seguro'], ['tarjeta','Tarjeta de circulación']
+];
+const tkEsc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const tkRol = () => session.rol==='admin'?'Administrador':session.rol==='auxiliar'?'Auxiliar':session.rol==='gerencia'?'Gerencia':'—';
+const tkFecha = v => { if(!v) return '—'; const d = new Date(v); return isNaN(d) ? '—' : fechaCorta(d.toISOString()); };
+const tkLimpio = s => String(s||'').replace(/[<>]/g,'').trim();
+
+const Tickets = {
+  lista: [], tab: 'pend', vinculo: { pres:null, inc:null }, _fotos: {}, _firmaCat: null,
+
+  /* ---------- Datos ---------- */
+  escuchar(){
+    fbDb.ref(`${FB_PUB}/solicitudes`).limitToLast(1500).on('value', snap=>{
+      const v = snap.val() || {};
+      this.lista = Object.keys(v).map(k=>Object.assign({ folio:k }, v[k]));
+      if(session.rol) this.render();
+    }, err=>console.warn('solicitudes', err));
+  },
+  porFolio(f){ return this.lista.find(s=>s.folio===f); },
+  estado(s){ return (s.gestion && s.gestion.estado) || 'NUEVA'; },
+  fechaDe(s){ return s.ts ? new Date(s.ts).toISOString() : (s.tsCliente || ''); },
+  historial(s){ const h = s.historial||{}; return Object.keys(h).map(k=>h[k]).sort((a,b)=>String(a.ts).localeCompare(String(b.ts))); },
+  esEditor(){ return session.rol==='admin' || session.rol==='auxiliar'; },
+  url(veh, tipo){
+    const u = new URL('solicitud.html', location.href.split('#')[0]); u.search = '';
+    if(veh) u.searchParams.set('u', veh);
+    if(tipo) u.searchParams.set('t', tipo);
+    return u.href;
+  },
+
+  /* Registra el estado vigente y agrega un renglón al historial (trazabilidad) */
+  async gestion(folio, estado, etapa, extra={}, nota=''){
+    const s = this.porFolio(folio); const antes = s ? this.estado(s) : '';
+    const ts = nowISO(), por = tkRol();
+    const up = {};
+    Object.entries(Object.assign({ estado, etapa, actualizado:ts, por }, extra)).forEach(([k,v])=>{ up[`${FB_PUB}/solicitudes/${folio}/gestion/${k}`] = v===undefined?null:v; });
+    up[`${FB_PUB}/solicitudes/${folio}/historial/${uid()}`] = { ts, estado, etapa, por, nota: nota||'' };
+    await fbDb.ref().update(up);
+    await logChange((s && s.unidad) || extra.unidad || '—', 'SOLICITUD', folio, antes, `${TK_ESTADOS[estado].l}: ${etapa}`);
+  },
+
+  /* Catálogo espejo para el formulario público (se publica solo si cambió) */
+  async publicarCatalogo(forzar){
+    if(!this.esEditor() || !STORE.unidades.length) return;
+    const unidades = {};
+    STORE.unidades.forEach(u=>{ if(u && u.id && u.veh) unidades[u.id] = { veh:u.veh, placas:u.placas||'', zona:u.zona||'', depto:u.depto||'', estatus:u.estatus||'' }; });
+    const deptos = [...new Set(STORE.unidades.map(u=>u.depto).filter(Boolean))].sort();
+    const firma = JSON.stringify([unidades, deptos]);
+    if(!forzar && firma===this._firmaCat) return;
+    this._firmaCat = firma;
+    try{ await fbDb.ref(`${FB_PUB}/catalogo`).set({ unidades, deptos, actualizado:nowISO() }); }
+    catch(e){ this._firmaCat = null; console.warn('catálogo público', e); }
+  },
+
+  /* ---------- Bandeja ---------- */
+  render(){
+    const card = $('#cardSolicitudes'); if(!card) return;
+    card.classList.toggle('hidden', !session.rol);
+    this.publicarCatalogo();
+    const L = this.lista, E = s=>this.estado(s);
+    const nuevas = L.filter(s=>E(s)==='NUEVA').length, rev = L.filter(s=>E(s)==='EN_REVISION').length, at = L.filter(s=>E(s)==='EN_ATENCION').length;
+    const mes = new Date().toISOString().slice(0,7);
+    const finMes = L.filter(s=>E(s)==='CULMINADA' && String((s.gestion||{}).actualizado||'').slice(0,7)===mes).length;
+    const resp = L.map(s=>{ const h = this.historial(s)[0]; return h ? new Date(h.ts) - new Date(this.fechaDe(s)) : null; }).filter(x=>x!=null && x>=0);
+    const prom = resp.length ? resp.reduce((a,b)=>a+b,0)/resp.length : null;
+    const durTxt = ms => { const m = Math.round(ms/60000); return m<60 ? `${m} min` : m<1440 ? `${Math.floor(m/60)} h ${m%60} min` : `${Math.floor(m/1440)} d ${Math.floor((m%1440)/60)} h`; };
+    $('#tkKpis').innerHTML = [
+      [nuevas,'Nuevas','Sin revisar', nuevas?'var(--red)':'var(--green)'],
+      [rev,'En revisión','Por transferir','var(--orange)'],
+      [at,'En atención','Préstamo o incidencia abiertos','var(--purple)'],
+      [finMes,'Culminadas en el mes','Cerradas con trazabilidad','var(--green)'],
+      [prom==null?'—':durTxt(prom),'Primera respuesta','Promedio desde la recepción','var(--accent)']
+    ].map(([v,l,s,c])=>`<div class="tk-kpi" style="border-left-color:${c}"><b style="color:${c}">${v}</b><span>${l}</span><small>${s}</small></div>`).join('');
+    $('#tkBadge').innerHTML = nuevas ? `<b style="color:var(--red)">${nuevas}</b> nueva(s) por revisar` : 'Bandeja al día';
+    $('#tkLiga').classList.toggle('hidden', !session.rol);
+    $('#tkEtiquetas').classList.toggle('hidden', !this.esEditor());
+
+    const q = ($('#tkBuscar').value||'').toUpperCase().trim();
+    let f = [...L];
+    if(this.tab==='pend') f = f.filter(s=>['NUEVA','EN_REVISION'].includes(E(s)));
+    else if(TK_TIPOS[this.tab]) f = f.filter(s=>s.tipo===this.tab);
+    if(q) f = f.filter(s=>[s.folio,s.solicitante,s.unidad,s.departamento].join(' ').toUpperCase().includes(q));
+    f.sort((a,b)=>String(this.fechaDe(b)).localeCompare(String(this.fechaDe(a))));
+    const cols = ['FOLIO','TIPO','SOLICITANTE','UNIDAD','DETALLE','FOTOS','ESTADO','ACCIONES'];
+    $('#tblTk thead').innerHTML = '<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+    if(!f.length){
+      $('#tblTk tbody').innerHTML = `<tr><td colspan="${cols.length}" style="text-align:center;color:var(--muted);padding:22px">${L.length?'Ninguna solicitud en esta vista.':'Aún no llegan solicitudes. Comparta la liga o coloque los QR en las unidades.'}</td></tr>`;
+      return;
+    }
+    const ed = this.esEditor();
+    $('#tblTk tbody').innerHTML = f.map(s=>{
+      const e = E(s), abierta = ['NUEVA','EN_REVISION'].includes(e), g = s.gestion||{};
+      const acc = [`<button class="btn tk-mini" onclick="Tickets.ver('${s.folio}')">Ver</button>`];
+      if(ed && e==='NUEVA') acc.push(`<button class="btn tk-mini" onclick="Tickets.revisar('${s.folio}')">Revisar</button>`);
+      if(ed && abierta && s.tipo==='PRESTAMO') acc.push(`<button class="btn btn-primary tk-mini" onclick="Tickets.asignarUnidad('${s.folio}')">Asignar unidad</button>`);
+      if(ed && abierta && s.tipo==='INCIDENCIA') acc.push(`<button class="btn btn-primary tk-mini" onclick="Tickets.registrarIncidencia('${s.folio}')">Registrar incidencia</button>`);
+      if(ed && abierta && s.tipo==='CHECKLIST') acc.push(`<button class="btn btn-primary tk-mini" onclick="Tickets.validarChecklist('${s.folio}')">Validar</button>`);
+      if(ed && e==='EN_ATENCION' && g.prestamoId) acc.push(`<button class="btn tk-mini" onclick="Tickets.abrirPrestamo('${s.folio}')">Préstamo</button>`);
+      if(ed && e==='EN_ATENCION' && g.incidenciaId) acc.push(`<button class="btn tk-mini" onclick="editarIncidencia('${g.incidenciaId}')">Incidencia</button>`);
+      return `<tr class="${e==='NUEVA'?'tk-row-nueva':''}">
+        <td style="white-space:nowrap"><b style="font-variant-numeric:tabular-nums">${s.folio}</b><br><span style="color:var(--muted);font-size:11px">${tkFecha(this.fechaDe(s))}</span></td>
+        <td><span class="tag ${TK_TIPOS[s.tipo]?TK_TIPOS[s.tipo].c:''}">${TK_TIPOS[s.tipo]?TK_TIPOS[s.tipo].l:s.tipo}</span></td>
+        <td><b>${tkEsc(s.solicitante)}</b><br><span style="color:var(--muted);font-size:11px">${tkEsc(s.departamento||'')}${s.telefono?' · '+tkEsc(s.telefono):''}</span></td>
+        <td><b>${tkEsc(s.unidad || (s.prestamo&&s.prestamo.unidadPreferida) || (g.unidad||'Por asignar'))}</b>${!s.unidad && s.prestamo && s.prestamo.unidadPreferida?'<br><span style="color:var(--muted);font-size:11px">preferencia</span>':''}</td>
+        <td class="tk-det">${tkEsc(this.detalle(s))}</td>
+        <td style="text-align:center">${s.fotos?`<button class="btn tk-mini" onclick="Tickets.verFotos('${s.folio}')">📷 ${s.fotos}</button>`:'—'}</td>
+        <td><span class="tag ${TK_ESTADOS[e].c}">${TK_ESTADOS[e].l}</span>${g.etapa?`<br><span style="color:var(--muted);font-size:11px">${tkEsc(g.etapa)}</span>`:''}</td>
+        <td style="white-space:nowrap">${acc.join(' ')}</td></tr>`;
+    }).join('');
+  },
+  detalle(s){
+    if(s.tipo==='PRESTAMO'){ const p = s.prestamo||{}; return `${tkFecha(p.salida)} a ${tkFecha(p.regreso)}. ${p.destino||''}. ${p.motivo||''}`; }
+    if(s.tipo==='INCIDENCIA'){ const i = s.incidencia||{}; return `${i.tipoIncidencia||''}: ${i.descripcion||''}`; }
+    const c = s.checklist||{}; return `${c.momento||''}. Km ${fmt(c.km)}. ${c.fallas?c.fallas+' falla(s)':'Sin fallas'}`;
+  },
+
+  /* ---------- Ventana genérica (mismo estilo que los modales del tablero) ---------- */
+  modal(titulo, sub, cuerpo, acciones, ancho){
+    $$('.modal-overlay.tk-dyn:not(.open)').forEach(el=>el.remove());
+    const ov = document.createElement('div');
+    ov.className = 'modal-overlay tk-dyn open'; ov.id = 'tkm_'+uid();
+    ov.innerHTML = `<div class="modal" style="${ancho?'max-width:'+ancho:''}"><h3>${tkEsc(titulo)}</h3><div class="modal-sub">${sub||''}</div>
+      <div class="tk-mbody">${cuerpo}</div><div class="modal-actions"></div></div>`;
+    document.body.appendChild(ov);
+    const api = { el:ov, q:s=>ov.querySelector(s), cerrar:()=>ov.remove() };
+    const pie = ov.querySelector('.modal-actions');
+    (acciones||[{t:'Cerrar'}]).forEach(a=>{
+      const b = document.createElement('button');
+      b.className = 'btn '+(a.c||''); b.textContent = a.t;
+      b.onclick = async ()=>{ if(!a.fn){ api.cerrar(); return; } b.disabled = true;
+        try{ const r = await a.fn(api); if(r!==false) api.cerrar(); } catch(e){ toast(e.message,'err'); } finally{ b.disabled = false; } };
+      pie.appendChild(b);
+    });
+    ov.addEventListener('mousedown', e=>{ if(e.target===ov) api.cerrar(); });
+    return api;
+  },
+  pedirTexto(titulo, etiqueta){
+    return new Promise(res=>{
+      let v = null;
+      const m = this.modal(titulo, '', `<label>${tkEsc(etiqueta)}</label><textarea id="tkTxt" rows="3" maxlength="300"></textarea>`,
+        [{t:'Cancelar', fn:()=>{ res(null); }}, {t:'Aceptar', c:'btn-primary', fn:mm=>{ const t = tkLimpio(mm.q('#tkTxt').value); if(!t){ toast('Escriba el motivo.','err'); return false; } v = t; res(v); }}], '480px');
+      setTimeout(()=>m.q('#tkTxt').focus(), 50);
+    });
+  },
+
+  /* ---------- Detalle con trazabilidad ---------- */
+  ver(folio){
+    const s = this.porFolio(folio); if(!s) return;
+    const e = this.estado(s), g = s.gestion||{};
+    const fila = (k,v)=>v?`<div class="tk-dl"><span>${k}</span><b>${tkEsc(v)}</b></div>`:'';
+    let det = '';
+    if(s.tipo==='PRESTAMO'){ const p = s.prestamo||{};
+      det = fila('Salida', tkFecha(p.salida)) + fila('Regreso estimado', tkFecha(p.regreso)) + fila('Destino', p.destino) + fila('Motivo', p.motivo)
+          + fila('Pasajeros', p.pasajeros) + fila('Conductor', p.conductor) + fila('Licencia vigente', p.licencia?'Confirmada por el solicitante':'No confirmada')
+          + fila('Unidad de preferencia', p.unidadPreferida || 'Sin preferencia');
+    } else if(s.tipo==='INCIDENCIA'){ const i = s.incidencia||{};
+      det = fila('Unidad', s.unidad) + fila('Tipo', i.tipoIncidencia) + fila('Fecha del evento', tkFecha(i.fechaEvento)) + fila('Kilometraje', i.km!=null&&i.km!==''?fmt(i.km):'')
+          + fila('Ubicación', i.ubicacion) + fila('¿Puede circular?', i.circula) + fila('Descripción', i.descripcion);
+    } else { const c = s.checklist||{};
+      det = fila('Unidad', s.unidad) + fila('Momento', c.momento) + fila('Kilometraje', fmt(c.km)) + fila('Combustible', c.combustible)
+          + `<div class="tk-chk">${TK_CHECK.map(([k,l])=>{ const v = (c.items||{})[k]||'—'; return `<span class="tk-ci tk-ci-${String(v).toLowerCase()}">${l}<b>${v==='BIEN'?'Bien':v==='FALLA'?'Falla':v==='NA'?'N/A':'—'}</b></span>`; }).join('')}</div>`;
+    }
+    const tel = String(s.telefono||'').replace(/\D/g,'');
+    const msg = `Buen día ${s.solicitante}. Le escribimos de Control Vehicular IES sobre su solicitud ${s.folio} (${TK_TIPOS[s.tipo].l}). Estado: ${TK_ESTADOS[e].l}${g.etapa?'. '+g.etapa:''}. Consulte el avance en ${this.url()}`;
+    const hist = this.historial(s);
+    this.modal(`Solicitud ${s.folio}`,
+      `<span class="tag ${TK_TIPOS[s.tipo].c}">${TK_TIPOS[s.tipo].l}</span> <span class="tag ${TK_ESTADOS[e].c}">${TK_ESTADOS[e].l}</span> Recibida ${tkFecha(this.fechaDe(s))}`,
+      `<div class="tk-cols"><div>
+          <h4 class="tk-h">Solicitante</h4>${fila('Nombre', s.solicitante)}${fila('Departamento', s.departamento)}${fila('Correo', s.correo)}${fila('Teléfono', s.telefono)}
+          <h4 class="tk-h">Detalle</h4>${det}
+          ${s.observaciones?`<h4 class="tk-h">Observaciones</h4><p class="tk-obs">${tkEsc(s.observaciones)}</p>`:''}
+        </div><div>
+          <h4 class="tk-h">Trazabilidad</h4>
+          <ol class="tk-tl"><li><b>Recibida</b><span>${tkFecha(this.fechaDe(s))}</span><small>Formulario público</small></li>
+            ${hist.map(h=>`<li class="tk-tl-${String(h.estado).toLowerCase()}"><b>${TK_ESTADOS[h.estado]?TK_ESTADOS[h.estado].l:h.estado}</b><span>${tkFecha(h.ts)} · ${tkEsc(h.por)}</span><small>${tkEsc(h.etapa||'')}${h.nota?'. '+tkEsc(h.nota):''}</small></li>`).join('')}</ol>
+          <div class="tk-notif">
+            ${s.correo?`<a class="btn tk-mini" href="mailto:${tkEsc(s.correo)}?subject=${encodeURIComponent('Solicitud '+s.folio+' · Control Vehicular IES')}&body=${encodeURIComponent(msg)}">Notificar por correo</a>`:''}
+            ${tel?`<a class="btn tk-mini" target="_blank" rel="noopener" href="https://wa.me/${tel.length===10?'52'+tel:tel}?text=${encodeURIComponent(msg)}">Notificar por WhatsApp</a>`:''}
+          </div>
+        </div></div>
+        ${s.fotos?`<h4 class="tk-h">Fotografías (${s.fotos})</h4><div class="tk-gal" id="tkGal"><span style="color:var(--muted);font-size:12px">Cargando…</span></div>`:''}`,
+      [{t:'Cerrar'}], '860px');
+    if(s.fotos) this.galeria(folio, '#tkGal');
+  },
+
+  async cargarFotos(folio){
+    if(this._fotos[folio]) return this._fotos[folio];
+    const v = (await fbDb.ref(`${FB_PUB}/fotos/${folio}`).get()).val() || {};
+    this._fotos[folio] = Object.keys(v).sort((a,b)=>Number(a.split('_')[1])-Number(b.split('_')[1])).map(k=>v[k]).filter(Boolean);
+    return this._fotos[folio];
+  },
+  async galeria(folio, sel){
+    try{
+      const fs = await this.cargarFotos(folio), el = $(sel); if(!el) return;
+      el.innerHTML = fs.length ? fs.map((src,i)=>`<img src="${src}" alt="Foto ${i+1}" onclick="abrirVisor(this.src,'${folio} · foto ${i+1} de ${fs.length}')">`).join('') : '<span style="color:var(--muted)">Las fotografías ya fueron depuradas; consulte el Cierre de Día.</span>';
+    }catch(e){ const el = $(sel); if(el) el.textContent = 'No se pudieron cargar las fotografías.'; }
+  },
+  verFotos(folio){
+    const s = this.porFolio(folio);
+    this.modal(`Fotografías ${folio}`, s ? `${TK_TIPOS[s.tipo].l} · ${tkEsc(s.unidad||'')} · ${tkEsc(s.solicitante)}` : '', '<div class="tk-gal tk-gal-xl" id="tkGal2">Cargando…</div>', [{t:'Cerrar'}], '860px');
+    this.galeria(folio, '#tkGal2');
+  },
+
+  /* ---------- Acciones de gestión ---------- */
+  async revisar(folio){ await this.gestion(folio, 'EN_REVISION', 'En revisión por Control Vehicular'); toast(`${folio} en revisión.`); },
+  async rechazar(folio){
+    const m = await this.pedirTexto(`Rechazar ${folio}`, 'Motivo (el solicitante lo verá al consultar su folio)');
+    if(!m) return false;
+    await this.gestion(folio, 'RECHAZADA', 'No procede', {}, m);
+    toast(`${folio} rechazada.`,'warn');
+  },
+
+  /* 1. Préstamo: elegir unidad y transferir a Préstamo / Check List */
+  asignarUnidad(folio){
+    const s = this.porFolio(folio); if(!s) return;
+    const p = s.prestamo||{};
+    const abiertoDe = veh => asignacionAbierta(veh);
+    const unidades = [...STORE.unidades].filter(u=>u.veh).sort((a,b)=>a.veh.localeCompare(b.veh));
+    const disp = unidades.filter(u=>u.estatus==='CIRCULACION' && !abiertoDe(u.veh));
+    const pref = p.unidadPreferida && disp.find(u=>u.veh===p.unidadPreferida) ? p.unidadPreferida : '';
+    const opt = u=>`<option value="${u.veh}"${u.veh===pref?' selected':''}>${u.veh} · ${u.placas||''} · ${u.zona||''} · ${u.depto||''}</option>`;
+    this.modal(`Asignar unidad a ${folio}`,
+      `${tkEsc(s.solicitante)} · ${tkFecha(p.salida)} a ${tkFecha(p.regreso)} · ${tkEsc(p.destino||'')}`,
+      `<label>Unidad disponible</label>
+       <select id="tkVeh"><option value="">— Seleccione la unidad —</option>
+         <optgroup label="Disponibles (en circulación, sin préstamo abierto)">${disp.map(opt).join('')}</optgroup>
+         <optgroup label="No disponibles">${unidades.filter(u=>!disp.includes(u)).map(u=>`<option disabled>${u.veh} · ${abiertoDe(u.veh)?'en préstamo':u.estatus}</option>`).join('')}</optgroup>
+       </select>
+       ${p.unidadPreferida?`<div class="hint" style="margin-top:6px">Preferencia del solicitante: <b>${tkEsc(p.unidadPreferida)}</b>${pref?'':' (no disponible)'}</div>`:''}
+       <div class="setup-note" style="margin-top:12px">Se abrirá el <b>Préstamo / Check List</b> de la unidad con el conductor, destino, fecha y comentarios precargados. Al guardarlo, la solicitud pasa a <b>En atención</b>; al registrar la devolución, a <b>Culminada</b>.</div>`,
+      [{t:'Rechazar', c:'btn-danger', fn:()=>this.rechazar(folio)}, {t:'Cancelar'},
+       {t:'Abrir Préstamo / Check List', c:'btn-primary', fn:async mm=>{
+         const veh = mm.q('#tkVeh').value; if(!veh){ toast('Seleccione una unidad.','err'); return false; }
+         setTimeout(()=>this.transferirPrestamo(folio, veh), 50);
+       }}], '620px');
+  },
+  async transferirPrestamo(folio, veh){
+    const s = this.porFolio(folio); const p = s.prestamo||{};
+    this.vinculo.pres = { folio };
+    await abrirModalAsignacion(veh, null);
+    const conductor = tkLimpio(p.conductor || s.solicitante).toUpperCase();
+    if(conductor && RX.chofer.test(conductor)){
+      if(!choferesConocidos().includes(conductor)){
+        STORE.choferesExtra = STORE.choferesExtra || [];
+        STORE.choferesExtra.push(conductor);
+        fbDb.ref(`${FB_ROOT}/choferesExtra`).set(STORE.choferesExtra).catch(()=>{});
+      }
+      buildChoferSelect(conductor);
+    }
+    if(p.salida) $('#aFechaEntrega').value = String(p.salida).slice(0,10);
+    $('#aDestino').value = tkLimpio(p.destino).slice(0,120);
+    $('#aComentarios').value = tkLimpio(`Solicitud ${folio}. Motivo: ${p.motivo||''}. Salida ${tkFecha(p.salida)}, regreso estimado ${tkFecha(p.regreso)}. Pasajeros: ${p.pasajeros||1}.${s.observaciones?' Obs.: '+s.observaciones:''}`).slice(0,500);
+    $('#mAsigSub').innerHTML += ` <span class="tk-vinc">Vinculado a la solicitud ${folio}</span>`;
+  },
+  abrirPrestamo(folio){
+    const g = (this.porFolio(folio)||{}).gestion||{};
+    const a = STORE.asignaciones.find(x=>x.id===g.prestamoId);
+    if(a) abrirModalAsignacion(a.vehiculo, a.id); else toast('El préstamo vinculado ya no existe.','err');
+  },
+
+  /* 2. Incidencia: registrar en Incidencias vehiculares */
+  registrarIncidencia(folio, origenChecklist){
+    const s = this.porFolio(folio); if(!s) return;
+    if(!STORE.unidades.some(u=>u.veh===s.unidad)){ toast(`La unidad ${s.unidad||''} no existe en la flotilla.`,'err'); return; }
+    const i = s.incidencia||{}, c = s.checklist||{};
+    this.vinculo.inc = { folio, fotos: s.fotos||0 };
+    abrirModalIncidencia(s.unidad);
+    const tipos = [...$('#iTipo').options].map(o=>o.value);
+    if(origenChecklist){
+      const fallas = TK_CHECK.filter(([k])=>(c.items||{})[k]==='FALLA').map(([,l])=>l);
+      $('#iFecha').value = this.fechaDe(s).slice(0,10) || new Date().toISOString().slice(0,10);
+      $('#iTipo').value = 'Mecánica';
+      $('#iNotas').value = tkLimpio(`${folio} (check list). Fallas: ${fallas.join(', ')}. Km ${c.km}. ${s.observaciones||''}`).slice(0,500);
+    } else {
+      $('#iFecha').value = String(i.fechaEvento||this.fechaDe(s)).slice(0,10);
+      if(tipos.includes(i.tipoIncidencia)) $('#iTipo').value = i.tipoIncidencia;
+      $('#iNotas').value = tkLimpio(`${folio}. Reporta ${s.solicitante}${s.telefono?' ('+s.telefono+')':''}: ${i.descripcion||''}${i.ubicacion?'. Ubicación: '+i.ubicacion:''}${i.circula?'. Puede circular: '+i.circula:''}${s.observaciones?'. Obs.: '+s.observaciones:''}`).slice(0,500);
+    }
+    $('#mIncTitle').textContent += ' · ' + folio;
+  },
+
+  /* 3. Check list rápido: validar, actualizar KM y, si hay fallas, generar incidencia */
+  validarChecklist(folio){
+    const s = this.porFolio(folio); if(!s) return;
+    const c = s.checklist||{}, u = STORE.unidades.find(x=>x.veh===s.unidad);
+    const fallas = TK_CHECK.filter(([k])=>(c.items||{})[k]==='FALLA');
+    const kmMayor = u && c.km!=null && (u.kmActual==null || Number(c.km) > Number(u.kmActual));
+    this.modal(`Validar check list ${folio}`, `${tkEsc(s.unidad)} · ${tkEsc(c.momento||'')} · ${tkEsc(s.solicitante)}`,
+      `<div class="tk-chk">${TK_CHECK.map(([k,l])=>{ const v=(c.items||{})[k]||'—'; return `<span class="tk-ci tk-ci-${String(v).toLowerCase()}">${l}<b>${v==='BIEN'?'Bien':v==='FALLA'?'Falla':v==='NA'?'N/A':'—'}</b></span>`; }).join('')}</div>
+       <div class="tk-dl"><span>Kilometraje reportado</span><b>${fmt(c.km)}</b></div>
+       <div class="tk-dl"><span>KM actual en el tablero</span><b>${u?fmt(u.kmActual):'Unidad no encontrada'}</b></div>
+       <div class="tk-dl"><span>Combustible</span><b>${tkEsc(c.combustible||'—')}</b></div>
+       ${s.observaciones?`<div class="tk-dl"><span>Observaciones</span><b>${tkEsc(s.observaciones)}</b></div>`:''}
+       ${s.fotos?`<div class="tk-gal" id="tkGal3">Cargando…</div>`:''}
+       <label class="tk-chkbox"><input type="checkbox" id="tkKm" ${kmMayor?'checked':''} ${u?'':'disabled'}> Actualizar el KM actual de ${tkEsc(s.unidad)} a ${fmt(c.km)}${u && !kmMayor?' (es menor o igual al registrado; verifique)':''}</label>
+       ${fallas.length?`<div class="setup-note" style="margin-top:10px;border-color:rgba(184,31,48,.35);background:rgba(184,31,48,.06)"><b>${fallas.length} falla(s):</b> ${fallas.map(([,l])=>l).join(', ')}. Use <b>Validar y generar incidencia</b> para darles seguimiento.</div>`:''}`,
+      [{t:'Rechazar', c:'btn-danger', fn:()=>this.rechazar(folio)}, {t:'Cancelar'},
+       ...(fallas.length?[{t:'Validar y generar incidencia', c:'btn', fn:async mm=>{ await this.guardarChecklist(s, mm.q('#tkKm').checked, true); setTimeout(()=>this.registrarIncidencia(folio, true), 60); }}]:[]),
+       {t:'Validar check list', c:'btn-primary', fn:async mm=>{ await this.guardarChecklist(s, mm.q('#tkKm').checked, false); }}], '760px');
+    if(s.fotos) this.galeria(folio, '#tkGal3');
+  },
+  async guardarChecklist(s, actualizarKm, conIncidencia){
+    const c = s.checklist||{}, u = STORE.unidades.find(x=>x.veh===s.unidad);
+    const reg = { id:uid(), folio:s.folio, unidad:s.unidad, fecha:this.fechaDe(s), solicitante:s.solicitante, departamento:s.departamento||'',
+      momento:c.momento||'', km:c.km??null, combustible:c.combustible||'', items:c.items||{}, fallas:c.fallas||0,
+      observaciones:s.observaciones||'', fotos:s.fotos||0, validadoPor:tkRol(), validadoAt:nowISO() };
+    await fbDb.ref(`${FB_ROOT}/checklists/${reg.id}`).set(reg);
+    let kmTxt = '';
+    if(actualizarKm && u && c.km!=null){
+      const antes = u.kmActual;
+      if(await fbWriteUnidad({...u, kmActual:Number(c.km), kmLegacy:null, updatedAt:nowISO()})){ await logChange(u.veh,'EDIT','kmActual',antes,c.km); kmTxt = `; KM actualizado a ${fmt(c.km)}`; }
+    }
+    await logChange(s.unidad,'CHECKLIST_RAPIDO', s.folio, '', `${c.fallas||0} falla(s)${kmTxt}`);
+    if(conIncidencia) await this.gestion(s.folio, 'EN_REVISION', `Check list validado con ${c.fallas} falla(s)${kmTxt}; se registra incidencia`, { checklistId:reg.id });
+    else await this.gestion(s.folio, 'CULMINADA', `Check list validado${c.fallas?` con ${c.fallas} falla(s)`:' sin fallas'}${kmTxt}`, { checklistId:reg.id });
+    toast(`Check list ${s.folio} validado${kmTxt}.`);
+  },
+
+  /* ---------- Vínculos con los módulos existentes ---------- */
+  camposVinculo(tipo){
+    const v = this.vinculo[tipo]; if(!v) return {};
+    return tipo==='inc' ? { solicitudFolio:v.folio, fotosTicket:v.fotos||0 } : { solicitudFolio:v.folio };
+  },
+  async alGuardarPrestamo(a){
+    if(!a || !a.solicitudFolio) return;
+    this.vinculo.pres = null;
+    const s = this.porFolio(a.solicitudFolio); if(!s) return;
+    const cerrada = a.estadoRegistro==='Cerrada';
+    const estado = cerrada ? 'CULMINADA' : 'EN_ATENCION';
+    const etapa = cerrada ? `Unidad ${a.vehiculo} devuelta (${a.bitacora||''})${a.kmRecorrido!=null?`, ${fmt(a.kmRecorrido)} km`:''}` : `Préstamo ${a.bitacora||''} abierto: unidad ${a.vehiculo}, chofer ${a.chofer||''}`;
+    const g = s.gestion||{};
+    if(g.estado===estado && g.etapa===etapa) return;
+    await this.gestion(a.solicitudFolio, estado, etapa, { prestamoId:a.id, prestamoFolio:a.bitacora||'', unidad:a.vehiculo });
+  },
+  async alGuardarIncidencia(i){
+    if(!i || !i.solicitudFolio) return;
+    this.vinculo.inc = null;
+    const s = this.porFolio(i.solicitudFolio); if(!s) return;
+    const estado = i.estatus==='Resuelto' ? 'CULMINADA' : 'EN_ATENCION';
+    const etapa = `Incidencia ${i.tipo} de ${i.unidad}: ${i.estatus}`;
+    const g = s.gestion||{};
+    if(g.estado===estado && g.etapa===etapa) return;
+    await this.gestion(i.solicitudFolio, estado, etapa, { incidenciaId:i.id, unidad:i.unidad });
+  },
+
+  /* ---------- Liga y QR ---------- */
+  qrCanvas(texto, lineas){
+    if(typeof qrcode==='undefined') return null;
+    const qr = qrcode(0,'M'); qr.addData(texto); qr.make();
+    const n = qr.getModuleCount(), cel = 7, mar = 28, lado = n*cel, alto = lineas.length ? 18 + lineas.length*24 : 0;
+    const c = document.createElement('canvas'); c.width = lado+mar*2; c.height = lado+mar*2+alto;
+    const x = c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,c.width,c.height); x.fillStyle='#0b2a52';
+    for(let r=0;r<n;r++) for(let k=0;k<n;k++) if(qr.isDark(r,k)) x.fillRect(mar+k*cel, mar+r*cel, cel, cel);
+    x.textAlign='center';
+    lineas.forEach((l,i)=>{ x.font = (i===0?'700 20px':'500 16px')+' Arial,sans-serif'; x.fillStyle = i===0?'#0b4f9e':'#1d2b3a'; x.fillText(l, c.width/2, lado+mar+20+i*24, c.width-20); });
+    return c;
+  },
+  liga(){
+    const unidades = [...STORE.unidades].filter(u=>u.veh).sort((a,b)=>a.veh.localeCompare(b.veh));
+    const m = this.modal('Liga y QR de solicitudes', 'Los colaboradores no necesitan código de acceso. El QR por unidad abre el formulario con la unidad ya seleccionada.',
+      `<div class="form-grid">
+         <div><label>Unidad (opcional)</label><select id="tkLu"><option value="">Liga general</option>${unidades.map(u=>`<option value="${u.veh}">${u.veh} · ${u.placas||''}</option>`).join('')}</select></div>
+         <div><label>Opción preseleccionada</label><select id="tkLt"><option value="">El usuario elige</option><option value="prestamo">Préstamo de unidad</option><option value="incidencia">Incidencia vehicular</option><option value="checklist">Check list rápido</option></select></div>
+         <div class="full"><label>Liga</label><div style="display:flex;gap:8px"><input type="text" id="tkUrl" readonly><button class="btn btn-primary" id="tkCopiar">Copiar</button></div></div>
+       </div>
+       <div class="tk-liga-acc"><a class="btn tk-mini" id="tkAbrir" target="_blank" rel="noopener">Abrir formulario</a><a class="btn tk-mini" id="tkWa" target="_blank" rel="noopener">Enviar por WhatsApp</a></div>
+       <div class="tk-qr" id="tkQr"></div>`,
+      [{t:'Cerrar'}, {t:'Descargar QR', c:'btn-primary', fn:mm=>{
+        const veh = mm.q('#tkLu').value, u = STORE.unidades.find(x=>x.veh===veh);
+        const c = this.qrCanvas(mm.q('#tkUrl').value, veh ? ['Control Vehicular IES', `${veh} · ${u&&u.placas||''}`, 'Préstamo, incidencias y check list'] : ['Control Vehicular IES','Solicitudes y reportes']);
+        if(!c){ toast('No se cargó la librería de QR.','err'); return false; }
+        const l = document.createElement('a'); l.href = c.toDataURL('image/png'); l.download = `QR_Solicitudes_${veh||'General'}.png`; l.click(); return false;
+      }}], '640px');
+    const pinta = ()=>{
+      const url = this.url(m.q('#tkLu').value, m.q('#tkLt').value);
+      m.q('#tkUrl').value = url; m.q('#tkAbrir').href = url;
+      m.q('#tkWa').href = 'https://wa.me/?text='+encodeURIComponent('Solicitudes de préstamo, reportes de incidencias y check list de unidades IES: '+url);
+      const c = this.qrCanvas(url, []); m.q('#tkQr').innerHTML = ''; if(c){ c.className='tk-qr-c'; m.q('#tkQr').appendChild(c); }
+    };
+    m.q('#tkLu').onchange = pinta; m.q('#tkLt').onchange = pinta;
+    m.q('#tkCopiar').onclick = async ()=>{ try{ await navigator.clipboard.writeText(m.q('#tkUrl').value); }catch(e){ m.q('#tkUrl').select(); document.execCommand('copy'); } toast('Liga copiada.'); };
+    pinta();
+  },
+  /* Hoja imprimible de etiquetas QR (respeta los filtros de zona, estatus y departamento) */
+  etiquetas(){
+    const lista = (DATA.length?DATA:STORE.unidades).filter(u=>u.veh).sort((a,b)=>a.veh.localeCompare(b.veh));
+    if(!lista.length){ toast('No hay unidades para imprimir.','warn'); return; }
+    const imgs = lista.map(u=>{ const c = this.qrCanvas(this.url(u.veh), []); return { u, src: c ? c.toDataURL('image/png') : '' }; });
+    const w = window.open('', '_blank'); if(!w){ toast('Permita las ventanas emergentes para imprimir las etiquetas.','err'); return; }
+    w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Etiquetas QR · Control Vehicular IES</title><style>
+      @page{size:letter;margin:10mm}body{font-family:Arial,sans-serif;margin:0}.g{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm}
+      .e{border:1px dashed #9fb7d3;border-radius:4mm;padding:4mm;text-align:center;break-inside:avoid}.e img{width:42mm;height:42mm}
+      .e b{display:block;font-size:15pt;color:#0b4f9e}.e span{display:block;font-size:9pt;color:#1d2b3a}.e small{display:block;font-size:7.5pt;color:#42566f;margin-top:1mm}
+      h1{font-size:12pt;color:#0b4f9e;margin:0 0 4mm}</style></head><body><h1>Etiquetas QR · Solicitudes y reportes por unidad (${lista.length})</h1><div class="g">
+      ${imgs.map(({u,src})=>`<div class="e"><img src="${src}" alt="QR ${u.veh}"><b>${u.veh}</b><span>${u.placas||''} · ${u.zona||''}</span><small>Escanee para préstamo, incidencia o check list</small></div>`).join('')}
+      </div><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);
+    w.document.close();
+    logChange('—','ETIQUETAS_QR','solicitudes','',`${lista.length} etiqueta(s)`);
+  },
+
+  /* ---------- Exportación ---------- */
+  filasExcel(){
+    return [...this.lista].sort((a,b)=>String(this.fechaDe(b)).localeCompare(String(this.fechaDe(a)))).map(s=>{
+      const g = s.gestion||{};
+      return { 'FOLIO':s.folio, 'RECIBIDA':tkFecha(this.fechaDe(s)), 'TIPO':TK_TIPOS[s.tipo]?TK_TIPOS[s.tipo].l:s.tipo, 'SOLICITANTE':s.solicitante||'',
+        'DEPARTAMENTO':s.departamento||'', 'CORREO':s.correo||'', 'TELÉFONO':s.telefono||'', 'UNIDAD':s.unidad||g.unidad||'',
+        'DETALLE':this.detalle(s), 'FOTOS':s.fotos||0, 'OBSERVACIONES':s.observaciones||'', 'ESTADO':TK_ESTADOS[this.estado(s)].l,
+        'ETAPA':g.etapa||'', 'PRÉSTAMO':g.prestamoFolio||'', 'ÚLTIMA GESTIÓN':g.actualizado?tkFecha(g.actualizado):'', 'POR':g.por||'' };
+    });
+  },
+  filasChecklist(){
+    return [...(STORE.checklists||[])].sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))).map(c=>{
+      const r = { 'FOLIO':c.folio, 'FECHA':tkFecha(c.fecha), 'UNIDAD':c.unidad, 'MOMENTO':c.momento, 'KM':c.km??'', 'COMBUSTIBLE':c.combustible, 'FALLAS':c.fallas||0 };
+      TK_CHECK.forEach(([k,l])=>{ const v=(c.items||{})[k]; r[l.toUpperCase()] = v==='BIEN'?'Bien':v==='FALLA'?'FALLA':v==='NA'?'N/A':''; });
+      r['OBSERVACIONES'] = c.observaciones||''; r['REPORTÓ'] = c.solicitante||''; r['VALIDÓ'] = c.validadoPor||'';
+      return r;
+    });
+  },
+  /* Fotografías de solicitudes dentro del ZIP de Cierre de Día */
+  async aZip(zip){
+    let n = 0;
+    for(const s of this.lista.filter(x=>x.fotos)){
+      try{
+        const fs = (await fbDb.ref(`${FB_PUB}/fotos/${s.folio}`).get()).val() || {};
+        Object.keys(fs).forEach(k=>{ if(fs[k]){ zip.file(`Solicitudes/${s.folio}_${(s.unidad||'SIN-UNIDAD').replace(/[^\w\-]/g,'_')}/${k}.jpg`, fs[k].split(',')[1]||'', {base64:true}); n++; } });
+      }catch(e){ console.warn('fotos de solicitud', s.folio, e); }
+    }
+    return n;
+  },
+  /* Libera las fotografías de solicitudes cerradas (culminadas o rechazadas) */
+  async purgarFotosCerradas(){
+    const cerradas = this.lista.filter(s=>s.fotos && ['CULMINADA','RECHAZADA'].includes(this.estado(s)));
+    if(!cerradas.length) return 0;
+    const up = {};
+    cerradas.forEach(s=>{ up[`${FB_PUB}/fotos/${s.folio}`] = null; up[`${FB_PUB}/solicitudes/${s.folio}/gestion/fotosDepuradas`] = nowISO(); });
+    await fbDb.ref().update(up);
+    this._fotos = {};
+    return cerradas.length;
+  }
+};
+window.Tickets = Tickets;
+$$('#tkTabs .tab').forEach(t=>t.onclick=()=>{ $$('#tkTabs .tab').forEach(x=>x.classList.toggle('active', x===t)); Tickets.tab = t.dataset.tk; Tickets.render(); });
+$('#tkBuscar').oninput = ()=>Tickets.render();
+$('#tkLiga').onclick = ()=>Tickets.liga();
+$('#tkEtiquetas').onclick = ()=>Tickets.etiquetas();
 
 /* ============ INIT ============ */
 function init(){
