@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.4</title>
+<title>Control Vehicular · KPI-AFI-01 v3.5</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2044%22%20role%3D%22img%22%20aria-label%3D%22Control%20Vehicular%22%3E%20%3Cg%20fill%3D%22%230b4f9e%22%3E%20%3Cpath%20d%3D%22M17.2%204.6Q18.3%202%2021.2%202H42.8Q45.7%202%2046.8%204.6L52%2017H12Z%22/%3E%20%3Crect%20x%3D%223%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2252.5%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%20%3Cpath%20d%3D%22M8%2019Q8%2016%2011%2016H53Q56%2016%2056%2019V32.5Q56%2035%2053.5%2035H10.5Q8%2035%208%2032.5Z%22/%3E%20%3Crect%20x%3D%2210%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%3Crect%20x%3D%2243.5%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%20%3C/g%3E%20%3Cpath%20d%3D%22M20.8%205H43.2L48%2014.6H16Z%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Crect%20x%3D%2211%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%3Crect%20x%3D%2242.5%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%20%3Crect%20x%3D%2224.5%22%20y%3D%2219.5%22%20width%3D%2215%22%20height%3D%228.5%22%20rx%3D%221.6%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Cpath%20d%3D%22M24.5%2022.4H39.5M24.5%2025.2H39.5%22%20stroke%3D%22%230b4f9e%22%20stroke-width%3D%221.1%22/%3E%20%3Crect%20x%3D%229%22%20y%3D%2229.6%22%20width%3D%2246%22%20height%3D%221.5%22%20rx%3D%22.75%22%20fill%3D%22%23dbe9fb%22/%3E%20%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -486,6 +486,47 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 .av-pasos li{margin-bottom:4px}
 .av-pasos code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--txt)}
 @media(max-width:620px){.av-wa{grid-template-columns:1fr}.gs-box kbd{display:none}.brand-logo{width:48px;height:33px}}
+/* ============ v3.5 · Centro de notificaciones ============ */
+header{position:relative;padding-right:64px}
+.nt-wrap{position:absolute;top:0;right:0;z-index:70}
+.nt-btn{position:relative;width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--panel);
+  color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(11,79,158,.08)}
+.nt-btn:hover,.nt-btn.open{border-color:var(--accent);background:var(--panel2)}
+.nt-btn svg{width:22px;height:22px}
+.nt-btn .nt-n{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--red);
+  color:#fff;font-size:11px;font-weight:700;line-height:20px;text-align:center;border:2px solid var(--bg)}
+.nt-btn .nt-n.hidden{display:none}
+.nt-btn.urgente svg{animation:ntPulso 2.4s ease-in-out 3}
+@keyframes ntPulso{0%,100%{transform:rotate(0)}10%{transform:rotate(14deg)}20%{transform:rotate(-12deg)}30%{transform:rotate(8deg)}40%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){.nt-btn.urgente svg{animation:none}}
+.nt-panel{display:none;position:absolute;top:54px;right:0;width:400px;max-width:calc(100vw - 24px);background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 44px rgba(11,79,158,.24);overflow:hidden}
+.nt-panel.open{display:block}
+.nt-top{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.nt-top b{font-size:14px;color:var(--accent)}
+.nt-top span{font-size:11.5px;color:var(--muted)}
+.nt-top button{margin-left:auto;font-size:11.5px;padding:4px 10px}
+.nt-res{display:flex;gap:6px;padding:9px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.nt-res span{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--panel2);color:var(--muted)}
+.nt-res span b{color:var(--txt)}
+.nt-res .r-venc b{color:var(--red)} .nt-res .r-hoy b{color:var(--orange)}
+.nt-list{max-height:min(62vh,540px);overflow:auto}
+.nt-grp{font-size:11px;font-weight:700;padding:9px 14px 4px;position:sticky;top:0;background:var(--panel);z-index:1}
+.nt-grp.g-venc{color:var(--red)} .nt-grp.g-hoy{color:var(--orange)} .nt-grp.g-nuevo{color:var(--accent)} .nt-grp.g-prox{color:var(--green)}
+.nt-it{display:grid;grid-template-columns:30px 1fr auto;gap:2px 10px;padding:8px 14px;cursor:pointer;align-items:center;border-left:3px solid transparent}
+.nt-it:hover{background:var(--panel2)}
+.nt-it.nv{border-left-color:var(--accent);background:#f4f9ff}
+.nt-ic{grid-row:1/3;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--panel2)}
+.nt-it .t{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nt-it .s{grid-column:2;font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nt-it .f{grid-row:1/3;grid-column:3;font-size:10.5px;font-weight:700;text-align:right;white-space:nowrap}
+.nt-it .f.venc{color:var(--red)} .nt-it .f.hoy{color:var(--orange)} .nt-it .f.prox{color:var(--green)} .nt-it .f.nuevo{color:var(--accent)}
+.nt-vacio{padding:28px 18px;text-align:center;color:var(--muted);font-size:12.5px}
+@media(max-width:620px){
+  header{padding-right:56px}
+  .nt-btn{width:42px;height:42px}
+  .nt-panel{position:fixed;top:64px;left:10px;right:10px;width:auto;max-width:none}
+}
 </style>
 </head>
 <body>
@@ -559,6 +600,20 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
     <button class="btn btn-ghost" id="btnLogout" title="Cerrar sesión">Salir</button>
     <span class="update-badge" id="updateBadge">—</span>
   </div>
+  <!-- v3.5: centro de notificaciones -->
+  <div class="nt-wrap" id="ntWrap">
+    <button class="nt-btn" id="ntBtn" type="button" aria-label="Notificaciones" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="nt-n hidden" id="ntN">0</span>
+    </button>
+    <div class="nt-panel" id="ntPanel" role="dialog" aria-label="Notificaciones">
+      <div class="nt-top"><div><b>Notificaciones</b><br><span>Ordenadas por urgencia del día</span></div>
+        <button class="btn" id="ntVistos" type="button">Marcar como vistas</button></div>
+      <div class="nt-res" id="ntRes"></div>
+      <div class="nt-list" id="ntList"></div>
+    </div>
+  </div>
 </header>
 
 <!-- ============ BÚSQUEDA GENERAL (v3.4) ============ -->
@@ -583,6 +638,22 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 
 <!-- ============ KPIs ============ -->
 <div class="kpis" id="kpis"></div>
+
+<!-- ============ PARQUE VEHICULAR ============ -->
+<div class="card col-12">
+  <h3>Parque Vehicular Total · Estatus Operativo
+    <button class="btn hidden" id="btnNuevaUnidad" style="margin-left:auto;font-size:12px;padding:5px 12px">+ Nueva unidad</button>
+  </h3>
+  <div class="hint">Cada recuadro es una unidad coloreada por estatus. Clic en una unidad para desplegar su detalle. <span style="color:var(--red)">●</span> = incidencias pendientes.</div>
+  <div class="fleet-legend">
+    <span><i class="dot u-circ"></i> Circulación</span>
+    <span><i class="dot u-tall"></i> Taller</span>
+    <span><i class="dot u-resg"></i> Resguardo</span>
+    <span><i class="dot u-sin"></i> Siniestrado</span>
+  </div>
+  <div class="fleet" id="fleet"></div>
+  <div id="fleetDetail"></div>
+</div>
 
 <!-- ============ CALENDARIO DE TAREAS (admin + auxiliar) ============ -->
 <div class="card col-12 hidden" id="cardCalendario">
@@ -638,22 +709,6 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
   </div>
   <div class="tk-filtros"><input type="text" id="tkBuscar" placeholder="Buscar folio, solicitante o unidad"></div>
   <div class="tablewrap" style="max-height:380px"><table id="tblTk"><thead></thead><tbody></tbody></table></div>
-</div>
-
-<!-- ============ PARQUE VEHICULAR ============ -->
-<div class="card col-12">
-  <h3>Parque Vehicular Total · Estatus Operativo
-    <button class="btn hidden" id="btnNuevaUnidad" style="margin-left:auto;font-size:12px;padding:5px 12px">+ Nueva unidad</button>
-  </h3>
-  <div class="hint">Cada recuadro es una unidad coloreada por estatus. Clic en una unidad para desplegar su detalle. <span style="color:var(--red)">●</span> = incidencias pendientes.</div>
-  <div class="fleet-legend">
-    <span><i class="dot u-circ"></i> Circulación</span>
-    <span><i class="dot u-tall"></i> Taller</span>
-    <span><i class="dot u-resg"></i> Resguardo</span>
-    <span><i class="dot u-sin"></i> Siniestrado</span>
-  </div>
-  <div class="fleet" id="fleet"></div>
-  <div id="fleetDetail"></div>
 </div>
 
 <!-- ============ GRÁFICAS ============ -->
@@ -1823,6 +1878,7 @@ function aplicarPermisos(){
   $('#btnConfig').classList.toggle('hidden', !esAdmin);
   $('#cardBitacora').classList.toggle('hidden', !esAdmin);
   $('#cardCalendario').classList.toggle('hidden', !esEditor);
+  if(window.Notif) Notif.render();
 }
 
 /* ============ RENDER: KPIs ============ */
@@ -5608,7 +5664,7 @@ function refrescarTodo(rebuild=true){
   pie('cEstatus', ec, 'estatus');
   barDepto(); barServicio(); renderTable();
   renderIncidencias(); renderBitacora(); renderFleetDetail(); renderCombustibles(); renderCalendario(); renderPrestamos();
-  renderMantenimientos(); renderCatalogoTalleres(); Tickets.render();
+  renderMantenimientos(); renderCatalogoTalleres(); Tickets.render(); Notif.render();
   const upd = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : hoyStr();
   $('#updateBadge').textContent = 'Actualizado: '+upd;
 }
@@ -6164,6 +6220,7 @@ const Tickets = {
       this.lista = Object.keys(v).map(k=>Object.assign({ folio:k }, v[k]));
       if(session.rol) this.render();
       Avisos.alRecibir(this.lista);
+      Notif.render();
       if($('#gsPanel').classList.contains('open')) GS.pinta();
     }, err=>console.warn('solicitudes', err));
   },
@@ -6993,6 +7050,169 @@ const Avisos = {
 window.Avisos = Avisos;
 
 $('#tkAvisos').onclick = ()=>Avisos.abrir();
+
+/* ============ CENTRO DE NOTIFICACIONES · v3.5 ============
+   Lista breve, ordenada por urgencia, de lo que requiere atención:
+     · Solicitudes nuevas o en revisión (préstamo, incidencia, check list)
+     · Incidencias pendientes
+     · Tareas del calendario (vencidas, de hoy y próximos 7 días)
+     · Mantenimientos programados (atrasados, de hoy y próximos 7 días)
+     · Programaciones de préstamo (solicitudes con fecha de salida y préstamos con entrega futura)
+   Prioridad: 1 Vencido · 2 Hoy · 3 Nuevo sin atender · 4 Próximos 7 días.
+   «Marcar como visto» se guarda en este navegador; los pendientes siguen en la lista
+   hasta que se atienden en su módulo. */
+const Notif = {
+  CLAVE: 'ies_vehicular_notif_vistos', abierta: false, items: [], _urg: 0,
+  vistos(){ try{ return JSON.parse(localStorage.getItem(this.CLAVE)||'{}'); }catch(e){ return {}; } },
+  guardaVistos(v){ try{ localStorage.setItem(this.CLAVE, JSON.stringify(v)); }catch(e){} },
+  dia(v){ if(!v) return ''; const s = String(v); if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+          const d = new Date(v); return isNaN(d) ? '' : toISO(d); },
+  sumaDias(iso, n){ const d = new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return toISO(d); },
+  clasifica(fecha){
+    const hoy = hoyISO();
+    if(!fecha) return null;
+    if(fecha < hoy) return 'venc';
+    if(fecha === hoy) return 'hoy';
+    if(fecha <= this.sumaDias(hoy, 7)) return 'prox';
+    return null;
+  },
+  etiquetaFecha(nivel, fecha, hora){
+    const hoy = hoyISO();
+    if(nivel==='venc'){ const d = diasEntreFechas(fecha, hoy); return d ? `Vencido ${d} d` : (hora ? `Atrasado ${hora}` : 'Atrasado'); }
+    if(nivel==='hoy') return hora ? `Hoy ${hora}` : 'Hoy';
+    if(nivel==='prox') return fecha===this.sumaDias(hoy,1) ? (hora?`Mañana ${hora}`:'Mañana') : fFechaMx(fecha);
+    return 'Nuevo';
+  },
+  construir(){
+    const ed = session.rol==='admin' || session.rol==='auxiliar';
+    const out = [];
+    const add = o => { o.fx = this.etiquetaFecha(o.nivel, o.fecha, o.hora); out.push(o); };
+    const hoy = hoyISO();
+
+    // 1. Solicitudes de usuarios
+    if(session.rol) (Tickets.lista||[]).forEach(s=>{
+      const e = (s.gestion && s.gestion.estado) || 'NUEVA';
+      if(['CULMINADA','RECHAZADA'].includes(e)) return;
+      const tipo = TK_TIPOS[s.tipo] ? TK_TIPOS[s.tipo].l : 'Solicitud';
+      const unidad = s.unidad || (s.prestamo && s.prestamo.unidadPreferida) || 'Por asignar';
+      const recibida = this.dia(s.ts || s.tsCliente);
+      if(s.tipo==='PRESTAMO' && s.prestamo && s.prestamo.salida && e!=='NUEVA'){
+        // Programación de préstamo ya revisada: se ordena por la fecha de salida
+        const f = this.dia(s.prestamo.salida), n = this.clasifica(f);
+        if(n) add({ id:'sp_'+s.folio, nivel:n, fecha:f, hora:String(s.prestamo.salida).slice(11,16), ic:'🗓', tipo:'Préstamo programado',
+          t:`Salida de unidad · ${unidad}`, s:`${s.folio} · ${s.solicitante||'—'} · ${s.prestamo.destino||''}`, ir:()=>Tickets.ver(s.folio) });
+        return;
+      }
+      if(!['NUEVA','EN_REVISION'].includes(e)) return;
+      let nivel = 'nuevo', fecha = recibida;
+      if(s.tipo==='PRESTAMO' && s.prestamo && s.prestamo.salida){
+        const f = this.dia(s.prestamo.salida), n = this.clasifica(f);
+        if(n==='venc' || n==='hoy'){ nivel = n; fecha = f; }
+      }
+      if(s.tipo==='INCIDENCIA' && (s.incidencia||{}).circula && /^no/i.test(s.incidencia.circula)) nivel = nivel==='nuevo' ? 'hoy' : nivel;
+      add({ id:'so_'+s.folio, nivel, fecha, ic: s.tipo==='PRESTAMO'?'🚗':s.tipo==='INCIDENCIA'?'⚠️':'✅', tipo:`Solicitud · ${tipo}`,
+        t:`${s.folio} · ${tipo}`, s:`${s.solicitante||'—'} · ${unidad}${s.tipo==='PRESTAMO'&&s.prestamo&&s.prestamo.salida?' · salida '+fFechaMx(this.dia(s.prestamo.salida)):''}${e==='EN_REVISION'?' · En revisión':''}`, ir:()=>Tickets.ver(s.folio) });
+    });
+
+    // 2. Incidencias pendientes
+    STORE.incidencias.filter(i=>i.estatus==='Pendiente').forEach(i=>{
+      const f = this.dia(i.fecha);
+      add({ id:'in_'+i.id, nivel: f===hoy ? 'hoy' : 'nuevo', fecha:f, ic:'🛠', tipo:'Incidencia',
+        t:`${i.unidad} · ${i.tipo||'Incidencia'}`, s:`Pendiente desde ${fFechaMx(f)}${i.notas?' · '+i.notas:''}`,
+        ir:()=> ed ? editarIncidencia(i.id) : filtrarIncidenciasPor(i.unidad) });
+    });
+
+    // 3. Tareas del calendario
+    if(ed) todasLasTareas().filter(t=>!t.hecha && t.fecha).forEach(t=>{
+      const n = this.clasifica(t.fecha); if(!n) return;
+      add({ id:'ta_'+t.incId+'_'+(t.id||t.texto), nivel:n, fecha:t.fecha, ic:'📌', tipo:'Tarea',
+        t:t.texto, s:`${t.unidad} · ${t.tipo||''}`, ir:()=>editarIncidencia(t.incId) });
+    });
+
+    // 4. Mantenimientos programados
+    STORE.mantenimientos.filter(m=>m.estatus==='Programado' && m.fecha).forEach(m=>{
+      const n = mtAtrasado(m) ? 'venc' : this.clasifica(m.fecha); if(!n) return;
+      add({ id:'mt_'+m.id, nivel:n, fecha:m.fecha, hora:m.hora||'', ic:'🔧', tipo:'Mantenimiento',
+        t:`${m.unidad} · ${m.tipo||'Servicio'}`, s:`${m.taller||'Taller por definir'}${m.folio?' · '+m.folio:''}`,
+        ir:()=> ed ? editarMantenimiento(m.id) : filtrarMantPor(m.unidad) });
+    });
+
+    // 5. Préstamos con entrega programada (registrados con fecha futura o de hoy)
+    STORE.asignaciones.filter(a=>a.estadoRegistro!=='Cerrada' && a.fechaEntrega && this.dia(a.fechaEntrega)>=hoy).forEach(a=>{
+      const f = this.dia(a.fechaEntrega), n = this.clasifica(f); if(!n) return;
+      add({ id:'pr_'+a.id, nivel:n, fecha:f, ic:'🔑', tipo:'Préstamo',
+        t:`Entrega de unidad · ${a.vehiculo}`, s:`${a.bitacora||'Sin folio'} · ${a.chofer||'—'} · ${a.destino||''}`,
+        ir:()=> ed ? abrirModalAsignacion(a.vehiculo, a.id) : verHistorialAsig(a.vehiculo) });
+    });
+
+    const peso = { venc:1, hoy:2, nuevo:3, prox:4 };
+    out.sort((a,b)=> peso[a.nivel]-peso[b.nivel]
+      || (a.nivel==='nuevo' || a.nivel==='venc' ? String(a.fecha).localeCompare(String(b.fecha)) * (a.nivel==='nuevo'?-1:1)
+                                                 : String(a.fecha+(a.hora||'')).localeCompare(String(b.fecha+(b.hora||'')))));
+    return out;
+  },
+  render(){
+    if(!$('#ntBtn') || !session.rol) return;
+    this.items = this.construir();
+    const v = this.vistos();
+    const sinVer = this.items.filter(x=>!v[x.id]);
+    const urg = this.items.filter(x=>x.nivel==='venc' || x.nivel==='hoy').length;
+    const n = $('#ntN'); n.textContent = sinVer.length>99 ? '99+' : sinVer.length; n.classList.toggle('hidden', !sinVer.length);
+    $('#ntBtn').title = `${this.items.length} aviso(s) · ${urg} urgente(s) hoy`;
+    if(urg > this._urg){ $('#ntBtn').classList.remove('urgente'); void $('#ntBtn').offsetWidth; $('#ntBtn').classList.add('urgente'); }
+    this._urg = urg;
+    if(this.abierta) this.pintaPanel();
+  },
+  pintaPanel(){
+    const v = this.vistos(), L = this.items;
+    const cnt = k => L.filter(x=>x.nivel===k).length;
+    $('#ntRes').innerHTML = `<span class="r-venc">Vencidos <b>${cnt('venc')}</b></span><span class="r-hoy">Hoy <b>${cnt('hoy')}</b></span>
+      <span>Nuevos <b>${cnt('nuevo')}</b></span><span>Próximos 7 días <b>${cnt('prox')}</b></span>`;
+    if(!L.length){ $('#ntList').innerHTML = '<div class="nt-vacio">Sin pendientes. No hay solicitudes, incidencias, tareas ni programaciones que atender.</div>'; return; }
+    const titulos = { venc:'Vencidos', hoy:'Para hoy', nuevo:'Nuevos sin atender', prox:'Próximos 7 días' };
+    let html = '', grupo = '';
+    L.slice(0, 60).forEach((x,i)=>{
+      if(x.nivel!==grupo){ grupo = x.nivel; html += `<div class="nt-grp g-${grupo}">${titulos[grupo]}</div>`; }
+      html += `<div class="nt-it ${v[x.id]?'':'nv'}" data-ni="${i}"><div class="nt-ic">${x.ic}</div>
+        <div class="t">${escapa(x.t)}</div><div class="s">${escapa(x.tipo)} · ${escapa(x.s)}</div>
+        <div class="f ${x.nivel}">${escapa(x.fx)}</div></div>`;
+    });
+    if(L.length>60) html += `<div class="nt-vacio" style="padding:10px">Se muestran 60 de ${L.length}. Use la búsqueda general para el resto.</div>`;
+    $('#ntList').innerHTML = html;
+  },
+  alternar(forzar){
+    this.abierta = forzar!==undefined ? forzar : !this.abierta;
+    $('#ntPanel').classList.toggle('open', this.abierta);
+    $('#ntBtn').classList.toggle('open', this.abierta);
+    $('#ntBtn').setAttribute('aria-expanded', this.abierta);
+    if(this.abierta){ this.items = this.construir(); this.pintaPanel(); }
+  },
+  marcarVistos(){
+    const v = this.vistos(); const vivos = new Set(this.items.map(x=>x.id));
+    Object.keys(v).forEach(k=>{ if(!vivos.has(k)) delete v[k]; });   // depura lo ya atendido
+    this.items.forEach(x=>v[x.id] = 1);
+    this.guardaVistos(v); this.render(); this.pintaPanel();
+  },
+  init(){
+    if(!$('#ntBtn')) return;
+    $('#ntBtn').onclick = ev=>{ ev.stopPropagation(); this.alternar(); };
+    $('#ntVistos').onclick = ()=>this.marcarVistos();
+    $('#ntList').addEventListener('click', ev=>{
+      const it = ev.target.closest('.nt-it'); if(!it) return;
+      const x = this.items[+it.dataset.ni]; if(!x) return;
+      const v = this.vistos(); v[x.id] = 1; this.guardaVistos(v);
+      this.alternar(false); this.render();
+      try{ x.ir(); }catch(e){ console.warn('notificación', e); toast('No fue posible abrir el registro.','err'); }
+    });
+    document.addEventListener('mousedown', ev=>{ if(this.abierta && !ev.target.closest('#ntWrap')) this.alternar(false); });
+    document.addEventListener('keydown', ev=>{ if(ev.key==='Escape' && this.abierta) this.alternar(false); });
+    // Cambio de día con el tablero abierto: se reclasifica cada 5 minutos
+    setInterval(()=>this.render(), 5*60*1000);
+  }
+};
+window.Notif = Notif;
+Notif.init();
+
 $$('#tkTabs .tab').forEach(t=>t.onclick=()=>{ $$('#tkTabs .tab').forEach(x=>x.classList.toggle('active', x===t)); Tickets.tab = t.dataset.tk; Tickets.render(); });
 $('#tkBuscar').oninput = ()=>Tickets.render();
 $('#tkLiga').onclick = ()=>Tickets.liga();
