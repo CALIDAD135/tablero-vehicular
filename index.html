@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.3</title>
+<title>Control Vehicular · KPI-AFI-01 v3.4</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2044%22%20role%3D%22img%22%20aria-label%3D%22Control%20Vehicular%22%3E%20%3Cg%20fill%3D%22%230b4f9e%22%3E%20%3Cpath%20d%3D%22M17.2%204.6Q18.3%202%2021.2%202H42.8Q45.7%202%2046.8%204.6L52%2017H12Z%22/%3E%20%3Crect%20x%3D%223%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2252.5%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%20%3Cpath%20d%3D%22M8%2019Q8%2016%2011%2016H53Q56%2016%2056%2019V32.5Q56%2035%2053.5%2035H10.5Q8%2035%208%2032.5Z%22/%3E%20%3Crect%20x%3D%2210%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%3Crect%20x%3D%2243.5%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%20%3C/g%3E%20%3Cpath%20d%3D%22M20.8%205H43.2L48%2014.6H16Z%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Crect%20x%3D%2211%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%3Crect%20x%3D%2242.5%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%20%3Crect%20x%3D%2224.5%22%20y%3D%2219.5%22%20width%3D%2215%22%20height%3D%228.5%22%20rx%3D%221.6%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Cpath%20d%3D%22M24.5%2022.4H39.5M24.5%2025.2H39.5%22%20stroke%3D%22%230b4f9e%22%20stroke-width%3D%221.1%22/%3E%20%3Crect%20x%3D%229%22%20y%3D%2229.6%22%20width%3D%2246%22%20height%3D%221.5%22%20rx%3D%22.75%22%20fill%3D%22%23dbe9fb%22/%3E%20%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
@@ -155,7 +156,6 @@ tbody tr:hover{background:#d6e8fb}
 /* ===== FIRMA ELECTRÓNICA ===== */
 .firma-wrap{border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:10px 12px}
 .firma-box{position:relative;background:#ffffff;border:1px solid var(--line);border-radius:8px;overflow:hidden;touch-action:none}
-#firmaCanvas{display:block;width:100%;height:180px;cursor:crosshair;touch-action:none}
 .firma-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
   color:#9aa8bd;font-size:12.5px;letter-spacing:.3px}
 .firma-hint.hide{display:none}
@@ -429,6 +429,63 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 .tk-ci b{font-size:11px}.tk-ci-bien b{color:var(--green)}.tk-ci-falla{border-color:rgba(184,31,48,.45);background:rgba(184,31,48,.05)}.tk-ci-falla b{color:var(--red)}.tk-ci-na b{color:var(--muted)}
 .tk-chkbox{display:flex;gap:8px;align-items:center;font-size:12px;margin-top:10px}.tk-chkbox input{width:auto}
 .tk-liga-acc{display:flex;gap:8px;margin:10px 0}.tk-qr{display:flex;justify-content:center}.tk-qr-c{width:220px;border:1px solid var(--line);border-radius:10px}
+/* ============ v3.4 · Identidad, búsqueda general, firma y avisos ============ */
+.brand{display:flex;align-items:center;gap:13px}
+.brand-logo{width:58px;height:40px;color:var(--accent);flex:none;display:block}
+.login-box .brand-logo{width:70px;height:48px;margin:0 auto 10px}
+
+/* Búsqueda general */
+.gsearch{position:relative;margin:-4px 0 18px;z-index:60}
+.gs-box{display:flex;align-items:center;gap:10px;background:var(--panel);border:1.5px solid var(--line);border-radius:12px;
+  padding:4px 8px 4px 14px;box-shadow:0 1px 3px rgba(11,79,158,.07);transition:border-color .15s, box-shadow .15s}
+.gs-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,79,158,.12)}
+.gs-box svg{width:18px;height:18px;color:var(--accent);flex:none}
+.gs-box input{flex:1;width:100%;min-width:0;outline:none;font-family:inherit;color:var(--txt);border:0!important;background:transparent!important;padding:9px 2px!important;font-size:14px!important;box-shadow:none!important}
+.gs-box input::-webkit-search-cancel-button{cursor:pointer}
+.gs-box kbd{font-family:inherit;font-size:11px;font-weight:600;line-height:1;color:var(--muted);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:4px 7px;background:var(--panel2)}
+.gs-panel{display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--panel);border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 18px 44px rgba(11,79,158,.22);max-height:min(70vh,620px);overflow:auto}
+.gs-panel.open{display:block}
+.gs-head{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 14px;z-index:1}
+.gs-resumen{font-size:12px;color:var(--muted)}
+.gs-resumen b{color:var(--txt)}
+.gs-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.gs-chip{font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;color:var(--txt)}
+.gs-chip b{color:var(--accent);margin-left:3px}
+.gs-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.gs-chip.on b{color:#fff}
+.gs-grp{padding:6px 0 4px}
+.gs-grp h5{font-size:11px;color:var(--accent);padding:6px 14px 4px;font-weight:700;letter-spacing:.3px}
+.gs-it{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:8px 14px;cursor:pointer;border-left:3px solid transparent}
+.gs-it:hover,.gs-it.act{background:var(--panel2);border-left-color:var(--accent)}
+.gs-it .t{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-it .s{grid-column:1;color:var(--muted);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-it .m{grid-row:1/3;grid-column:2;align-self:center;font-size:10.5px;color:var(--muted);text-align:right;white-space:nowrap}
+.gs-it .m.aprox{color:var(--orange)}
+.gs-it mark{background:#fff1b8;color:inherit;border-radius:2px;padding:0 1px}
+.gs-mas{font-size:11.5px;color:var(--accent);padding:4px 14px 8px;cursor:pointer}
+.gs-vacio{padding:22px 16px;color:var(--muted);font-size:12.5px;text-align:center}
+
+/* Firma: lienzo responsivo para teléfono y tablet */
+.firma-box canvas{display:block;width:100%;height:190px;cursor:crosshair;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+@media(max-width:620px){
+  .modal-overlay{padding:14px 8px}
+  .modal{padding:18px 14px}
+  .firma-wrap{padding:8px}
+  .firma-box canvas{height:200px}
+}
+
+/* Avisos */
+.av-estado{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);font-size:12.5px;margin-bottom:14px}
+.av-estado i{width:10px;height:10px;border-radius:50%;flex:none;background:var(--muted)}
+.av-estado.ok i{background:var(--green)} .av-estado.warn i{background:var(--orange)} .av-estado.err i{background:var(--red)}
+.av-wa{display:grid;grid-template-columns:.8fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.av-tipos{display:flex;gap:16px;flex-wrap:wrap}
+.av-tipos label{display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-size:12.5px;color:var(--txt);font-weight:500;margin:0}
+.av-pasos{font-size:12px;color:var(--muted);line-height:1.55;padding-left:18px}
+.av-pasos li{margin-bottom:4px}
+.av-pasos code{background:var(--panel2);padding:1px 5px;border-radius:4px;color:var(--txt)}
+@media(max-width:620px){.av-wa{grid-template-columns:1fr}.gs-box kbd{display:none}.brand-logo{width:48px;height:33px}}
 </style>
 </head>
 <body>
@@ -436,6 +493,19 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 <!-- ============ LOGIN OVERLAY ============ -->
 <div class="overlay" id="loginOverlay">
   <div class="login-box">
+    <svg class="brand-logo" viewBox="0 0 64 44" role="img" aria-label="Control Vehicular">
+      <g fill="currentColor">
+        <path d="M17.2 4.6Q18.3 2 21.2 2H42.8Q45.7 2 46.8 4.6L52 17H12Z"/>
+        <rect x="3" y="12.5" width="8.5" height="5.5" rx="1.8"/><rect x="52.5" y="12.5" width="8.5" height="5.5" rx="1.8"/>
+        <path d="M8 19Q8 16 11 16H53Q56 16 56 19V32.5Q56 35 53.5 35H10.5Q8 35 8 32.5Z"/>
+        <rect x="10" y="33" width="10.5" height="10" rx="2.2"/><rect x="43.5" y="33" width="10.5" height="10" rx="2.2"/>
+      </g>
+      <path d="M20.8 5H43.2L48 14.6H16Z" fill="#dbe9fb"/>
+      <rect x="11" y="19.5" width="10.5" height="5" rx="2.5" fill="#ffffff"/><rect x="42.5" y="19.5" width="10.5" height="5" rx="2.5" fill="#ffffff"/>
+      <rect x="24.5" y="19.5" width="15" height="8.5" rx="1.6" fill="#dbe9fb"/>
+      <path d="M24.5 22.4H39.5M24.5 25.2H39.5" stroke="currentColor" stroke-width="1.1"/>
+      <rect x="9" y="29.6" width="46" height="1.5" rx=".75" fill="#dbe9fb"/>
+    </svg>
     <h2>Acceso a Control Vehicular</h2>
     <div class="sub">KPI-AFI-01 · Coordinación de Activos Fijos y Control Vehicular</div>
     <div class="login-role-btns">
@@ -455,9 +525,24 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 
 <!-- ============ HEADER ============ -->
 <header>
-  <div>
-    <h1>Control Vehicular</h1>
-    <div class="sub">KPI-AFI-01 · Activos Fijos 2025-2026 · Coordinación de Activos Fijos y Control Vehicular</div>
+  <div class="brand">
+    <svg class="brand-logo" viewBox="0 0 64 44" role="img" aria-label="Control Vehicular">
+      <g fill="currentColor">
+        <path d="M17.2 4.6Q18.3 2 21.2 2H42.8Q45.7 2 46.8 4.6L52 17H12Z"/>
+        <rect x="3" y="12.5" width="8.5" height="5.5" rx="1.8"/><rect x="52.5" y="12.5" width="8.5" height="5.5" rx="1.8"/>
+        <path d="M8 19Q8 16 11 16H53Q56 16 56 19V32.5Q56 35 53.5 35H10.5Q8 35 8 32.5Z"/>
+        <rect x="10" y="33" width="10.5" height="10" rx="2.2"/><rect x="43.5" y="33" width="10.5" height="10" rx="2.2"/>
+      </g>
+      <path d="M20.8 5H43.2L48 14.6H16Z" fill="#dbe9fb"/>
+      <rect x="11" y="19.5" width="10.5" height="5" rx="2.5" fill="#ffffff"/><rect x="42.5" y="19.5" width="10.5" height="5" rx="2.5" fill="#ffffff"/>
+      <rect x="24.5" y="19.5" width="15" height="8.5" rx="1.6" fill="#dbe9fb"/>
+      <path d="M24.5 22.4H39.5M24.5 25.2H39.5" stroke="currentColor" stroke-width="1.1"/>
+      <rect x="9" y="29.6" width="46" height="1.5" rx=".75" fill="#dbe9fb"/>
+    </svg>
+    <div>
+      <h1>Control Vehicular</h1>
+      <div class="sub">KPI-AFI-01 · Activos Fijos 2025-2026 · Coordinación de Activos Fijos y Control Vehicular</div>
+    </div>
   </div>
   <div class="toolbar">
     <span class="role-badge" id="roleBadge">—</span>
@@ -476,6 +561,17 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
   </div>
 </header>
 
+<!-- ============ BÚSQUEDA GENERAL (v3.4) ============ -->
+<div class="gsearch" id="gsearch">
+  <div class="gs-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+    <input type="search" id="gsInput" autocomplete="off" spellcheck="false" aria-label="Búsqueda general"
+      placeholder="Búsqueda general: unidad, placas, chofer, folio, taller, destino, solicitante…">
+    <kbd title="Atajo de teclado">/</kbd>
+  </div>
+  <div class="gs-panel" id="gsPanel" role="listbox"></div>
+</div>
+
 <!-- ============ SEED BOX (primera vez, solo admin) ============ -->
 <div id="seedBox" class="hidden">
   <div>
@@ -488,11 +584,47 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
 <!-- ============ KPIs ============ -->
 <div class="kpis" id="kpis"></div>
 
+<!-- ============ CALENDARIO DE TAREAS (admin + auxiliar) ============ -->
+<div class="card col-12 hidden" id="cardCalendario">
+  <h3>Calendario de Tareas y Mantenimientos
+    <span class="hint" style="font-weight:400">· tareas derivadas de incidencias y agenda de taller por unidad</span>
+    <span id="calBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
+  </h3>
+  <div class="cal-toolbar">
+    <div class="cal-switch">
+      <button data-cal="semana" class="active">Semanal</button>
+      <button data-cal="mes">Mensual</button>
+    </div>
+    <div class="cal-nav">
+      <button id="calPrev" title="Anterior">‹</button>
+      <button id="calHoy" title="Hoy" style="width:auto;padding:0 12px;font-size:12px">Hoy</button>
+      <button id="calNext" title="Siguiente">›</button>
+    </div>
+    <div class="cal-title" id="calTitle">—</div>
+    <div class="cal-legend">
+      <span class="grp"><b>Tareas:</b>
+        <span><i class="lg-task" style="border-left-color:var(--accent)"></i>Pendiente</span>
+        <span><i class="lg-task" style="border-left-color:var(--red)"></i>Vencida</span>
+        <span><i class="lg-task" style="border-left-color:var(--green)"></i>Cumplida</span>
+      </span>
+      <span class="grp"><b>🔧 Mantenimiento:</b>
+        <span><i style="background:#1565c0"></i>Programado</span>
+        <span><i style="background:#f4c20d"></i>Ingreso</span>
+        <span><i style="background:#0f7a4e"></i>Entregado</span>
+        <span><i class="lg-late"></i>Atrasado</span>
+      </span>
+    </div>
+  </div>
+  <div id="calBody"></div>
+  <div id="calSinFecha"></div>
+</div>
+
 <!-- ============ SOLICITUDES DE USUARIOS (v3.3) ============ -->
 <div class="card col-12 hidden" id="cardSolicitudes">
   <h3>Solicitudes de Usuarios
     <span class="hint" style="font-weight:400">· préstamos, incidencias y check list recibidos por liga o QR</span>
     <span id="tkBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
+    <button class="btn hidden" id="tkAvisos" style="font-size:12px;padding:5px 12px" title="Avisos por correo y celular">🔔 Avisos</button>
     <button class="btn" id="tkLiga" style="font-size:12px;padding:5px 12px">Liga y QR</button>
     <button class="btn hidden" id="tkEtiquetas" style="font-size:12px;padding:5px 12px" title="Hoja imprimible con el QR de cada unidad (respeta los filtros)">Etiquetas QR de la flotilla</button>
   </h3>
@@ -596,41 +728,6 @@ tfoot tr.mt-total .sub{font-weight:400;color:var(--muted);font-size:11px;text-tr
     <div class="tab" data-mant="todos">Todos</div>
   </div>
   <div id="mantBody"></div>
-</div>
-
-<!-- ============ CALENDARIO DE TAREAS (admin + auxiliar) ============ -->
-<div class="card col-12 hidden" id="cardCalendario">
-  <h3>Calendario de Tareas y Mantenimientos
-    <span class="hint" style="font-weight:400">· tareas derivadas de incidencias y agenda de taller por unidad</span>
-    <span id="calBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
-  </h3>
-  <div class="cal-toolbar">
-    <div class="cal-switch">
-      <button data-cal="semana" class="active">Semanal</button>
-      <button data-cal="mes">Mensual</button>
-    </div>
-    <div class="cal-nav">
-      <button id="calPrev" title="Anterior">‹</button>
-      <button id="calHoy" title="Hoy" style="width:auto;padding:0 12px;font-size:12px">Hoy</button>
-      <button id="calNext" title="Siguiente">›</button>
-    </div>
-    <div class="cal-title" id="calTitle">—</div>
-    <div class="cal-legend">
-      <span class="grp"><b>Tareas:</b>
-        <span><i class="lg-task" style="border-left-color:var(--accent)"></i>Pendiente</span>
-        <span><i class="lg-task" style="border-left-color:var(--red)"></i>Vencida</span>
-        <span><i class="lg-task" style="border-left-color:var(--green)"></i>Cumplida</span>
-      </span>
-      <span class="grp"><b>🔧 Mantenimiento:</b>
-        <span><i style="background:#1565c0"></i>Programado</span>
-        <span><i style="background:#f4c20d"></i>Ingreso</span>
-        <span><i style="background:#0f7a4e"></i>Entregado</span>
-        <span><i class="lg-late"></i>Atrasado</span>
-      </span>
-    </div>
-  </div>
-  <div id="calBody"></div>
-  <div id="calSinFecha"></div>
 </div>
 
 <!-- ============ COMBUSTIBLES ============ -->
@@ -1524,6 +1621,7 @@ function fbInit(){
       $('#syncBadge').textContent = '● Error';
     });
     Tickets.escuchar();   // v3.3: bandeja de solicitudes públicas
+    Avisos.escuchar();    // v3.4: estado del verificador de avisos
     return true;
   }catch(e){
     console.error('fbInit', e);
@@ -2219,48 +2317,131 @@ function actualizaContadorFotos(){
 }
 function leerFotos(){ return evidActual.fotos; }
 
-/* ============ FIRMA ELECTRÓNICA (canvas táctil) ============ */
-/* Gestor de firmas: admite varios lienzos (entrega y devolución) */
-const FIRMAS = {};   // { canvasId: {ctx, trazos, pintando, ult, hintId, estadoId} }
+/* ============ FIRMA ELECTRÓNICA (canvas táctil) · v3.4 ============
+   Corrección del desfase en teléfono y tablet:
+   · El lienzo se dimensiona con su tamaño REAL en pantalla (ResizeObserver),
+     no al abrir el modal, cuando la sección aún está oculta.
+   · Cada punto se convierte a coordenadas del lienzo considerando la escala
+     CSS, de modo que el trazo nace exactamente bajo el dedo o el lápiz.
+   · Pointer Events con captura: dedo, lápiz (Apple Pencil) y ratón.
+   · La firma guardada se vuelve a mostrar centrada y sin deformarse. */
+const FIRMAS = {};   // { canvasId: {ctx, w, h, ratio, trazos, pintando, ult, hintId, estadoId, pendiente} }
+
+function dimensionaFirma(canvasId){
+  const cv = document.getElementById(canvasId); const F = FIRMAS[canvasId];
+  if(!cv || !F) return false;
+  const r = cv.getBoundingClientRect();
+  const w = Math.round(r.width), h = Math.round(r.height);
+  if(w < 40 || h < 40) return false;                       // sección oculta: se medirá al mostrarse
+  const ratio = Math.max(1, window.devicePixelRatio || 1);
+  if(F.ctx && F.w===w && F.h===h && F.ratio===ratio) return true;
+  // Conserva lo ya trazado antes de redimensionar
+  let previo = null; const ratioPrevio = F.ratio || 1;
+  if(F.ctx && F.trazos>0 && cv.width && cv.height){
+    previo = document.createElement('canvas'); previo.width = cv.width; previo.height = cv.height;
+    previo.getContext('2d').drawImage(cv, 0, 0);
+  }
+  cv.width = Math.round(w*ratio); cv.height = Math.round(h*ratio);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#000000'; ctx.fillStyle = '#000000';
+  F.ctx = ctx; F.w = w; F.h = h; F.ratio = ratio;
+  if(previo){   // reacomoda lo trazado conservando proporción y centrado
+    const ow = previo.width/ratioPrevio, oh = previo.height/ratioPrevio;
+    const k = Math.min(w/ow, h/oh), dw = ow*k, dh = oh*k;
+    ctx.drawImage(previo, (w-dw)/2, (h-dh)/2, dw, dh);
+  }
+  else if(F.pendiente){ const p = F.pendiente; F.pendiente = null; pintaFirmaGuardada(canvasId, p); }
+  return true;
+}
+/* Dibuja una imagen de firma ajustada al área útil (sobre la línea punteada), centrada y sin deformar */
+function dibujaFirmaCentrada(canvasId, src, sw, sh){
+  const F = FIRMAS[canvasId]; if(!F || !F.ctx || !sw || !sh) return;
+  const padX = 16, top = 10, base = F.h - 36;               // la línea guía está a 34 px del borde inferior
+  const aw = F.w - padX*2, ah = Math.max(40, base - top);
+  const k = Math.min(aw/sw, ah/sh, .6);   // tamaño cercano al original (exportación a densidad 2x)
+  const dw = sw*k, dh = sh*k;
+  F.ctx.drawImage(src, (F.w-dw)/2, top + (ah-dh)/2, dw, dh);
+}
+function pintaFirmaGuardada(canvasId, dataUrl){
+  const F = FIRMAS[canvasId]; if(!F) return;
+  if(!F.ctx){ F.pendiente = dataUrl; return; }
+  const img = new Image();
+  img.onload = ()=>{
+    dibujaFirmaCentrada(canvasId, img, img.naturalWidth, img.naturalHeight);
+    F.trazos = 1;
+    const hEl = document.getElementById(F.hintId); if(hEl) hEl.classList.add('hide');
+    marcaFirmaEstado(canvasId, true);
+  };
+  img.src = dataUrl;
+}
 
 function initFirmaCanvas(canvasId, hintId, estadoId){
   const cv = document.getElementById(canvasId); if(!cv) return;
-  const ratio = window.devicePixelRatio || 1;
-  const rect = cv.getBoundingClientRect();
-  const w = rect.width || (cv.parentElement ? cv.parentElement.clientWidth : 0) || 520;
-  cv.width  = Math.round(w*ratio);
-  cv.height = Math.round(180*ratio);
-  const ctx = cv.getContext('2d');
-  ctx.scale(ratio, ratio);
-  ctx.lineWidth = 2.2; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle = '#000000';
-
   const F = FIRMAS[canvasId] = FIRMAS[canvasId] || {};
-  F.ctx = ctx; F.trazos = F.trazos || 0; F.pintando = false; F.ult = {x:0,y:0};
+  F.trazos = F.trazos || 0; F.pintando = false; F.ult = null;
   F.hintId = hintId; F.estadoId = estadoId;
+  dimensionaFirma(canvasId);
 
   if(F.ligado) return;   // los escuchadores se registran una sola vez
   F.ligado = true;
 
-  const pos = ev => { const r=cv.getBoundingClientRect(); const t=ev.touches?ev.touches[0]:ev;
-                      return {x:t.clientX-r.left, y:t.clientY-r.top}; };
-  const inicia = ev => { ev.preventDefault(); F.pintando=true; F.ult=pos(ev);
-                         const h=document.getElementById(F.hintId); if(h) h.classList.add('hide'); };
-  const traza = ev => {
-    if(!F.pintando) return; ev.preventDefault();
-    const pt = pos(ev);
-    F.ctx.beginPath(); F.ctx.moveTo(F.ult.x,F.ult.y); F.ctx.lineTo(pt.x,pt.y); F.ctx.stroke();
-    F.ult = pt; F.trazos++; marcaFirmaEstado(canvasId, true);
+  // Punto en coordenadas del lienzo, compensando cualquier escala CSS
+  const pos = ev => {
+    const r = cv.getBoundingClientRect();
+    const sx = (F.w || r.width) / (r.width || 1), sy = (F.h || r.height) / (r.height || 1);
+    return { x:(ev.clientX - r.left)*sx, y:(ev.clientY - r.top)*sy };
   };
-  const termina = ev => { if(ev) ev.preventDefault(); F.pintando=false; };
+  const puntoInicial = pt => {
+    F.ctx.beginPath(); F.ctx.arc(pt.x, pt.y, F.ctx.lineWidth/2, 0, Math.PI*2); F.ctx.fill();
+  };
+  const segmento = pt => {
+    const u = F.ult; if(!u) { F.ult = pt; return; }
+    const mx = (u.x+pt.x)/2, my = (u.y+pt.y)/2;               // suavizado por punto medio
+    F.ctx.beginPath(); F.ctx.moveTo(u.mx ?? u.x, u.my ?? u.y);
+    F.ctx.quadraticCurveTo(u.x, u.y, mx, my); F.ctx.stroke();
+    F.ult = { x:pt.x, y:pt.y, mx, my };
+  };
+  const inicia = pt => {
+    if(!F.ctx && !dimensionaFirma(canvasId)) return false;
+    F.pintando = true; F.ult = { x:pt.x, y:pt.y }; puntoInicial(pt);
+    F.trazos++; marcaFirmaEstado(canvasId, true);
+    const hEl = document.getElementById(F.hintId); if(hEl) hEl.classList.add('hide');
+    return true;
+  };
+  const termina = () => {
+    if(F.pintando && F.ult && F.ult.mx!=null){ F.ctx.beginPath(); F.ctx.moveTo(F.ult.mx, F.ult.my); F.ctx.lineTo(F.ult.x, F.ult.y); F.ctx.stroke(); }
+    F.pintando = false; F.ult = null;
+  };
 
-  cv.addEventListener('mousedown', inicia);
-  cv.addEventListener('mousemove', traza);
-  window.addEventListener('mouseup', termina);
-  cv.addEventListener('mouseleave', termina);
-  cv.addEventListener('touchstart', inicia, {passive:false});
-  cv.addEventListener('touchmove',  traza,  {passive:false});
-  cv.addEventListener('touchend',   termina,{passive:false});
-  cv.addEventListener('touchcancel',termina,{passive:false});
+  if(window.PointerEvent){
+    cv.addEventListener('pointerdown', ev=>{
+      if(ev.pointerType==='mouse' && ev.button!==0) return;
+      ev.preventDefault();
+      if(!inicia(pos(ev))) return;
+      try{ cv.setPointerCapture(ev.pointerId); }catch(e){}
+    });
+    cv.addEventListener('pointermove', ev=>{
+      if(!F.pintando) return; ev.preventDefault();
+      const lista = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [];
+      (lista.length ? lista : [ev]).forEach(e=>segmento(pos(e)));
+    });
+    ['pointerup','pointercancel','lostpointercapture'].forEach(t=>cv.addEventListener(t, termina));
+  } else {   // respaldo para navegadores sin Pointer Events
+    const t0 = ev => ev.touches ? ev.touches[0] : ev;
+    cv.addEventListener('touchstart', ev=>{ ev.preventDefault(); inicia(pos(t0(ev))); }, {passive:false});
+    cv.addEventListener('touchmove',  ev=>{ if(!F.pintando) return; ev.preventDefault(); segmento(pos(t0(ev))); }, {passive:false});
+    cv.addEventListener('touchend', termina); cv.addEventListener('touchcancel', termina);
+    cv.addEventListener('mousedown', ev=>inicia(pos(ev)));
+    cv.addEventListener('mousemove', ev=>{ if(F.pintando) segmento(pos(ev)); });
+    window.addEventListener('mouseup', termina);
+  }
+  // Evita el desplazamiento de la página y el menú contextual mientras se firma
+  cv.addEventListener('touchmove', ev=>{ if(F.pintando) ev.preventDefault(); }, {passive:false});
+  cv.addEventListener('contextmenu', ev=>ev.preventDefault());
+  // Se vuelve a medir al mostrarse la sección, girar el equipo o cambiar el ancho
+  if(window.ResizeObserver) new ResizeObserver(()=>dimensionaFirma(canvasId)).observe(cv);
 }
 function marcaFirmaEstado(canvasId, hay){
   const F = FIRMAS[canvasId]; if(!F) return;
@@ -2270,10 +2451,9 @@ function marcaFirmaEstado(canvasId, hay){
 }
 function limpiaFirmaCanvas(canvasId, campo){
   const F = FIRMAS[canvasId]; const cv = document.getElementById(canvasId);
-  if(!F || !F.ctx || !cv) return;
-  const ratio = window.devicePixelRatio || 1;
-  F.ctx.clearRect(0,0,cv.width/ratio,cv.height/ratio);
-  F.trazos = 0;
+  if(!F || !cv) return;
+  if(F.ctx){ F.ctx.save(); F.ctx.setTransform(1,0,0,1,0,0); F.ctx.clearRect(0,0,cv.width,cv.height); F.ctx.restore(); }
+  F.trazos = 0; F.pendiente = null; F.pintando = false; F.ult = null;
   if(campo) evidActual[campo] = '';
   const h = document.getElementById(F.hintId); if(h) h.classList.remove('hide');
   marcaFirmaEstado(canvasId, false);
@@ -2282,24 +2462,17 @@ function cargaFirmaCanvas(canvasId, dataUrl, campo){
   limpiaFirmaCanvas(canvasId, campo);
   if(!dataUrl) return;
   if(campo) evidActual[campo] = dataUrl;
-  const F = FIRMAS[canvasId]; const cv = document.getElementById(canvasId);
-  if(!F || !F.ctx || !cv) return;
-  const img = new Image();
-  img.onload = ()=>{
-    const ratio = window.devicePixelRatio || 1;
-    F.ctx.drawImage(img, 0, 0, cv.width/ratio, cv.height/ratio);
-    F.trazos = 1;
-    const h = document.getElementById(F.hintId); if(h) h.classList.add('hide');
-    marcaFirmaEstado(canvasId, true);
-  };
-  img.src = dataUrl;
+  const F = FIRMAS[canvasId]; if(!F) return;
+  dimensionaFirma(canvasId);
+  pintaFirmaGuardada(canvasId, dataUrl);
+  if(!F.ctx) marcaFirmaEstado(canvasId, true);
 }
 /* Recorta el lienzo al trazo real y devuelve un PNG compacto */
 function exportaFirmaCanvas(canvasId, campo){
   const F = FIRMAS[canvasId]; const cv = document.getElementById(canvasId);
   if(!F || !F.ctx || !cv) return (campo && evidActual[campo]) || '';
   if(F.trazos===0) return (campo && evidActual[campo]) || '';
-  const ratio = window.devicePixelRatio || 1;
+  const ratio = F.ratio || 1;
   const w = cv.width, h = cv.height;
   const px = F.ctx.getImageData(0,0,w,h).data;
   let x0=w, y0=h, x1=0, y1=0, hay=false;
@@ -2309,8 +2482,10 @@ function exportaFirmaCanvas(canvasId, campo){
   if(!hay) return '';
   const m = Math.round(8*ratio);
   x0=Math.max(0,x0-m); y0=Math.max(0,y0-m); x1=Math.min(w,x1+m); y1=Math.min(h,y1+m);
+  // Normaliza a densidad 2x para que la firma pese lo mismo desde teléfono, tablet o PC
+  const k = Math.min(1, 2/ratio);
   const out = document.createElement('canvas');
-  out.width = x1-x0; out.height = y1-y0;
+  out.width = Math.max(1, Math.round((x1-x0)*k)); out.height = Math.max(1, Math.round((y1-y0)*k));
   const octx = out.getContext('2d');
   octx.fillStyle='#ffffff'; octx.fillRect(0,0,out.width,out.height);
   octx.drawImage(cv, x0,y0,x1-x0,y1-y0, 0,0,out.width,out.height);
@@ -3718,6 +3893,7 @@ const asignacionAbierta = veh => asignacionesDe(veh).find(a=>a.estadoRegistro===
 
 /* --- Pestañas de sección --- */
 function setSeccion(id){
+  setTimeout(()=>{ if(window.dimensionaFirma){ dimensionaFirma('firmaCanvas'); dimensionaFirma('firmaCanvasDev'); } }, 30);
   $$('#modalAsignacion .asig-tabs .tab').forEach(t=>t.classList.toggle('active', t.dataset.sec===id));
   $$('#modalAsignacion .sec-pane').forEach(p=>p.classList.toggle('active', p.id==='pane_'+id));
 }
@@ -3916,6 +4092,7 @@ window.abrirModalAsignacion = async function(veh, asigId){
   $('#modalAsignacion').classList.add('open');
   // El canvas necesita estar visible para medirse correctamente
   setTimeout(()=>{ initFirma(); cargaFirma(evidActual.firma); cargaFirmaDev(evidActual.firmaDev); }, 60);
+  setTimeout(()=>{ dimensionaFirma('firmaCanvas'); dimensionaFirma('firmaCanvasDev'); }, 350);
 };
 
 /* --- Validación --- */
@@ -5839,12 +6016,10 @@ document.addEventListener('keydown', e=>{
   if(state.selVeh){ e.preventDefault(); cerrarDetalle(); }
 });
 $('#btnPurgarEvid').onclick = purgarEvidenciasCerradas;
-// El canvas se remide al rotar el dispositivo o cambiar el tamaño
-window.addEventListener('resize', ()=>{
-  if($('#modalAsignacion').classList.contains('open')){
-    const f = evidActual.firma || exportaFirma(), fd = evidActual.firmaDev || exportaFirmaDev();
-    initFirma(); cargaFirma(f); cargaFirmaDev(fd);
-  }
+// El lienzo se remide solo (ResizeObserver) sin perder ni deformar la firma.
+// Respaldo para navegadores sin ResizeObserver:
+if(!window.ResizeObserver) window.addEventListener('resize', ()=>{
+  if($('#modalAsignacion').classList.contains('open')){ dimensionaFirma('firmaCanvas'); dimensionaFirma('firmaCanvasDev'); }
 });
 
 // Tareas
@@ -5988,6 +6163,8 @@ const Tickets = {
       const v = snap.val() || {};
       this.lista = Object.keys(v).map(k=>Object.assign({ folio:k }, v[k]));
       if(session.rol) this.render();
+      Avisos.alRecibir(this.lista);
+      if($('#gsPanel').classList.contains('open')) GS.pinta();
     }, err=>console.warn('solicitudes', err));
   },
   porFolio(f){ return this.lista.find(s=>s.folio===f); },
@@ -6047,6 +6224,7 @@ const Tickets = {
     ].map(([v,l,s,c])=>`<div class="tk-kpi" style="border-left-color:${c}"><b style="color:${c}">${v}</b><span>${l}</span><small>${s}</small></div>`).join('');
     $('#tkBadge').innerHTML = nuevas ? `<b style="color:var(--red)">${nuevas}</b> nueva(s) por revisar` : 'Bandeja al día';
     $('#tkLiga').classList.toggle('hidden', !session.rol);
+    $('#tkAvisos').classList.toggle('hidden', !this.esEditor());
     $('#tkEtiquetas').classList.toggle('hidden', !this.esEditor());
 
     const q = ($('#tkBuscar').value||'').toUpperCase().trim();
@@ -6413,6 +6591,408 @@ const Tickets = {
   }
 };
 window.Tickets = Tickets;
+const LOGO_DATA_URI = 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2044%22%20role%3D%22img%22%20aria-label%3D%22Control%20Vehicular%22%3E%20%3Cg%20fill%3D%22%230b4f9e%22%3E%20%3Cpath%20d%3D%22M17.2%204.6Q18.3%202%2021.2%202H42.8Q45.7%202%2046.8%204.6L52%2017H12Z%22/%3E%20%3Crect%20x%3D%223%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2252.5%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%20%3Cpath%20d%3D%22M8%2019Q8%2016%2011%2016H53Q56%2016%2056%2019V32.5Q56%2035%2053.5%2035H10.5Q8%2035%208%2032.5Z%22/%3E%20%3Crect%20x%3D%2210%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%3Crect%20x%3D%2243.5%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%20%3C/g%3E%20%3Cpath%20d%3D%22M20.8%205H43.2L48%2014.6H16Z%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Crect%20x%3D%2211%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%3Crect%20x%3D%2242.5%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%20%3Crect%20x%3D%2224.5%22%20y%3D%2219.5%22%20width%3D%2215%22%20height%3D%228.5%22%20rx%3D%221.6%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Cpath%20d%3D%22M24.5%2022.4H39.5M24.5%2025.2H39.5%22%20stroke%3D%22%230b4f9e%22%20stroke-width%3D%221.1%22/%3E%20%3Crect%20x%3D%229%22%20y%3D%2229.6%22%20width%3D%2246%22%20height%3D%221.5%22%20rx%3D%22.75%22%20fill%3D%22%23dbe9fb%22/%3E%20%3C/svg%3E';
+
+/* ============ BÚSQUEDA GENERAL · v3.4 ============
+   Un solo campo consulta todos los módulos: unidades, incidencias, tareas,
+   préstamos, mantenimientos, combustibles, solicitudes y bitácora.
+   · Ignora mayúsculas, acentos, guiones y espacios (MARCH05 = MARCH_05, abc123 = ABC-123).
+   · Tolera errores de escritura (Levenshtein) y amplía con sinónimos del ramo.
+   · Resultados agrupados por módulo, ordenados por relevancia, con acceso directo al registro.
+   · Respeta los permisos del rol en sesión. */
+const GS = {
+  modulo: 'todos', ultimo: [], sel: -1, _t: null,
+  SINONIMOS: [
+    ['llanta','neumatico','rueda','ponchadura','ponchada','llantas'],
+    ['choque','siniestro','colision','accidente','golpe','impacto','percance'],
+    ['servicio','mantenimiento','afinacion','preventivo','correctivo','taller'],
+    ['aceite','lubricante','afinacion'],
+    ['gasolina','combustible','diesel','carga','litros','rendimiento'],
+    ['prestamo','asignacion','checklist','salida','bitacora'],
+    ['poliza','seguro','aseguradora','hdi','ana','chubb','qualitas'],
+    ['verificacion','verificentro','emisiones'],
+    ['bateria','acumulador'],
+    ['freno','frenos','balata','balatas','disco'],
+    ['chofer','conductor','operador','solicitante'],
+    ['placa','placas','matricula'],
+    ['tarjeta','circulacion','tenencia','refrendo'],
+    ['multa','infraccion'],
+    ['grua','arrastre'],
+    ['camioneta','pickup','unidad','vehiculo','auto','carro']
+  ],
+  norm(v){ return String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); },
+  compacto(v){ return this.norm(v).replace(/[^a-z0-9]/g,''); },
+  palabras(v){ return this.norm(v).split(/[^a-z0-9]+/).filter(w=>w.length>0); },
+  lev(a, b, tope){
+    if(Math.abs(a.length-b.length) > tope) return tope+1;
+    let prev = Array.from({length:b.length+1}, (_,i)=>i);
+    for(let i=1;i<=a.length;i++){
+      const cur=[i]; let min=i;
+      for(let j=1;j<=b.length;j++){
+        cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a[i-1]===b[j-1]?0:1));
+        if(cur[j]<min) min=cur[j];
+      }
+      if(min>tope) return tope+1;
+      prev=cur;
+    }
+    return prev[b.length];
+  },
+  sinonimosDe(t){
+    const out = new Set();
+    this.SINONIMOS.forEach(g=>{ if(g.some(w=>w===t || (t.length>=5 && (w.startsWith(t) || t.startsWith(w))))) g.forEach(w=>{ if(w!==t) out.add(w); }); });
+    return [...out];
+  },
+  /* Texto indexable de un registro: valores simples, sin imágenes ni firmas */
+  textoDe(obj, prof=0, acc=[]){
+    if(obj==null || prof>3) return acc;
+    if(typeof obj==='string'){ if(obj.length<=400 && !obj.startsWith('data:') && !/^https?:\/\/firebasestorage/.test(obj)) acc.push(obj); return acc; }
+    if(typeof obj==='number'){ acc.push(String(obj)); return acc; }
+    if(typeof obj!=='object') return acc;
+    Object.keys(obj).forEach(k=>{ if(!/foto|firma|evid|img|imagen|historial|blob|ruta|thumb/i.test(k)) this.textoDe(obj[k], prof+1, acc); });
+    return acc;
+  },
+  esEditor(){ return session.rol==='admin' || session.rol==='auxiliar'; },
+  fecha(v){ if(!v) return ''; const d=new Date(v); return isNaN(d)?String(v):d.toLocaleDateString('es-MX'); },
+  MODULOS(){
+    const ed = this.esEditor(), f = v=>this.fecha(v);
+    const estTk = s=>{ const e=(s.gestion&&s.gestion.estado)||'NUEVA'; return TK_ESTADOS[e]?TK_ESTADOS[e].l:e; };
+    return [
+      { k:'uni', l:'Unidades', src:()=>STORE.unidades,
+        t:u=>u.veh, s:u=>[u.placas,u.zona,u.depto,u.estatus,u.chofer].filter(Boolean).join(' · '),
+        ir:u=>this.irUnidad(u.veh) },
+      { k:'sol', l:'Solicitudes', src:()=>session.rol ? Tickets.lista : [],
+        t:s=>`${s.folio} · ${TK_TIPOS[s.tipo]?TK_TIPOS[s.tipo].l:(s.tipo||'Solicitud')}`,
+        s:s=>[s.solicitante, s.departamento, s.unidad || (s.prestamo&&s.prestamo.unidadPreferida), estTk(s), f(s.ts||s.tsCliente)].filter(Boolean).join(' · '),
+        ir:s=>Tickets.ver(s.folio) },
+      { k:'inc', l:'Incidencias', src:()=>STORE.incidencias,
+        t:i=>`${i.unidad} · ${i.tipo||'Incidencia'}`, s:i=>[i.estatus, f(i.fecha), i.chofer, i.notas].filter(Boolean).join(' · '),
+        ir:i=> ed ? editarIncidencia(i.id) : filtrarIncidenciasPor(i.unidad) },
+      { k:'tar', l:'Tareas', src:()=>todasLasTareas(),
+        t:t=>t.texto, s:t=>[t.unidad, t.fecha?fFechaMx(t.fecha):'Sin fecha', t.hecha?'Cumplida':'Pendiente', t.tipo].filter(Boolean).join(' · '),
+        ir:t=> ed ? editarIncidencia(t.incId) : filtrarIncidenciasPor(t.unidad) },
+      { k:'pre', l:'Préstamos', src:()=>STORE.asignaciones,
+        t:a=>`${a.bitacora||'Sin folio'} · ${a.vehiculo}`, s:a=>[a.chofer, a.destino, a.estadoRegistro==='Cerrada'?'Devuelta':'En préstamo', a.fechaEntrega].filter(Boolean).join(' · '),
+        ir:a=> ed ? abrirModalAsignacion(a.vehiculo, a.id) : verHistorialAsig(a.vehiculo) },
+      { k:'man', l:'Mantenimientos', src:()=>STORE.mantenimientos,
+        t:m=>`${m.unidad} · ${m.tipo||'Servicio'}`, s:m=>[m.estatus, fFechaMx(m.fecha), m.taller, m.folio, m.notas].filter(Boolean).join(' · '),
+        ir:m=> ed ? editarMantenimiento(m.id) : filtrarMantPor(m.unidad) },
+      { k:'com', l:'Combustibles', src:()=>STORE.combustibles,
+        t:c=>`${c.unidad} · Período de combustible`, s:c=>[`${fFechaMx(c.fechaIni)} a ${fFechaMx(c.fechaFin)}`, c.notas].filter(Boolean).join(' · '),
+        ir:c=>verCombustibles(c.unidad) },
+      { k:'bit', l:'Bitácora', src:()=>session.rol==='admin' ? STORE.bitacora.slice(0,1500) : [],
+        t:b=>`${b.unidad} · ${b.accion}`, s:b=>[b.ts?fechaCorta(b.ts):'', b.campo, b.despues, b.rol].filter(Boolean).join(' · '),
+        ir:()=>this.irCard('#cardBitacora') }
+    ];
+  },
+  /* Calificación 0–1 de un término contra un registro */
+  califica(tok, R){
+    if(!tok) return 1;
+    if(R.c.includes(tok)) return tok.length<=2 ? (R.w.some(w=>w.startsWith(tok)) ? 1 : .55) : 1;
+    let best = 0;
+    for(const w of R.w){
+      if(w.startsWith(tok) || (tok.length>=3 && w.includes(tok))) return .96;
+      if(tok.length>=4 && w.length>=3){
+        const tope = tok.length>=8 ? 2 : 1;
+        const a = this.lev(tok, w, tope), b = w.length>tok.length ? this.lev(tok, w.slice(0,tok.length), tope) : tope+1;
+        const d = Math.min(a, b);
+        if(d<=tope) best = Math.max(best, d===1 ? .8 : .7);
+      }
+    }
+    if(best<.8) for(const s of this.sinonimosDe(tok)) if(R.c.includes(s)){ best = Math.max(best, .82); break; }
+    return best;
+  },
+  buscar(q){
+    const toks = [...new Set(this.palabras(q))].filter(t=>t.length>0);
+    const qc = this.compacto(q);
+    if(!qc) return [];
+    const out = [];
+    this.MODULOS().forEach(M=>{
+      let lista = []; try{ lista = M.src() || []; }catch(e){ lista = []; }
+      lista.forEach(r=>{
+        if(!r) return;
+        const txt = this.textoDe(r).join(' ');
+        const R = { c:this.compacto(txt), w:this.palabras(txt) };
+        let score, aprox = '';
+        if(qc.length>=3 && R.c.includes(qc)) score = 1;
+        else {
+          const sc = toks.map(t=>this.califica(t, R));
+          const ok = sc.filter(v=>v>=.6).length;
+          if(!ok) return;
+          if(ok===sc.length){ score = sc.reduce((a,b)=>a+b,0)/sc.length; aprox = sc.every(v=>v>=.95) ? '' : 'Similar'; }
+          else if(sc.length>=2 && Math.max(...sc)>=.95){ score = .5*sc.reduce((a,b)=>a+b,0)/sc.length; aprox = 'Relacionado'; }
+          else return;
+        }
+        // Prioriza coincidencias en el título
+        const tc = this.compacto(M.t(r));
+        if(tc.includes(qc)) score += .3; else if(toks.some(t=>t.length>=3 && tc.includes(t))) score += .12;
+        out.push({ M, r, score, aprox });
+      });
+    });
+    return out.sort((a,b)=>b.score-a.score);
+  },
+  resalta(texto, q){
+    let h = escapa(texto);
+    const toks = this.palabras(q).filter(t=>t.length>=2).sort((a,b)=>b.length-a.length);
+    if(!toks.length) return h;
+    // Marca sobre el texto sin acentos, conservando el original
+    const base = this.norm(texto); const marcas = new Array(texto.length).fill(false);
+    toks.forEach(t=>{ let i = base.indexOf(t); while(i>=0){ for(let k=i;k<i+t.length;k++) marcas[k]=true; i = base.indexOf(t, i+t.length); } });
+    if(base.length!==texto.length) return h;
+    let out='', abierto=false;
+    for(let i=0;i<texto.length;i++){
+      if(marcas[i] && !abierto){ out+='<mark>'; abierto=true; }
+      if(!marcas[i] && abierto){ out+='</mark>'; abierto=false; }
+      out += escapa(texto[i]);
+    }
+    return out + (abierto?'</mark>':'');
+  },
+  pinta(){
+    const q = $('#gsInput').value.trim(), P = $('#gsPanel');
+    if(!q || this.compacto(q).length<2){ P.classList.remove('open'); P.innerHTML=''; this.ultimo=[]; return; }
+    const res = this.buscar(q);
+    const porMod = {}; res.forEach(x=>{ (porMod[x.M.k] = porMod[x.M.k] || { M:x.M, items:[] }).items.push(x); });
+    const mods = Object.values(porMod).sort((a,b)=>b.items[0].score-a.items[0].score);
+    if(this.modulo!=='todos' && !porMod[this.modulo]) this.modulo='todos';
+    const chips = `<span class="gs-chip ${this.modulo==='todos'?'on':''}" data-gm="todos">Todos<b>${res.length}</b></span>` +
+      mods.map(g=>`<span class="gs-chip ${this.modulo===g.M.k?'on':''}" data-gm="${g.M.k}">${g.M.l}<b>${g.items.length}</b></span>`).join('');
+    const visibles = this.modulo==='todos' ? mods : mods.filter(g=>g.M.k===this.modulo);
+    this.ultimo = [];
+    const cuerpo = visibles.map(g=>{
+      const tope = this.modulo==='todos' ? 6 : 60;
+      const items = g.items.slice(0, tope).map(x=>{
+        const idx = this.ultimo.push(x) - 1;
+        let t='', s='';
+        try{ t = String(x.M.t(x.r)||''); s = String(x.M.s(x.r)||''); }catch(e){}
+        return `<div class="gs-it" data-gi="${idx}"><div class="t">${this.resalta(t,q)}</div><div class="s">${this.resalta(s,q)}</div>
+          <div class="m ${x.aprox?'aprox':''}">${x.aprox||'Coincide'}</div></div>`;
+      }).join('');
+      const mas = g.items.length>tope ? `<div class="gs-mas" data-gm="${g.M.k}">Ver los ${g.items.length} resultados de ${g.M.l.toLowerCase()}</div>` : '';
+      return `<div class="gs-grp"><h5>${g.M.l}</h5>${items}${mas}</div>`;
+    }).join('');
+    P.innerHTML = `<div class="gs-head"><div class="gs-resumen">${res.length
+        ? `<b>${res.length}</b> resultado(s) en <b>${mods.length}</b> módulo(s) para «${escapa(q)}»`
+        : `Sin resultados para «${escapa(q)}»`}</div>${res.length?`<div class="gs-chips">${chips}</div>`:''}</div>` +
+      (res.length ? cuerpo : `<div class="gs-vacio">Pruebe con el número económico, las placas, el nombre del chofer o del solicitante, un folio, el taller o el destino.</div>`);
+    P.classList.add('open'); this.sel = -1;
+  },
+  abrir(idx){
+    const x = this.ultimo[idx]; if(!x) return;
+    this.cerrar();
+    try{ x.M.ir(x.r); }catch(e){ console.warn('búsqueda', e); toast('No fue posible abrir el registro.','err'); }
+  },
+  cerrar(){ $('#gsPanel').classList.remove('open'); },
+  mueve(d){
+    const its = $$('#gsPanel .gs-it'); if(!its.length) return;
+    this.sel = (this.sel + d + its.length) % its.length;
+    its.forEach((el,i)=>el.classList.toggle('act', i===this.sel));
+    its[this.sel].scrollIntoView({block:'nearest'});
+  },
+  irUnidad(veh){
+    if(!DATA.some(x=>x.veh===veh)){ const b = $('#resetBtn'); if(b) b.click(); }
+    state.selVeh = '';
+    mostrarUnidad(veh);
+    setTimeout(()=>{ const d = $('#fleetDetail'); if(d) d.scrollIntoView({behavior:'smooth', block:'center'}); }, 80);
+  },
+  irCard(sel){ const c = $(sel); if(c) c.scrollIntoView({behavior:'smooth', block:'start'}); },
+  init(){
+    const inp = $('#gsInput'), P = $('#gsPanel'); if(!inp) return;
+    inp.addEventListener('input', ()=>{ clearTimeout(this._t); this.modulo='todos'; this._t = setTimeout(()=>this.pinta(), 140); });
+    inp.addEventListener('focus', ()=>{ if(inp.value.trim()) this.pinta(); });
+    inp.addEventListener('keydown', ev=>{
+      if(ev.key==='ArrowDown'){ ev.preventDefault(); this.mueve(1); }
+      else if(ev.key==='ArrowUp'){ ev.preventDefault(); this.mueve(-1); }
+      else if(ev.key==='Enter'){ ev.preventDefault(); this.abrir(this.sel>=0 ? +$$('#gsPanel .gs-it')[this.sel].dataset.gi : 0); }
+      else if(ev.key==='Escape'){ this.cerrar(); inp.blur(); }
+    });
+    P.addEventListener('click', ev=>{
+      const ch = ev.target.closest('[data-gm]'); if(ch){ this.modulo = ch.dataset.gm; this.pinta(); inp.focus(); return; }
+      const it = ev.target.closest('.gs-it'); if(it) this.abrir(+it.dataset.gi);
+    });
+    document.addEventListener('mousedown', ev=>{ if(!ev.target.closest('#gsearch')) this.cerrar(); });
+    document.addEventListener('keydown', ev=>{
+      const tag = (ev.target.tagName||'').toLowerCase();
+      const escribiendo = tag==='input' || tag==='textarea' || tag==='select' || ev.target.isContentEditable;
+      if((ev.key==='/' && !escribiendo) || ((ev.ctrlKey||ev.metaKey) && ev.key.toLowerCase()==='k')){
+        if($('.modal-overlay.open') || !$('#loginOverlay').classList.contains('hidden')) return;
+        ev.preventDefault(); inp.focus(); inp.select();
+      }
+    });
+  }
+};
+window.GS = GS;
+GS.init();
+
+/* ============ AVISOS DE SOLICITUDES · v3.4 ============
+   Correo electrónico y celular (WhatsApp vía CallMeBot y/o push con la app ntfy)
+   en cada Préstamo, Incidencia o Check list recibido por liga o QR.
+   El envío lo realiza un verificador en Google Apps Script que revisa Firebase
+   cada minuto, por lo que funciona aunque el tablero esté cerrado.
+   Además, mientras el tablero está abierto, se muestra una notificación del sistema.
+   Nodo: tableros/vehicular_avisos/{config, estado, enviados} (fuera del nodo
+   principal para no recargar el tablero en cada revisión). */
+const FB_AVISOS = 'tableros/vehicular_avisos';
+/* Destinatarios institucionales precargados (se usan mientras no exista configuración guardada) */
+const AVISOS_BASE = {
+  correos: 'coordinacion.activofijo@iesinternacional.com, aux.activofijo@iesinternacional.com',
+  whatsapp: {
+    w1: { nombre:'Coordinador', tel:'529982416143', apikey:'' },
+    w2: { nombre:'Auxiliar',    tel:'529845371065', apikey:'' }
+  },
+  tipos: { PRESTAMO:true, INCIDENCIA:true, CHECKLIST:true }
+};
+const telWa = v => { const d = String(v||'').replace(/\D/g,''); return d.length===10 ? '52'+d : d; };
+const Avisos = {
+  estado: null, conocidos: null,
+  escuchar(){
+    fbDb.ref(`${FB_AVISOS}/estado`).on('value', s=>{ this.estado = s.val() || null; this.pintaEstado(); }, e=>console.warn('avisos', e));
+  },
+  /* Notificación local con el tablero abierto */
+  alRecibir(lista){
+    const nuevas = lista.filter(s=>((s.gestion&&s.gestion.estado)||'NUEVA')==='NUEVA');
+    if(this.conocidos===null){ this.conocidos = new Set(lista.map(s=>s.folio)); return; }
+    const recientes = nuevas.filter(s=>!this.conocidos.has(s.folio));
+    lista.forEach(s=>this.conocidos.add(s.folio));
+    if(!recientes.length || !session.rol) return;
+    recientes.forEach(s=>{
+      const tipo = TK_TIPOS[s.tipo] ? TK_TIPOS[s.tipo].l : 'Solicitud';
+      const cuerpo = `${s.solicitante||'—'} · ${s.unidad || (s.prestamo&&s.prestamo.unidadPreferida) || 'Por asignar'}`;
+      toast(`Nueva solicitud ${s.folio}: ${tipo} · ${cuerpo}`, 'warn');
+      try{
+        if('Notification' in window && Notification.permission==='granted'){
+          const n = new Notification(`Nueva solicitud ${s.folio} · ${tipo}`, { body:cuerpo, tag:s.folio, icon:LOGO_DATA_URI });
+          n.onclick = ()=>{ window.focus(); Tickets.ver(s.folio); n.close(); };
+        }
+      }catch(e){}
+    });
+    this.tono();
+  },
+  tono(){
+    try{
+      const C = window.AudioContext || window.webkitAudioContext; if(!C) return;
+      const ctx = new C(), o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sine'; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(.18, ctx.currentTime+.02);
+      g.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime+.45);
+      o.start(); o.frequency.setValueAtTime(1175, ctx.currentTime+.18); o.stop(ctx.currentTime+.5);
+    }catch(e){}
+  },
+  semaforo(){
+    const e = this.estado;
+    if(!e || !e.ultimaRevision) return { c:'', t:'Verificador no instalado. Siga los pasos de instalación de esta ventana.' };
+    const min = (Date.now() - new Date(e.ultimaRevision).getTime())/60000;
+    if(e.error) return { c:'err', t:`Verificador con error: ${e.error}` };
+    if(min>6) return { c:'warn', t:`Verificador sin actividad desde ${fechaCorta(e.ultimaRevision)}. Revise el activador en Apps Script.` };
+    return { c:'ok', t:`Verificador activo · última revisión ${fechaCorta(e.ultimaRevision)}${e.ultimoEnvio?` · último aviso ${fechaCorta(e.ultimoEnvio)} (${escapa(e.ultimoFolio||'')})`:''}` };
+  },
+  pintaEstado(){
+    const b = $('#tkAvisos');
+    if(b){ const s = this.semaforo(); b.textContent = s.c==='ok' ? '🔔 Avisos activos' : '🔔 Avisos'; b.title = s.t; }
+    const el = document.querySelector('.tk-dyn #avEstado');
+    if(el){ const s = this.semaforo(); el.className = 'av-estado '+s.c; el.innerHTML = `<i></i><span>${s.t}</span>`; }
+    const pr = document.querySelector('.tk-dyn #avPrueba');
+    if(pr && this.estado && this.estado.prueba){
+      const r = this.estado.prueba.resultado || {};
+      pr.innerHTML = `Última prueba ${fechaCorta(this.estado.prueba.ts)}: ` + Object.entries(r).map(([k,v])=>`${escapa(k.replace('_',' '))} <b style="color:${v==='ok'?'var(--green)':'var(--red)'}">${escapa(v)}</b>`).join(' · ');
+    }
+  },
+  async abrir(){
+    const esAdmin = session.rol==='admin';
+    let cfg = {};
+    try{ cfg = (await fbDb.ref(`${FB_AVISOS}/config`).once('value')).val() || {}; }catch(e){ toast('No se pudo leer la configuración de avisos.','err'); }
+    const precargado = !cfg.correos && !cfg.whatsapp;
+    if(precargado) cfg = Object.assign({}, AVISOS_BASE, cfg);
+    const wa = cfg.whatsapp ? Object.values(cfg.whatsapp) : [];
+    while(wa.length<3) wa.push({ nombre:'', tel:'', apikey:'' });
+    const sinKey = wa.filter(w=>w.tel && !w.apikey).map(w=>w.nombre||w.tel);
+    const tipos = cfg.tipos || { PRESTAMO:true, INCIDENCIA:true, CHECKLIST:true };
+    const dis = esAdmin ? '' : 'disabled';
+    const permiso = !('Notification' in window) ? 'no disponible en este navegador'
+      : Notification.permission==='granted' ? 'activadas en este navegador' : Notification.permission==='denied' ? 'bloqueadas en este navegador' : 'sin activar';
+    const cuerpo = `
+      <div id="avEstado" class="av-estado"><i></i><span>Consultando…</span></div>
+      ${precargado ? `<div class="setup-note" style="margin-bottom:12px">Destinatarios institucionales precargados (Coordinación y Auxiliar). Presione <b>Guardar</b> para registrarlos.</div>` : ''}
+      ${sinKey.length ? `<div class="setup-note" style="margin-bottom:12px;border-color:#f3cf9a;background:#fff7ea">WhatsApp pendiente de apikey: <b>${escapa(sinKey.join(', '))}</b>. Mientras no se capture, ese número no recibe avisos (el correo sí).</div>` : ''}
+      <h4 class="mt-sub" style="margin-top:4px">Destinatarios</h4>
+      <label>Correos electrónicos</label>
+      <input type="text" id="avCorreos" ${dis} value="${escapa(cfg.correos||'')}" placeholder="correo1@empresa.com, correo2@empresa.com">
+      <div style="margin:4px 0 12px;font-size:11.5px;color:var(--muted)">Separe varios correos con coma. El aviso sale desde la cuenta de Google que instale el verificador.</div>
+      <label>WhatsApp · responsable, número (10 dígitos o con lada 52) y apikey de CallMeBot</label>
+      ${wa.slice(0,3).map((w,i)=>`<div class="av-wa"><input type="text" class="avNom" ${dis} value="${escapa(w.nombre||'')}" placeholder="Responsable ${i+1}">
+        <input type="text" class="avTel" ${dis} inputmode="tel" value="${escapa(w.tel||'')}" placeholder="${i<2?'9981234567':'Número (opcional)'}">
+        <input type="text" class="avKey" ${dis} value="${escapa(w.apikey||'')}" placeholder="apikey"></div>`).join('')}
+      <label style="margin-top:6px">Notificación push (app ntfy) · tema privado</label>
+      <input type="text" id="avNtfy" ${dis} value="${escapa(cfg.ntfy||'')}" placeholder="ies-vehicular-xxxxxx (opcional)">
+      <h4 class="mt-sub">Avisar cuando llegue</h4>
+      <div class="av-tipos">
+        ${Object.keys(TK_TIPOS).map(k=>`<label><input type="checkbox" class="avTipo" data-t="${k}" ${dis} ${tipos[k]!==false?'checked':''}> ${TK_TIPOS[k].l}</label>`).join('')}
+      </div>
+      <h4 class="mt-sub">Este navegador</h4>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px">
+        <span>Notificaciones con el tablero abierto: <b id="avPermiso">${permiso}</b></span>
+        <button class="btn tk-mini" id="avActivar" type="button">Activar en este equipo</button>
+      </div>
+      <h4 class="mt-sub">Instalación del verificador (una sola vez)</h4>
+      <ol class="av-pasos">
+        <li>Descargue el script con el botón <b>Descargar script</b> y ábralo en <code>script.google.com</code> → Nuevo proyecto; pegue el código y guarde.</li>
+        <li>Elija la función <code>instalar</code> y presione <b>Ejecutar</b>; autorice correo y conexión externa. Desde ese momento revisa cada minuto, aun con el tablero cerrado.</li>
+        <li>WhatsApp: desde cada celular envíe <code>I allow callmebot to send me messages</code> al número que indica <code>callmebot.com</code>; capture aquí el número y la apikey recibida.</li>
+        <li>Push opcional: instale la app <b>ntfy</b>, suscríbase al mismo tema que capture aquí (use un nombre difícil de adivinar).</li>
+        <li>Guarde y presione <b>Enviar aviso de prueba</b>; el resultado aparece abajo en menos de un minuto.</li>
+      </ol>
+      <div id="avPrueba" style="margin-top:10px;font-size:11.5px;color:var(--muted)"></div>`;
+    const acciones = [{ t:'Cerrar' }];
+    if(esAdmin){
+      acciones.unshift(
+        { t:'Descargar script', fn:()=>{ this.descargarScript(); return false; } },
+        { t:'Enviar aviso de prueba', fn:async m=>{ await this.guardar(m, true); toast('Prueba solicitada. El verificador la enviará en menos de un minuto.'); return false; } },
+        { t:'Guardar', c:'btn-primary', fn:async m=>{ await this.guardar(m, false); toast('Destinatarios de avisos guardados.'); } }
+      );
+    }
+    const m = Tickets.modal('Avisos de solicitudes', 'Correo y celular en cada préstamo, incidencia o check list recibido por liga o QR.' + (esAdmin?'':' Solo el Administrador modifica los destinatarios.'), cuerpo, acciones, '640px');
+    m.q('#avActivar').onclick = async ()=>{
+      if(!('Notification' in window)){ toast('Este navegador no admite notificaciones.','err'); return; }
+      const p = await Notification.requestPermission();
+      m.q('#avPermiso').textContent = p==='granted' ? 'activadas en este navegador' : p==='denied' ? 'bloqueadas en este navegador' : 'sin activar';
+      if(p==='granted'){ this.tono(); toast('Notificaciones activadas en este equipo.'); }
+    };
+    this.pintaEstado();
+  },
+  async guardar(m, prueba){
+    const correos = m.q('#avCorreos').value.split(/[,;\s]+/).map(x=>x.trim()).filter(Boolean);
+    const malos = correos.filter(c=>!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c));
+    if(malos.length) throw new Error('Correo no válido: '+malos.join(', '));
+    const whatsapp = {};
+    const tels = [...m.el.querySelectorAll('.avTel')], keys = [...m.el.querySelectorAll('.avKey')], noms = [...m.el.querySelectorAll('.avNom')];
+    const pendientes = [];
+    tels.forEach((t,i)=>{
+      const tel = telWa(t.value), apikey = keys[i].value.trim(), nombre = tkLimpio(noms[i].value);
+      if(!tel && !apikey) return;
+      if(tel.length<12) throw new Error(`WhatsApp ${nombre||i+1}: capture el número a 10 dígitos o con lada 52.`);
+      if(!apikey) pendientes.push(nombre||tel);
+      whatsapp['w'+(i+1)] = { nombre, tel, apikey };
+    });
+    const tipos = {}; m.el.querySelectorAll('.avTipo').forEach(c=>tipos[c.dataset.t] = c.checked);
+    const ntfy = m.q('#avNtfy').value.trim().replace(/[^A-Za-z0-9_-]/g,'');
+    if(!correos.length && !Object.keys(whatsapp).length && !ntfy) throw new Error('Capture al menos un correo, un WhatsApp o un tema de ntfy.');
+    const cfg = { correos: correos.join(', '), whatsapp, ntfy, tipos,
+      ligaTablero: location.href.split('#')[0].split('?')[0], actualizado: nowISO(), por: tkRol() };
+    if(prueba) cfg.prueba = nowISO();
+    await fbDb.ref(`${FB_AVISOS}/config`).update(cfg);
+    await fbDb.ref(`${FB_AVISOS}/config/whatsapp`).set(Object.keys(whatsapp).length ? whatsapp : null);
+    await logChange('—', 'AVISOS', prueba?'prueba':'destinatarios', '', `${correos.length} correo(s) · ${Object.keys(whatsapp).length} WhatsApp${ntfy?' · push':''}`);
+    if(pendientes.length) toast(`WhatsApp guardado sin apikey: ${pendientes.join(', ')}. Recibirá avisos al capturarla.`, 'warn');
+  },
+  descargarScript(){
+    const txt = ($('#gasAvisos') ? $('#gasAvisos').textContent : '').replace(/^\s+/, '');
+    const blob = new Blob([txt], { type:'text/plain;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Avisos_Solicitudes_IES.gs';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+    logChange('—','AVISOS','script','','Descarga del verificador');
+  }
+};
+window.Avisos = Avisos;
+
+$('#tkAvisos').onclick = ()=>Avisos.abrir();
 $$('#tkTabs .tab').forEach(t=>t.onclick=()=>{ $$('#tkTabs .tab').forEach(x=>x.classList.toggle('active', x===t)); Tickets.tab = t.dataset.tk; Tickets.render(); });
 $('#tkBuscar').oninput = ()=>Tickets.render();
 $('#tkLiga').onclick = ()=>Tickets.liga();
@@ -6433,6 +7013,222 @@ function init(){
   }catch(e){}
 }
 init();
+</script>
+<!-- v3.4: verificador de avisos para Google Apps Script (se descarga desde «Avisos») -->
+<script type="text/plain" id="gasAvisos">
+/* =====================================================================
+   AVISOS DE SOLICITUDES · CONTROL VEHICULAR IES · KPI-AFI-01 (v3.4)
+   Google Apps Script — verificador automático (cada minuto)
+   ---------------------------------------------------------------------
+   Función: detecta cada nueva solicitud (Préstamo de unidad, Incidencia
+   vehicular o Check list rápido) registrada desde solicitud.html y envía
+   un aviso por correo electrónico y al celular (WhatsApp vía CallMeBot
+   y/o notificación push con la app ntfy).
+
+   Los destinatarios se administran desde el tablero (botón «Avisos» de
+   la bandeja de Solicitudes); este script los lee de Firebase.
+
+   Instalación (una sola vez):
+     1. https://script.google.com  →  Nuevo proyecto
+     2. Pegue este código completo y guarde (nombre sugerido:
+        «Avisos Control Vehicular IES»).
+     3. Seleccione la función  instalar  y presione «Ejecutar».
+        Autorice los permisos (correo y conexión externa).
+     4. Listo: el verificador revisa cada minuto. Use el botón
+        «Enviar aviso de prueba» del tablero para confirmar.
+   Para detenerlo: ejecute  desinstalar.
+   ===================================================================== */
+
+const FB_URL    = 'https://ies-comparativos-default-rtdb.firebaseio.com';
+const NODO_SOL  = 'tableros/vehicular_publico/solicitudes';
+const NODO_AV   = 'tableros/vehicular_avisos';
+const ZONA_HORA = 'America/Cancun';
+
+// Destinatarios institucionales: se usan mientras no exista configuración guardada en el tablero
+const DESTINATARIOS_BASE = {
+  correos: 'coordinacion.activofijo@iesinternacional.com, aux.activofijo@iesinternacional.com',
+  whatsapp: {
+    w1: { nombre: 'Coordinador', tel: '529982416143', apikey: '' },
+    w2: { nombre: 'Auxiliar',    tel: '529845371065', apikey: '' }
+  }
+};
+
+const TIPOS = { PRESTAMO:'Préstamo de unidad', INCIDENCIA:'Incidencia vehicular', CHECKLIST:'Check list rápido' };
+const ICONO = { PRESTAMO:'🚗', INCIDENCIA:'⚠️', CHECKLIST:'✅' };
+
+/* ---------------- Instalación ---------------- */
+function instalar(){
+  desinstalar();
+  ScriptApp.newTrigger('revisarSolicitudes').timeBased().everyMinutes(1).create();
+  // Las solicitudes ya existentes se marcan como avisadas para no reenviarlas
+  const llaves = fbGet_(NODO_SOL, { shallow:'true' }) || {};
+  const marca = {}; const ts = new Date().toISOString();
+  Object.keys(llaves).forEach(k => marca[k] = { ts, canales:'histórico (sin aviso)' });
+  if(Object.keys(marca).length) fbPatch_(NODO_AV + '/enviados', marca);
+  fbPatch_(NODO_AV + '/estado', { instalado: ts, ultimaRevision: ts, error: null });
+  Logger.log('Verificador instalado. Solicitudes previas marcadas: ' + Object.keys(marca).length);
+}
+function desinstalar(){
+  ScriptApp.getProjectTriggers()
+    .filter(t => t.getHandlerFunction() === 'revisarSolicitudes')
+    .forEach(t => ScriptApp.deleteTrigger(t));
+}
+
+/* ---------------- Ciclo principal ---------------- */
+function revisarSolicitudes(){
+  const lock = LockService.getScriptLock();
+  if(!lock.tryLock(20000)) return;
+  const ahora = new Date().toISOString();
+  try{
+    let cfg = fbGet_(NODO_AV + '/config') || {};
+    if(!cfg.correos && !cfg.whatsapp) cfg = Object.assign({}, DESTINATARIOS_BASE, cfg);
+    const props = PropertiesService.getScriptProperties();
+
+    /* 1. Aviso de prueba solicitado desde el tablero */
+    if(cfg.prueba && cfg.prueba !== props.getProperty('ULTIMA_PRUEBA')){
+      props.setProperty('ULTIMA_PRUEBA', cfg.prueba);
+      const r = enviarATodos_(cfg, {
+        asunto: '[Control Vehicular IES] Aviso de prueba',
+        titulo: 'Aviso de prueba',
+        filas: [['Resultado','El canal de avisos está configurado correctamente.'],['Fecha', fecha_(ahora)]],
+        texto: '🔔 Control Vehicular IES\nAviso de prueba: el canal está configurado correctamente.\n' + fecha_(ahora),
+        liga: cfg.ligaTablero || ''
+      });
+      fbPatch_(NODO_AV + '/estado', { prueba: { ts: ahora, solicitada: cfg.prueba, resultado: r } });
+    }
+
+    /* 2. Solicitudes nuevas */
+    const llaves = Object.keys(fbGet_(NODO_SOL, { shallow:'true' }) || {});
+    const enviados = fbGet_(NODO_AV + '/enviados', { shallow:'true' }) || {};
+    const nuevas = llaves.filter(k => !enviados[k]).slice(0, 15);   // tope por ciclo
+    const tipos = cfg.tipos || { PRESTAMO:true, INCIDENCIA:true, CHECKLIST:true };
+    let enviadosCiclo = 0;
+
+    nuevas.forEach(folio => {
+      const s = fbGet_(NODO_SOL + '/' + encodeURIComponent(folio));
+      if(!s) return;
+      if(tipos[s.tipo] === false){
+        fbPatch_(NODO_AV + '/enviados/' + encodeURIComponent(folio), { ts: ahora, canales: 'tipo desactivado' });
+        return;
+      }
+      const tipo = TIPOS[s.tipo] || s.tipo || 'Solicitud';
+      const unidad = s.unidad || (s.prestamo && s.prestamo.unidadPreferida) || 'Por asignar';
+      const det = detalle_(s);
+      const recibida = fecha_(s.ts || s.tsCliente);
+      const r = enviarATodos_(cfg, {
+        asunto: `[Control Vehicular IES] ${tipo} · ${folio} · ${unidad}`,
+        titulo: `Nueva solicitud: ${tipo}`,
+        filas: [
+          ['Folio', folio], ['Tipo', tipo], ['Solicitante', s.solicitante || '—'],
+          ['Departamento', s.departamento || '—'], ['Teléfono', s.telefono || '—'],
+          ['Unidad', unidad], ['Detalle', det], ['Recibida', recibida]
+        ],
+        texto: `${ICONO[s.tipo] || '🔔'} Nueva solicitud ${folio}\n` +
+               `Tipo: ${tipo}\nSolicitante: ${s.solicitante || '—'}` + (s.departamento ? ` (${s.departamento})` : '') + `\n` +
+               `Unidad: ${unidad}\nDetalle: ${det}\nRecibida: ${recibida}` +
+               (cfg.ligaTablero ? `\nRevisar: ${cfg.ligaTablero}` : ''),
+        liga: cfg.ligaTablero || ''
+      });
+      fbPatch_(NODO_AV + '/enviados/' + encodeURIComponent(folio), { ts: ahora, tipo: s.tipo || '', canales: r });
+      enviadosCiclo++;
+    });
+
+    const est = { ultimaRevision: ahora, error: null };
+    if(enviadosCiclo){ est.ultimoEnvio = ahora; est.ultimoFolio = nuevas[nuevas.length - 1]; }
+    fbPatch_(NODO_AV + '/estado', est);
+  }catch(e){
+    try{ fbPatch_(NODO_AV + '/estado', { ultimaRevision: ahora, error: String(e && e.message || e) }); }catch(_){}
+  }finally{
+    lock.releaseLock();
+  }
+}
+
+/* ---------------- Envío por canal ---------------- */
+function enviarATodos_(cfg, m){
+  const res = {};
+  // Correo electrónico
+  const correos = String(cfg.correos || '').split(/[,;\s]+/).filter(x => /@/.test(x));
+  if(correos.length){
+    try{
+      MailApp.sendEmail({ to: correos.join(','), subject: m.asunto, htmlBody: html_(m), name: 'Control Vehicular IES' });
+      res.correo = 'ok';
+    }catch(e){ res.correo = 'error: ' + e.message; }
+  }
+  // WhatsApp (CallMeBot)
+  const was = cfg.whatsapp ? Object.values(cfg.whatsapp) : [];
+  was.filter(w => w && w.tel && w.apikey).forEach((w, i) => {
+    const etiqueta = 'whatsapp_' + (w.nombre || (i + 1));
+    try{
+      const tel = '+' + String(w.tel).replace(/\D/g, '');
+      const url = 'https://api.callmebot.com/whatsapp.php?phone=' + encodeURIComponent(tel) +
+                  '&text=' + encodeURIComponent(m.texto) + '&apikey=' + encodeURIComponent(w.apikey);
+      const r = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+      res[etiqueta] = r.getResponseCode() === 200 ? 'ok' : 'error ' + r.getResponseCode();
+    }catch(e){ res[etiqueta] = 'error: ' + e.message; }
+  });
+  // Notificación push (app ntfy)
+  if(cfg.ntfy){
+    try{
+      const head = { Title: m.titulo, Priority: 'high', Tags: 'oncoming_automobile' };
+      if(m.liga) head.Click = m.liga;
+      const r = UrlFetchApp.fetch('https://ntfy.sh/' + encodeURIComponent(cfg.ntfy), {
+        method: 'post', payload: m.texto, headers: head, muteHttpExceptions: true
+      });
+      res.push = r.getResponseCode() === 200 ? 'ok' : 'error ' + r.getResponseCode();
+    }catch(e){ res.push = 'error: ' + e.message; }
+  }
+  if(!Object.keys(res).length) res.aviso = 'sin destinatarios configurados';
+  return res;
+}
+
+/* ---------------- Utilidades ---------------- */
+function detalle_(s){
+  if(s.tipo === 'PRESTAMO'){
+    const p = s.prestamo || {};
+    return `Salida ${fecha_(p.salida)} · regreso ${fecha_(p.regreso)}. Destino: ${p.destino || '—'}. Motivo: ${p.motivo || '—'}` +
+           (p.conductor ? `. Conductor: ${p.conductor}` : '');
+  }
+  if(s.tipo === 'INCIDENCIA'){
+    const i = s.incidencia || {};
+    return `${i.tipoIncidencia || 'Incidencia'}: ${i.descripcion || '—'}` + (i.circula ? `. ¿Puede circular? ${i.circula}` : '') +
+           (s.fotos ? `. Fotos: ${s.fotos}` : '');
+  }
+  const c = s.checklist || {};
+  return `${c.momento || 'Check list'}. Km ${c.km != null ? c.km : '—'}. ` + (c.fallas ? `${c.fallas} falla(s) reportada(s)` : 'Sin fallas');
+}
+function fecha_(v){
+  if(!v) return '—';
+  const d = new Date(v);
+  return isNaN(d) ? String(v) : Utilities.formatDate(d, ZONA_HORA, 'dd/MM/yyyy HH:mm');
+}
+function esc_(v){ return String(v == null ? '' : v).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c])); }
+function html_(m){
+  const filas = m.filas.map(([k, v]) =>
+    `<tr><td style="padding:7px 12px;color:#42566f;font-size:12px;border-bottom:1px solid #e3eefb;white-space:nowrap">${esc_(k)}</td>` +
+    `<td style="padding:7px 12px;font-size:13px;color:#000;border-bottom:1px solid #e3eefb"><b>${esc_(v)}</b></td></tr>`).join('');
+  const boton = m.liga ? `<p style="margin:18px 0 0"><a href="${esc_(m.liga)}" style="background:#0b4f9e;color:#fff;text-decoration:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600">Abrir el tablero</a></p>` : '';
+  return `<div style="font-family:Segoe UI,Helvetica,Arial,sans-serif;max-width:560px">
+    <div style="border-bottom:3px solid #0b4f9e;padding-bottom:8px;margin-bottom:12px">
+      <div style="color:#0b4f9e;font-size:17px;font-weight:700">${esc_(m.titulo)}</div>
+      <div style="color:#42566f;font-size:11.5px">KPI-AFI-01 · Coordinación de Activos Fijos y Control Vehicular</div>
+    </div>
+    <table style="border-collapse:collapse;width:100%;border:1px solid #c2d8ef">${filas}</table>${boton}
+    <p style="color:#42566f;font-size:11px;margin-top:16px">Aviso automático del Tablero de Control Vehicular. La atención y su trazabilidad se registran en la bandeja de Solicitudes.</p>
+  </div>`;
+}
+function fbGet_(ruta, params){
+  let url = FB_URL + '/' + ruta + '.json';
+  if(params) url += '?' + Object.keys(params).map(k => k + '=' + encodeURIComponent(params[k])).join('&');
+  const r = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  if(r.getResponseCode() !== 200) throw new Error('Firebase GET ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 140));
+  return JSON.parse(r.getContentText());
+}
+function fbPatch_(ruta, datos){
+  const r = UrlFetchApp.fetch(FB_URL + '/' + ruta + '.json', {
+    method: 'patch', contentType: 'application/json', payload: JSON.stringify(datos), muteHttpExceptions: true
+  });
+  if(r.getResponseCode() !== 200) throw new Error('Firebase PATCH ' + r.getResponseCode() + ': ' + r.getContentText().slice(0, 140));
+}
 </script>
 </body>
 </html>
