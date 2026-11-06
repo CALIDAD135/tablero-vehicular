@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.7</title>
+<title>Control Vehicular · KPI-AFI-01 v3.8</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2044%22%20role%3D%22img%22%20aria-label%3D%22Control%20Vehicular%22%3E%20%3Cg%20fill%3D%22%230b4f9e%22%3E%20%3Cpath%20d%3D%22M17.2%204.6Q18.3%202%2021.2%202H42.8Q45.7%202%2046.8%204.6L52%2017H12Z%22/%3E%20%3Crect%20x%3D%223%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2252.5%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%20%3Cpath%20d%3D%22M8%2019Q8%2016%2011%2016H53Q56%2016%2056%2019V32.5Q56%2035%2053.5%2035H10.5Q8%2035%208%2032.5Z%22/%3E%20%3Crect%20x%3D%2210%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%3Crect%20x%3D%2243.5%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%20%3C/g%3E%20%3Cpath%20d%3D%22M20.8%205H43.2L48%2014.6H16Z%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Crect%20x%3D%2211%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%3Crect%20x%3D%2242.5%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%20%3Crect%20x%3D%2224.5%22%20y%3D%2219.5%22%20width%3D%2215%22%20height%3D%228.5%22%20rx%3D%221.6%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Cpath%20d%3D%22M24.5%2022.4H39.5M24.5%2025.2H39.5%22%20stroke%3D%22%230b4f9e%22%20stroke-width%3D%221.1%22/%3E%20%3Crect%20x%3D%229%22%20y%3D%2229.6%22%20width%3D%2246%22%20height%3D%221.5%22%20rx%3D%22.75%22%20fill%3D%22%23dbe9fb%22/%3E%20%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -607,6 +607,11 @@ img.ch-foto{cursor:zoom-in}
 .ch-ficha a{color:var(--accent);cursor:pointer;text-decoration:underline}
 /* Fotografías de documentos en el checklist */
 .doc-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+/* ============ v3.8 · Resguardo de unidad ============ */
+.rg-box{border:1.5px solid #7cc9be;background:#eef9f7;border-radius:10px;padding:11px 13px;margin:4px 0 12px}
+.rg-box .rg-tit{font-size:12px;font-weight:700;color:#0b5d55;margin-bottom:8px}
+.rg-box .def-chk{color:#0b5d55!important}
+.asig-state.st-resg{background:#d9f2ee;color:#0b5d55;border-color:#7cc9be}
 </style>
 </head>
 <body>
@@ -836,12 +841,13 @@ img.ch-foto{cursor:zoom-in}
 
 <!-- ============ UNIDADES EN PRÉSTAMO ============ -->
 <div class="card col-12">
-  <h3>Préstamos de Unidades
+  <h3>Préstamos y Resguardos de Unidades
     <span class="hint" style="font-weight:400">· historial vigente hasta el cierre del día</span>
     <span id="presBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
   </h3>
   <div class="tabs">
     <div class="tab" data-pres="abiertos">En préstamo</div>
+    <div class="tab" data-pres="resguardos">En resguardo</div>
     <div class="tab" data-pres="devueltos">Devueltos</div>
     <div class="tab active" data-pres="vigentes">Vigentes (ambos)</div>
     <div class="tab" data-pres="todos">Histórico completo</div>
@@ -1220,6 +1226,62 @@ img.ch-foto{cursor:zoom-in}
     <!-- ===== SECCIÓN 1 ===== -->
     <div class="sec-pane active" id="pane_s1">
       <div class="sec-title"><span class="n">1</span> Acerca del Préstamo</div>
+      <!-- v3.8: datos del resguardo (solo en modo Resguardo) -->
+      <div class="rg-box hidden" id="rgBox">
+        <div class="rg-tit">🛡 Resguardo de unidad · la unidad queda bajo custodia de Activos Fijos y se entrega posteriormente</div>
+        <div class="form-grid">
+          <div>
+            <label>Motivo del resguardo</label>
+            <select id="rgMotivo">
+              <option value="">— Seleccione el motivo —</option>
+              <option value="Pernocta">Pernocta</option>
+              <option value="Fin de semana">Fin de semana</option>
+              <option value="Vacaciones del chofer">Vacaciones del chofer</option>
+              <option value="Incapacidad o permiso del chofer">Incapacidad o permiso del chofer</option>
+              <option value="Sanción administrativa">Sanción administrativa</option>
+              <option value="Siniestro">Siniestro</option>
+              <option value="Baja de unidad">Baja de unidad</option>
+              <option value="Resguardo preventivo (seguridad)">Resguardo preventivo (seguridad)</option>
+              <option value="Mantenimiento preventivo (en espera)">Mantenimiento preventivo (en espera)</option>
+              <option value="Mantenimiento correctivo (en espera)">Mantenimiento correctivo (en espera)</option>
+              <option value="Unidad sin chofer asignado">Unidad sin chofer asignado</option>
+              <option value="Trámite documental (verificación, placas, tenencia)">Trámite documental (verificación, placas, tenencia)</option>
+              <option value="Auditoría o inventario físico">Auditoría o inventario físico</option>
+              <option value="Fin de proyecto o cambio de zona">Fin de proyecto o cambio de zona</option>
+              <option value="Otro (especifique)">Otro (especifique)</option>
+            </select>
+            <div class="field-msg" id="e_rgMotivo"></div>
+          </div>
+          <div>
+            <label>Detalle del motivo</label>
+            <input type="text" id="rgDetalle" maxlength="120" placeholder="Ej. Vacaciones del 10 al 17 de noviembre">
+            <div class="field-msg" id="e_rgDetalle"></div>
+          </div>
+          <div>
+            <label>Entrega estimada</label>
+            <input type="date" id="rgFechaEst">
+            <div class="field-msg" id="e_rgFechaEst"></div>
+          </div>
+          <div>
+            <label>Autoriza</label>
+            <input type="text" id="rgAutoriza" maxlength="60" list="dlAutoriza" placeholder="Nombre de quien autoriza (opcional)">
+            <div class="field-msg" id="e_rgAutoriza"></div>
+          </div>
+          <div>
+            <label>Llaves recibidas</label>
+            <select id="rgLlaves">
+              <option value="Recibe 1 juego">Recibe 1 juego</option>
+              <option value="Recibe 2 juegos">Recibe 2 juegos</option>
+              <option value="Sin llaves">Sin llaves</option>
+            </select>
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <label class="def-chk" style="font-weight:500!important;font-size:12.5px!important"><input type="checkbox" id="rgEstatus" checked>
+              Cambiar el estatus de la unidad a RESGUARDO al guardar</label>
+          </div>
+        </div>
+      </div>
       <div class="form-grid">
         <div>
           <label>Fecha de entrega</label>
@@ -1488,6 +1550,21 @@ img.ch-foto{cursor:zoom-in}
             <label class="def-chk" style="font-weight:500!important;font-size:12.5px!important"><input type="checkbox" id="dDefActualizar" checked>
               Registrar al chofer como resguardante en la ficha de la unidad</label>
             <div class="def-nota">Al guardar, el checklist se cierra como <b>Asignación definitiva</b>. Los datos de devolución dejan de ser obligatorios.</div>
+          </div>
+        </div>
+      </div>
+      <!-- v3.8: salida del resguardo -->
+      <div class="rg-box hidden" id="rgEntBox">
+        <div class="rg-tit">🛡 Al registrar la entrega, el resguardo se cierra y la unidad sale de custodia</div>
+        <div class="form-grid">
+          <div>
+            <label>Estatus de la unidad al entregar</label>
+            <select id="rgEstatusEnt">
+              <option value="CIRCULACION">CIRCULACIÓN</option>
+              <option value="TALLER">TALLER</option>
+              <option value="SINIESTRADO">SINIESTRADO</option>
+              <option value="">Sin cambio de estatus</option>
+            </select>
           </div>
         </div>
       </div>
@@ -2168,8 +2245,10 @@ function renderFleetDetail(){
       <div class="fd-item"><div class="lab">Km restantes</div><div class="val">${kmDisplay}</div></div>
       <div class="fd-item"><div class="lab">Incidencias totales</div><div class="val">${incsUnidad.length}</div></div>
       <div class="fd-item"><div class="lab">Períodos de combustible</div><div class="val">${combUnidad.length}</div></div>
-      <div class="fd-item"><div class="lab">Préstamo vigente</div><div class="val">${
-        asigAbierta
+      <div class="fd-item"><div class="lab">Préstamo / resguardo</div><div class="val">${
+        asigAbierta && esRG(asigAbierta)
+          ? `<span class="asig-state st-resg">EN RESGUARDO</span><div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${escapa(asigAbierta.rgMotivo||'')} · desde ${asigAbierta.fechaEntrega||'—'}${asigAbierta.rgFechaEstimada?' · entrega est. '+fFechaMx(asigAbierta.rgFechaEstimada):''}</div>`
+          : asigAbierta
           ? `<span class="asig-state st-abierta">ABIERTA</span><div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${asigAbierta.chofer||'—'} · desde ${asigAbierta.fechaEntrega||'—'}</div>`
           : `<span style="font-size:13px;color:var(--muted)">Sin préstamo activo</span>${asigUnidad.length?`<div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${asigUnidad.length} checklist(s) en historial</div>`:''}`
       }</div></div>
@@ -2190,7 +2269,10 @@ function renderFleetDetail(){
       ${esEditor?`<button class="btn" onclick="abrirModalMant('${r.veh}')">🔧 Agregar mantenimiento</button>`:''}
       ${op?'':`<button class="btn" onclick="verCombustibles('${r.veh}')">⛽ Combustibles${combUnidad.length?` (${combUnidad.length})`:''}</button>`}
       ${presta && apart && !asigAbierta?`<button class="btn btn-primary" onclick="Tickets.entregar('${apart.folio}')">🔑 Entregar a ${escapa(apart.folio)}</button>`:''}
-      ${presta?`<button class="btn ${asigAbierta?'btn-success':''}" onclick="abrirModalAsignacion('${r.veh}')">📋 Préstamo / Checklist${asigAbierta?' · abierta':''}</button>`:''}
+      ${presta?(asigAbierta && esRG(asigAbierta)
+        ? `<button class="btn btn-success" onclick="abrirModalAsignacion('${r.veh}')">🛡 Resguardo abierto · entregar</button>`
+        : `<button class="btn ${asigAbierta?'btn-success':''}" onclick="abrirModalAsignacion('${r.veh}')">📋 Préstamo / Checklist${asigAbierta?' · abierta':''}</button>`):''}
+      ${presta && !asigAbierta?`<button class="btn" onclick="abrirModalAsignacion('${r.veh}',null,'Resguardo')">🛡 Resguardo de unidad</button>`:''}
       ${asigUnidad.length>0?`<button class="btn" onclick="verHistorialAsig('${r.veh}')">Historial (${asigUnidad.length})</button>`:''}
       ${incsUnidad.length>0 && !op?`<button class="btn" onclick="filtrarIncidenciasPor('${r.veh}')">Ver ${incsUnidad.length} incidencia(s)</button>`:''}
       ${mantUnidad.length>0?`<button class="btn" onclick="filtrarMantPor('${r.veh}')">Ver ${mantUnidad.length} mantenimiento(s)</button>`:''}
@@ -2824,16 +2906,16 @@ async function guardaEvidencias(asigId, fotos, fotosDev, firma, firmaDev, insp){
    RESERVA en Firebase con una transacción atómica. Si el Coordinador y el
    Auxiliar generan un folio en el mismo instante, la transacción rechaza al
    segundo y el sistema reintenta: nunca se emiten dos folios iguales. */
-function candidatoFolio(fechaISO){
+function candidatoFolio(fechaISO, pre){
   const base = (fechaISO || new Date().toISOString().slice(0,10)).replace(/-/g,'');
   const t   = Date.now().toString(36).slice(-5).toUpperCase();
   const r   = (Math.random().toString(36).slice(2,6)+'0000').slice(0,4).toUpperCase();
-  return `PR-${base}-${t}${r}`;
+  return `${pre||'PR'}-${base}-${t}${r}`;
 }
 /* Reserva atómica: devuelve el folio confirmado por el servidor */
-async function reservaFolio(fechaISO, asigId){
+async function reservaFolio(fechaISO, asigId, pre){
   for(let i=0;i<12;i++){
-    const folio = candidatoFolio(fechaISO);
+    const folio = candidatoFolio(fechaISO, pre);
     if(STORE.asignaciones.some(a=>a.bitacora===folio)) continue;
     try{
       const ref = fbDb.ref(`${FB_ROOT}/folios/${folio}`);
@@ -2844,7 +2926,7 @@ async function reservaFolio(fechaISO, asigId){
     }catch(e){ console.warn('reservaFolio', e); }
   }
   // Último recurso: marca de tiempo completa, imposible de colisionar en la práctica
-  return `PR-${(fechaISO||'').replace(/-/g,'')}-${Date.now().toString(36).toUpperCase()}`;
+  return `${pre||'PR'}-${(fechaISO||'').replace(/-/g,'')}-${Date.now().toString(36).toUpperCase()}`;
 }
 async function liberaFolio(folio){
   if(!folio) return;
@@ -2918,10 +3000,12 @@ function renderPrestamos(){
   const devueltos = STORE.asignaciones.filter(a=>a.estadoRegistro==='Cerrada');
   // "Vigente" = aún no incluido en un cierre de día
   const devVigentes = devueltos.filter(a=>!a.archivado);
+  const enResg = abiertos.filter(esRG);   // v3.8
 
   let lista;
   if(vista==='abiertos')       lista = abiertos;
   else if(vista==='devueltos') lista = devVigentes;
+  else if(vista==='resguardos') lista = STORE.asignaciones.filter(a=>esRG(a) && (a.estadoRegistro==='Abierta' || !a.archivado));
   else if(vista==='todos')     lista = [...STORE.asignaciones];
   else                         lista = [...abiertos, ...devVigentes];
 
@@ -2931,12 +3015,13 @@ function renderPrestamos(){
   });
 
   $('#presBadge').innerHTML =
-    `<b style="color:var(--accent)">${abiertos.length}</b> en préstamo · `+
+    `<b style="color:var(--accent)">${abiertos.length-enResg.length}</b> en préstamo · <b style="color:#0b5d55">${enResg.length}</b> en resguardo · `+
     `<b style="color:var(--green)">${devVigentes.length}</b> devueltos vigentes`+
     (devueltos.length-devVigentes.length ? ` · ${devueltos.length-devVigentes.length} archivados` : '');
 
   if(lista.length===0){
-    const msg = vista==='abiertos' ? 'No hay unidades en préstamo. Todos los checklists están cerrados.'
+    const msg = vista==='resguardos' ? 'No hay unidades en resguardo.'
+      : vista==='abiertos' ? 'No hay unidades en préstamo. Todos los checklists están cerrados.'
       : vista==='devueltos' ? 'Sin devoluciones pendientes de archivar. El último cierre de día ya las respaldó.'
       : 'Sin registros de préstamo.';
     $('#presBody').innerHTML = `<div class="pres-empty">${msg}</div>`;
@@ -2959,13 +3044,13 @@ function renderPrestamos(){
         const evCol = (cerrada ? (nf===TOTAL_FOTOS && nfd===TOTAL_FOTOS) : nf===TOTAL_FOTOS)
           ? 'var(--green)' : (nf||nfd) ? 'var(--gold)' : 'var(--muted)';
         return `<tr${a.archivado?' style="opacity:.62"':''}>
-          <td><span class="asig-state ${a.asignacionDefinitiva?'st-def':cerrada?'st-cerrada':'st-abierta'}">${a.asignacionDefinitiva?'ASIG. DEFINITIVA':cerrada?'DEVUELTA':'EN PRÉSTAMO'}</span>${
+          <td>${estadoAsigHtml(a)}${
             a.archivado?'<br><span style="font-size:10px;color:var(--muted)">archivada</span>':''}</td>
           <td style="font-variant-numeric:tabular-nums">${a.bitacora||'—'}</td>
           <td><b>${a.vehiculo}</b></td>
           <td>${a.chofer||'—'}</td>
           <td>${a.zona||'—'}</td>
-          <td>${a.destino||'—'}</td>
+          <td>${esRG(a)?`<b style="color:#0b5d55">${escapa(a.rgMotivo||'Resguardo')}</b><br><span style="font-size:11px;color:var(--muted)">${escapa(a.destino||'')}${a.rgFechaEstimada&&!cerrada?' · entrega est. '+fFechaMx(a.rgFechaEstimada):''}</span>`:(a.destino||'—')}</td>
           <td>${a.fechaEntrega||'—'}</td>
           <td>${a.devFecha || (a.asignacionDefinitiva ? (a.defFecha||'')+' · definitiva' : '—')}</td>
           <td><span class="dias-badge ${cls}">${d===null?'—':d+(d===1?' día':' días')}</span></td>
@@ -2976,7 +3061,7 @@ function renderPrestamos(){
           <td style="white-space:nowrap">
             <button class="btn" style="padding:3px 9px;font-size:11px" onclick="pdfDePrestamo('${a.id}',this)">📄 PDF</button>
             ${esEditor?`<button class="btn" style="padding:3px 9px;font-size:11px;margin-left:4px"
-              onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}')">${cerrada?'Ver':'Devolver'}</button>`:''}
+              onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}')">${cerrada?'Ver':esRG(a)?'Entregar':'Devolver'}</button>`:''}
           </td>
         </tr>`;
       }).join('')}</tbody></table>
@@ -3325,6 +3410,9 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   const W=210, H=297, ML=13, MR=13, MT=13, MB=15;
   const CW = W-ML-MR;                       // 184 mm de ancho útil
   let y = MT;
+  const RG = a.tipoRegistro==='Resguardo';   // v3.8
+  const TIT = RG ? 'RESGUARDO DE UNIDADES IES' : 'PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES';
+  const L1 = RG ? 'INGRESO' : 'ENTREGA', L2 = RG ? 'ENTREGA POSTERIOR' : 'DEVOLUCIÓN';
 
   /* --- Paleta --- */
   const AZUL=[11,79,158], AZUL_C=[214,232,251], GRIS=[246,248,251],
@@ -3349,7 +3437,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   function encabezadoContinuacion(){
     doc.setFillColor(...AZUL); doc.rect(0,0,W,11,'F');
     doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
-    doc.text('PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES', ML, 7.2);
+    doc.text(TIT, ML, 7.2);
     doc.setFont('helvetica','normal'); doc.setFontSize(8);
     doc.text(a.bitacora ? 'Folio '+sane(a.bitacora) : 'Registro sin folio', W-MR, 7.2, {align:'right'});
     doc.setTextColor(...TXT);
@@ -3364,7 +3452,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
     doc.setFillColor(...AZUL); doc.rect(0,0,W,26,'F');
     doc.setTextColor(255,255,255);
     doc.setFont('helvetica','bold'); doc.setFontSize(15);
-    doc.text('PRÉSTAMO / ASIGNACIÓN DE UNIDADES IES', W/2, 11, {align:'center'});
+    doc.text(TIT, W/2, 11, {align:'center'});
     doc.setFontSize(8.5); doc.setFont('helvetica','normal');
     doc.text(RAZON_SOCIAL, W/2, 17, {align:'center'});
     doc.setFontSize(7.5);
@@ -3495,7 +3583,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
     doc.setFillColor(251,238,205); doc.setDrawColor(220,178,87); doc.setLineWidth(0.2);
     doc.roundedRect(ML, y, CW, 12, 1.4, 1.4, 'FD');
     doc.setFont('helvetica','bold'); doc.setFontSize(8.4); doc.setTextColor(125,86,6);
-    doc.text('Este préstamo no tiene evidencia fotográfica registrada.', ML+5, y+5.4);
+    doc.text((RG?'Este resguardo':'Este préstamo')+' no tiene evidencia fotográfica registrada.', ML+5, y+5.4);
     doc.setFont('helvetica','normal'); doc.setFontSize(7.4);
     doc.text('Capture las tomas desde el checklist para que aparezcan en este documento.', ML+5, y+9.2);
     doc.setTextColor(...TXT);
@@ -3534,8 +3622,8 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
     doc.setFillColor(...AZUL_C); doc.rect(ML, y, bw, 6, 'F');
     doc.setFillColor(251,238,205); doc.rect(ML+bw+gap, y, bw, 6, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(7.6);
-    doc.setTextColor(...AZUL);   doc.text('ENTREGA', ML+bw/2, y+4.1, {align:'center'});
-    doc.setTextColor(125,86,6);  doc.text('DEVOLUCIÓN', ML+bw+gap+bw/2, y+4.1, {align:'center'});
+    doc.setTextColor(...AZUL);   doc.text(L1, ML+bw/2, y+4.1, {align:'center'});
+    doc.setTextColor(125,86,6);  doc.text(L2, ML+bw+gap+bw/2, y+4.1, {align:'center'});
     doc.setTextColor(...TXT);
     y += 8;
 
@@ -3545,8 +3633,8 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
         doc.setFillColor(...AZUL_C); doc.rect(ML, y, bw, 6, 'F');
         doc.setFillColor(251,238,205); doc.rect(ML+bw+gap, y, bw, 6, 'F');
         doc.setFont('helvetica','bold'); doc.setFontSize(7.6);
-        doc.setTextColor(...AZUL);  doc.text('ENTREGA', ML+bw/2, y+4.1, {align:'center'});
-        doc.setTextColor(125,86,6); doc.text('DEVOLUCIÓN', ML+bw+gap+bw/2, y+4.1, {align:'center'});
+        doc.setTextColor(...AZUL);  doc.text(L1, ML+bw/2, y+4.1, {align:'center'});
+        doc.setTextColor(125,86,6); doc.text(L2, ML+bw+gap+bw/2, y+4.1, {align:'center'});
         doc.setTextColor(...TXT);
         y += 8;
       }
@@ -3595,9 +3683,19 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   datos([
     ['Unidad', a.vehiculo], ['Placas', u.placas],
     ['Zona', a.zona||u.zona], ['Departamento', u.depto],
-    ['Estatus operativo', u.estatus], ['KM a la entrega', km(a.kmInicial)]
+    ['Estatus operativo', u.estatus], [RG?'KM al ingreso':'KM a la entrega', km(a.kmInicial)]
   ]);
 
+  if(RG){
+    seccion('2. Datos del resguardo');
+    datos([
+      ['Motivo', [a.rgMotivo, a.rgDetalle].filter(Boolean).join(' · ')], ['Fecha de ingreso', a.fechaEntrega],
+      ['Chofer que entrega', a.chofer], ['Recibido por', a.entregadoPor],
+      ['Lugar de resguardo', a.destino], ['Entrega estimada', a.rgFechaEstimada],
+      ['Autoriza', a.rgAutoriza], ['Llaves', a.rgLlaves],
+      ['Estado unidad', a.estado], ['Nivel de tanque', a.tanque]
+    ]);
+  } else {
   seccion('2. Datos del préstamo');
   datos([
     ['Fecha de entrega', a.fechaEntrega], ['Chofer responsable', a.chofer],
@@ -3605,9 +3703,10 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
     ['Estado unidad', a.estado], ['Nivel de tanque', a.tanque],
     ['Próx. servicio KM', km(a.proxServKm)], ['Próx. servicio fecha', a.proxServFecha]
   ]);
+  }
   if(a.comentarios){
     doc.setFont('helvetica','bold'); doc.setFontSize(7.4); doc.setTextColor(...SUAVE);
-    doc.text('COMENTARIOS DE ENTREGA', ML, y); y += 3.5;
+    doc.text(RG?'COMENTARIOS DE RECEPCIÓN':'COMENTARIOS DE ENTREGA', ML, y); y += 3.5;
     parrafo(a.comentarios, 8);
   }
 
@@ -3622,16 +3721,16 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
               ['Frenos',a.parFrenos],['Líquido limpiaparabrisas',a.parLimpia]], 'Bueno');
 
   if(hayDev){
-    seccion(sig()+'. Devolución de la unidad');
+    seccion(sig()+(RG?'. Entrega posterior de la unidad':'. Devolución de la unidad'));
     datos([
-      ['Fecha devolución', a.devFecha], ['Chofer que devuelve', a.devChofer],
-      ['Recibido por', a.devRecibidoPor], ['Estado unidad', a.devEstado],
-      ['Nivel de tanque', a.devTanque], ['KM final', km(a.devKmFinal)],
-      ['KM del recorrido', km(a.kmRecorrido)], ['Estado del registro', a.estadoRegistro]
+      [RG?'Fecha de entrega':'Fecha devolución', a.devFecha], [RG?'Chofer que recibe':'Chofer que devuelve', a.devChofer],
+      [RG?'Entregado por':'Recibido por', a.devRecibidoPor], ['Estado unidad', a.devEstado],
+      ['Nivel de tanque', a.devTanque], [RG?'KM de salida':'KM final', km(a.devKmFinal)],
+      [RG?'KM durante el resguardo':'KM del recorrido', km(a.kmRecorrido)], ['Estado del registro', a.estadoRegistro]
     ]);
     if(a.devComentarios){
       doc.setFont('helvetica','bold'); doc.setFontSize(7.4); doc.setTextColor(...SUAVE);
-      doc.text('COMENTARIOS DE DEVOLUCIÓN', ML, y); y += 3.5;
+      doc.text(RG?'COMENTARIOS DE ENTREGA':'COMENTARIOS DE DEVOLUCIÓN', ML, y); y += 3.5;
       parrafo(a.devComentarios, 8);
     }
   }
@@ -3657,35 +3756,35 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
     sinEvidenciasAviso();
   } else if(hayDev){
     doc.addPage(); encabezadoContinuacion();
-    seccion(sig()+'. Evidencia fotográfica · comparativa entrega vs. devolución');
+    seccion(sig()+(RG?'. Evidencia fotográfica · comparativa ingreso vs. entrega':'. Evidencia fotográfica · comparativa entrega vs. devolución'));
     comparativa();
   } else {
     doc.addPage(); encabezadoContinuacion();
-    seccion(sig()+'. Evidencia fotográfica de entrega');
+    seccion(sig()+(RG?'. Evidencia fotográfica de ingreso':'. Evidencia fotográfica de entrega'));
     rejillaFotos(F);
   }
 
   doc.addPage(); encabezadoContinuacion();
-  seccion(sig()+'. Carta responsiva');
-  parrafo(CARTA_RESPONSIVA, 8.4);
+  seccion(sig()+(RG?'. Acta de entrega-recepción para resguardo':'. Carta responsiva'));
+  parrafo(RG?ACTA_RESGUARDO:CARTA_RESPONSIVA, 8.4);
   y += 3;
 
   seccion(sig()+'. Firmas de conformidad');
   doc.setFont('helvetica','bold'); doc.setFontSize(7.6); doc.setTextColor(...AZUL);
-  doc.text('ENTREGA', ML, y); y += 4;
+  doc.text(RG?'INGRESO A RESGUARDO':'ENTREGA', ML, y); y += 4;
   doc.setTextColor(...TXT);
   firmas([
-    {img:fEnt, nombre:a.firmaRecepcion||a.chofer, rol:'Chofer responsable · Recibe de conformidad'},
-    {img:null, nombre:a.entregadoPor,             rol:'Por '+RAZON_SOCIAL}
+    {img:fEnt, nombre:a.firmaRecepcion||a.chofer, rol:RG?'Chofer · Entrega la unidad para resguardo':'Chofer responsable · Recibe de conformidad'},
+    {img:null, nombre:a.entregadoPor,             rol:'Por '+RAZON_SOCIAL+(RG?' · Recibe en resguardo':'')}
   ]);
   if(hayDev){
     reserva(42);
     doc.setFont('helvetica','bold'); doc.setFontSize(7.6); doc.setTextColor(...AZUL);
-    doc.text('DEVOLUCIÓN', ML, y); y += 4;
+    doc.text(L2, ML, y); y += 4;
     doc.setTextColor(...TXT);
     firmas([
-      {img:fDev, nombre:a.devChofer,      rol:'Chofer que devuelve · Entrega de conformidad'},
-      {img:null, nombre:a.devRecibidoPor, rol:'Por '+RAZON_SOCIAL+' · Recibe la unidad'}
+      {img:fDev, nombre:a.devChofer,      rol:RG?'Chofer que recibe la unidad · Conformidad':'Chofer que devuelve · Entrega de conformidad'},
+      {img:null, nombre:a.devRecibidoPor, rol:'Por '+RAZON_SOCIAL+(RG?' · Entrega la unidad':' · Recibe la unidad')}
     ]);
   }
   if(esDef){
@@ -3703,7 +3802,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   if(iEnt || iDev || a.inspObs || a.inspObsDev){
     doc.addPage(); encabezadoContinuacion();
     seccion(sig()+'. Inspección visual de carrocería');
-    const bloques = [['ENTREGA', iEnt, a.inspObs], ['DEVOLUCIÓN', iDev, a.inspObsDev]].filter(b=>b[1] || b[2]);
+    const bloques = [[L1, iEnt, a.inspObs], [L2, iDev, a.inspObsDev]].filter(b=>b[1] || b[2]);
     const dos = bloques.length===2;
     bloques.forEach(([tit, im, obs])=>{
       const bw = CW, bh = dos ? 92 : 128;
@@ -3736,7 +3835,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   }
 
   const ref = a.bitacora || ('S-F-'+String(a.id||'').slice(-6).toUpperCase());
-  const nombre = ('Prestamo-'+ref+'-'+(a.vehiculo||'')+'.pdf').replace(/[^\w\-.]/g,'_');
+  const nombre = ((RG?'Resguardo-':'Prestamo-')+ref+'-'+(a.vehiculo||'')+'.pdf').replace(/[^\w\-.]/g,'_');
   if(comoBlob) return { blob: doc.output('blob'), nombre };
   doc.save(nombre);
   return true;
@@ -3778,6 +3877,7 @@ async function descargarPdfLegal(){
       devRecibidoPor:$('#dEntregadoPor').value, devComentarios:$('#dComentarios').value,
       inspObs:$('#aInspObs').value, inspObsDev:$('#dInspObs').value,
       ...Definitiva.lee(),
+      ...Resguardo.lee(),
       estadoRegistro: (($('#dFecha').value && num('dKmFinal')!==null) || $('#dDefinitiva').checked) ? 'Cerrada' : 'Abierta'
     };
     a.kmRecorrido = (a.devKmFinal!=null && a.kmInicial!=null) ? a.devKmFinal - a.kmInicial : null;
@@ -3832,9 +3932,9 @@ async function exportacionDiariaZip(){
     const csv = (rows) => rows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
 
     zip.file('01_Prestamos.csv', csv([
-      ['FOLIO','UNIDAD','ZONA','CHOFER','DESTINO','F.ENTREGA','KM INICIAL','ENTREGÓ',
+      ['FOLIO','TIPO','MOTIVO RESGUARDO','UNIDAD','ZONA','CHOFER','DESTINO','F.ENTREGA','KM INICIAL','ENTREGÓ',
        'F.DEVOLUCIÓN','KM FINAL','KM RECORRIDO','RECIBIÓ','ESTADO','EVID.ENT','EVID.DEV'],
-      ...pres.map(a=>[a.bitacora,a.vehiculo,a.zona,a.chofer,a.destino,a.fechaEntrega,a.kmInicial,a.entregadoPor,
+      ...pres.map(a=>[a.bitacora,esRG(a)?'Resguardo':'Préstamo',esRG(a)?(a.rgMotivo||''):'',a.vehiculo,a.zona,a.chofer,a.destino,a.fechaEntrega,a.kmInicial,a.entregadoPor,
         a.devFecha,a.devKmFinal,a.kmRecorrido,a.devRecibidoPor,a.estadoRegistro,
         a.evidenciasCount??0, a.evidenciasDevCount??0])
     ]));
@@ -4353,7 +4453,7 @@ window.verHistorialAsig = function(veh){
           const cerrada = a.estadoRegistro==='Cerrada';
           const firmas = `${a.firmaCapturada?'✓':'—'} / ${a.firmaDevCapturada?'✓':'—'}`;
           return `<tr${a.archivado?' style="opacity:.62"':''}>
-            <td><span class="asig-state ${a.asignacionDefinitiva?'st-def':cerrada?'st-cerrada':'st-abierta'}">${a.asignacionDefinitiva?'ASIG. DEFINITIVA':cerrada?'DEVUELTA':'ABIERTA'}</span></td>
+            <td>${estadoAsigHtml(a)}</td>
             <td style="font-variant-numeric:tabular-nums">${a.bitacora||'—'}</td>
             <td>${a.chofer||'—'}</td>
             <td>${a.destino||'—'}</td>
@@ -4375,9 +4475,14 @@ window.verHistorialAsig = function(veh){
 };
 
 let _omitirApartado = false;   // v3.7: préstamo sin vínculo autorizado por Activos
-window.abrirModalAsignacion = async function(veh, asigId){
+window.abrirModalAsignacion = async function(veh, asigId, tipo){
   if(!puedePrestar()){ toast('Su perfil es de solo consulta.','warn'); return; }
-  if(!asigId && !asignacionAbierta(veh) && !Tickets.vinculo.pres && !_omitirApartado){
+  // v3.8: un resguardo nuevo exige que la unidad no tenga un préstamo abierto
+  const abiertaPrev = asignacionAbierta(veh);
+  if(!asigId && tipo==='Resguardo' && abiertaPrev && !esRG(abiertaPrev)){
+    toast(`${veh} tiene el préstamo ${abiertaPrev.bitacora||''} abierto. Registre primero la devolución y después el resguardo.`,'err'); return;
+  }
+  if(!asigId && tipo!=='Resguardo' && !asignacionAbierta(veh) && !Tickets.vinculo.pres && !_omitirApartado){
     const ap = Apartados.de(veh);
     if(ap){ Tickets.avisoApartada(veh, ap); return; }
   }
@@ -4392,13 +4497,16 @@ window.abrirModalAsignacion = async function(veh, asigId){
   const a = abierta || {};
   // Identificador previo a guardar: permite subir evidencias antes del primer guardado
   draftAsigId = editingAsigId || uid();
+  const tipoReg = abierta ? (abierta.tipoRegistro || 'Préstamo') : (tipo==='Resguardo' ? 'Resguardo' : 'Préstamo');
+  const RGm = tipoReg==='Resguardo';
 
   $('#mAsigTitle').textContent = abierta
-    ? `Checklist ${abierta.estadoRegistro==='Cerrada'?'cerrado':'abierto'} · ${veh}`
-    : `Nuevo checklist de préstamo · ${veh}`;
+    ? `${RGm?'Resguardo':'Checklist'} ${abierta.estadoRegistro==='Cerrada'?'cerrado':'abierto'} · ${veh}`
+    : `Nuevo ${RGm?'resguardo de unidad':'checklist de préstamo'} · ${veh}`;
   $('#mAsigSub').innerHTML = abierta
     ? `Registro del ${abierta.fechaEntrega||'—'} · <span class="asig-state ${abierta.asignacionDefinitiva?'st-def':abierta.estadoRegistro==='Cerrada'?'st-cerrada':'st-abierta'}">${abierta.asignacionDefinitiva?'Asignación definitiva':abierta.estadoRegistro}</span>`
-    : 'Checklist de préstamo y devolución de unidad. Las secciones se recorren con las pestañas.';
+    : (RGm ? 'Ingreso de la unidad a resguardo y entrega posterior. Las secciones se recorren con las pestañas.'
+           : 'Checklist de préstamo y devolución de unidad. Las secciones se recorren con las pestañas.');
 
   // Sección 1
   $('#aVehiculo').value      = veh;
@@ -4410,7 +4518,7 @@ window.abrirModalAsignacion = async function(veh, asigId){
   if(a.bitacora){ $('#aBitacora').value = a.bitacora; }
   else {
     $('#aBitacora').value = 'Generando folio…';
-    reservaFolio($('#aFechaEntrega').value || new Date().toISOString().slice(0,10), draftAsigId)
+    reservaFolio($('#aFechaEntrega').value || new Date().toISOString().slice(0,10), draftAsigId, RGm?'RG':'PR')
       .then(f=>{ if(!$('#aBitacora').value || $('#aBitacora').value==='Generando folio…') $('#aBitacora').value = f; });
   }
   $('#aEstado').value        = a.estado || 'Bueno';
@@ -4464,6 +4572,7 @@ window.abrirModalAsignacion = async function(veh, asigId){
   $('#aInspObs').value       = a.inspObs || '';
   $('#dInspObs').value       = a.inspObsDev || '';
   Definitiva.carga(a);
+  Resguardo.modo(tipoReg, a, u);   // v3.8
   Insp.init().catch(e=>console.warn('inspección', e));
 
   $('#btnEliminarAsig').classList.toggle('hidden', !editingAsigId || session.rol!=='admin');
@@ -4483,7 +4592,7 @@ function validaAsignacion(a){
   if(!a.entregadoPor) errs.aEntregadoPor = 'Seleccione quién entrega la unidad.';
   if(a.kmInicial===null || isNaN(a.kmInicial)) errs.aKmInicial = 'Capture el kilometraje inicial.';
   else if(a.kmInicial < 0 || a.kmInicial > 9999999) errs.aKmInicial = 'Rango válido: 0 a 9,999,999.';
-  if(!a.destino || a.destino.length < 3) errs.aDestino = 'Indique el destino (mínimo 3 caracteres).';
+  if(!a.destino || a.destino.length < 3) errs.aDestino = a.tipoRegistro==='Resguardo' ? 'Indique el lugar de resguardo (mínimo 3 caracteres).' : 'Indique el destino (mínimo 3 caracteres).';
   else if(!RX.notas.test(a.destino)) errs.aDestino = 'No se permiten los caracteres < ni >.';
   if(!a.zona) errs.aZona = 'Seleccione la zona del préstamo.';
   if(a.comentarios && !RX.notas.test(a.comentarios)) errs.aComentarios = 'No se permiten los caracteres < ni >.';
@@ -4521,6 +4630,7 @@ function validaAsignacion(a){
     if(!a.devEstado) errs.dEstado = 'Seleccione el estado de la unidad.';
     if(a.devComentarios && !RX.notas.test(a.devComentarios)) errs.dComentarios = 'No se permiten los caracteres < ni >.';
   }
+  Resguardo.valida(a, errs);   // v3.8
   return errs;
 }
 
@@ -4574,7 +4684,8 @@ async function guardarAsignacion(){
     // Inspección visual y asignación definitiva (v3.6)
     inspObs:    $('#aInspObs').value.trim(),
     inspObsDev: $('#dInspObs').value.trim(),
-    ...Definitiva.lee()
+    ...Definitiva.lee(),
+    ...Resguardo.lee()   // v3.8
   };
 
   const errs = validaAsignacion(a);
@@ -4619,6 +4730,7 @@ async function guardarAsignacion(){
   a.inspDevCapturada = !!Insp.exporta('dev');
 
   const orig = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
+  if(a.tipoRegistro==='Resguardo') a.rgEstatusPrevio = (orig && orig.rgEstatusPrevio) || u.estatus || '';
   const reg = orig
     ? {...orig, ...a, updatedAt:nowISO(), updatedBy:session.rol}
     : {id:draftAsigId||uid(), ...a, ...Tickets.camposVinculo('pres'), createdBy:session.rol, createdAt:nowISO(), updatedAt:nowISO(), updatedBy:session.rol};
@@ -4634,17 +4746,32 @@ async function guardarAsignacion(){
   if(Object.keys(fotosFull).length || Object.keys(fotosDevFull).length || firmaFinal || firmaDevFinal || inspFinal.ent || inspFinal.dev)
     await guardaEvidencias(reg.id, fotosFull, fotosDevFull, firmaFinal, firmaDevFinal, inspFinal);
 
+  // --- v3.8 · Resguardo: estatus de la unidad al ingresar y al entregar ---
+  let rgEstatus = null, rgAplicado = false;
+  if(a.tipoRegistro==='Resguardo'){
+    const yaCerrado = orig && orig.estadoRegistro==='Cerrada';
+    if(!orig && !cerrada && $('#rgEstatus').checked && u.estatus!=='RESGUARDO') rgEstatus = 'RESGUARDO';
+    if(devuelta && !yaCerrado && a.rgEstatusEntrega && a.rgEstatusEntrega!==u.estatus) rgEstatus = a.rgEstatusEntrega;
+  }
+
   // --- Actualización cruzada: KM final → KM actual de la unidad ---
   let sincronizado = false;
   if(devuelta && $('#dActualizarKm').checked && a.devKmFinal !== u.kmActual){
     const antes = u.kmActual;
     const actualizada = {...u, kmActual:a.devKmFinal, kmLegacy:null, updatedAt:nowISO()};
+    if(rgEstatus){ actualizada.estatus = rgEstatus; rgAplicado = true; }
     if(a.proxServKm!==null && !isNaN(a.proxServKm)) actualizada.kmProximoServicio = a.proxServKm;
     const ok2 = await fbWriteUnidad(actualizada);
     if(ok2){
       sincronizado = true;
       await logChange(veh,'EDIT','kmActual',antes,a.devKmFinal);
     }
+  }
+  if(rgEstatus){
+    let okE = rgAplicado;
+    if(!rgAplicado) okE = await fbWriteUnidad({...u, estatus:rgEstatus, updatedAt:nowISO()});
+    if(okE) await logChange(veh,'EDIT','estatus',u.estatus||'',rgEstatus);
+    else rgEstatus = null;
   }
 
   // --- Asignación definitiva: el chofer queda como resguardante de la unidad ---
@@ -4660,10 +4787,18 @@ async function guardarAsignacion(){
   }
 
   if(orig){
-    await logChange(veh, cerrada?'CIERRE_ASIG':'EDIT_ASIG', 'checklist',
+    await logChange(veh, a.tipoRegistro==='Resguardo' ? (cerrada?'CIERRE_RESG':'EDIT_RESG') : (cerrada?'CIERRE_ASIG':'EDIT_ASIG'), 'checklist',
       orig.estadoRegistro, `${a.asignacionDefinitiva?'Asignación definitiva':a.estadoRegistro}${devuelta?` · ${a.kmRecorrido.toLocaleString('es-MX')} km recorridos`:''}`);
   } else {
-    await logChange(veh,'ALTA_ASIG','checklist','', `${a.fechaEntrega} · ${a.chofer} · ${a.destino}`);
+    await logChange(veh, a.tipoRegistro==='Resguardo'?'ALTA_RESG':'ALTA_ASIG','checklist','', `${a.fechaEntrega} · ${a.chofer} · ${a.tipoRegistro==='Resguardo'?a.rgMotivo+' · ':''}${a.destino}`);
+  }
+
+  if(a.tipoRegistro==='Resguardo'){
+    toast(devuelta
+      ? `Resguardo cerrado: ${veh} entregada a ${a.devChofer}${rgEstatus?' · estatus '+rgEstatus:''}${sincronizado?' · KM actual sincronizado':''}.`
+      : `${veh} en resguardo por ${a.rgMotivo}${rgEstatus?' · estatus RESGUARDO':''}.`);
+    cerrarModal('modalAsignacion');
+    return;
   }
 
   toast(a.asignacionDefinitiva && !devuelta
@@ -5833,7 +5968,8 @@ function datosReporte(){
   const asig = [...STORE.asignaciones]
     .sort((a,b)=>(b.fechaEntrega||'').localeCompare(a.fechaEntrega||''))
     .map(a=>({
-      'FOLIO': a.bitacora||'', 'UNIDAD': a.vehiculo, 'ZONA': a.zona||'', 'ESTADO REG.': a.estadoRegistro||'',
+      'FOLIO': a.bitacora||'', 'TIPO': esRG(a)?'Resguardo':'Préstamo', 'MOTIVO RESGUARDO': esRG(a)?[a.rgMotivo,a.rgDetalle].filter(Boolean).join(' · '):'',
+      'UNIDAD': a.vehiculo, 'ZONA': a.zona||'', 'ESTADO REG.': a.estadoRegistro||'',
       'F. ENTREGA': a.fechaEntrega||'', 'CHOFER': a.chofer||'', 'DESTINO': a.destino||'',
       'KM INICIAL': a.kmInicial ?? '', 'TANQUE ENT.': a.tanque||'', 'EDO. ENT.': a.estado||'',
       'F. DEVOLUCIÓN': a.devFecha||'', 'KM FINAL': a.devKmFinal ?? '',
@@ -7648,6 +7784,138 @@ window.Definitiva = Definitiva;
 $('#dDefinitiva').addEventListener('change', ()=>Definitiva.pinta());
 $('#aChofer').addEventListener('change', ()=>Definitiva.pinta());
 
+/* ============ RESGUARDO DE UNIDAD · v3.8 ============
+   Registro inverso al préstamo: el chofer entrega la unidad a la empresa para su
+   resguardo (pernocta, fin de semana, vacaciones, sanción, siniestro, baja, etc.) y
+   la unidad se le entrega posteriormente. Usa el mismo checklist (8 secciones,
+   evidencias, inspección y firmas) con tipoRegistro = 'Resguardo' y folio RG-….
+     · Ingreso (sección 1): motivo, fecha estimada de entrega, autoriza y llaves.
+       Al guardar, la unidad pasa a estatus RESGUARDO (opcional).
+     · Entrega posterior (sección 8): fecha, KM de salida, chofer que recibe y
+       estatus con el que la unidad sale del resguardo. */
+const RG_MOTIVOS = [
+  'Pernocta', 'Fin de semana', 'Vacaciones del chofer', 'Incapacidad o permiso del chofer',
+  'Sanción administrativa', 'Siniestro', 'Baja de unidad', 'Resguardo preventivo (seguridad)',
+  'Mantenimiento preventivo (en espera)', 'Mantenimiento correctivo (en espera)',
+  'Unidad sin chofer asignado', 'Trámite documental (verificación, placas, tenencia)',
+  'Auditoría o inventario físico', 'Fin de proyecto o cambio de zona', 'Otro (especifique)'
+];
+const RG_REQ_AUTORIZA = ['Sanción administrativa', 'Baja de unidad'];
+const ACTA_RESGUARDO = 'Por medio de la presente, el chofer que suscribe hace entrega a INNOVACIONES TECNOLÓGICAS EN TRATAMIENTO DEL AGUA, S.A. DE C.V. del vehículo descrito en este documento, para su resguardo en el lugar indicado por la Coordinación de Activos Fijos y Control Vehicular y por el motivo aquí señalado. La unidad, sus llaves, documentos, accesorios y herramienta se reciben conforme al inventario, los parámetros, la evidencia fotográfica y la inspección visual que integran este documento, los cuales ambas partes reconocen como reflejo fiel de las condiciones de la unidad al momento de su ingreso. Durante el resguardo, la unidad no podrá utilizarse sin autorización expresa de la Coordinación. Su entrega posterior se registrará en este mismo folio con fecha, kilometraje, estado y firma de quien la recibe. Cualquier daño, faltante u observación no asentada al momento del ingreso deberá reportarse de inmediato. El chofer manifiesta que la información asentada es veraz y que entrega la unidad de conformidad.';
+const esRG = a => !!(a && a.tipoRegistro==='Resguardo');
+function estadoAsigHtml(a){
+  const c = a.estadoRegistro==='Cerrada';
+  if(esRG(a)) return `<span class="asig-state ${c?'st-cerrada':'st-resg'}">${c?'RESG. ENTREGADA':'EN RESGUARDO'}</span>`;
+  return `<span class="asig-state ${a.asignacionDefinitiva?'st-def':c?'st-cerrada':'st-abierta'}">${a.asignacionDefinitiva?'ASIG. DEFINITIVA':c?'DEVUELTA':'EN PRÉSTAMO'}</span>`;
+}
+const Resguardo = {
+  tipo: 'Préstamo',
+  activo(){ return this.tipo==='Resguardo'; },
+  _orig: new WeakMap(),
+  /* Cambia solo los nodos de texto (no recrea inputs ni pierde eventos) */
+  swap(el, pares, rg){
+    if(!el) return;
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodos = []; while(w.nextNode()) nodos.push(w.currentNode);
+    nodos.forEach(n=>{
+      if(!this._orig.has(n)) this._orig.set(n, n.nodeValue);
+      const o = this._orig.get(n);
+      n.nodeValue = rg ? pares.reduce((t,[a,b])=>t.split(a).join(b), o) : o;
+    });
+  },
+  lab(id){ const e = $('#'+id); return e ? e.parentElement.querySelector('label') : null; },
+  textos(){
+    const L = id=>this.lab(id);
+    return [
+      [$('#modalAsignacion .asig-tabs .tab[data-sec="s1"]'), [['Préstamo','Resguardo']]],
+      [$('#modalAsignacion .asig-tabs .tab[data-sec="s7"]'), [['Devolución','Entrega posterior']]],
+      [$('#pane_s1 > .sec-title'), [['Acerca del Préstamo','Acerca del Resguardo']]],
+      [L('aFechaEntrega'), [['Fecha de entrega','Fecha de ingreso a resguardo']]],
+      [L('aChofer'), [['Chofer asignado','Chofer que entrega la unidad']]],
+      [L('aBitacora'), [['Folio de préstamo','Folio de resguardo']]],
+      [L('aKmInicial'), [['KM inicial','KM de ingreso']]],
+      [L('aDestino'), [['Destino','Lugar de resguardo']]],
+      [L('aEntregadoPor'), [['Entregado por','Recibido por (Activos Fijos)']]],
+      [L('aComentarios'), [['Comentarios de entrega','Comentarios de recepción']]],
+      [$('#pane_s5 .insp-wrap'), [['· Entrega','· Ingreso']]],
+      [L('aFirmaRecepcion'), [['Nombre de quien recibe','Nombre de quien entrega la unidad']]],
+      [$('#firmaCanvas').closest('.full').querySelector('label'), [['Firma de recepción','Firma de quien entrega la unidad']]],
+      [$('#pane_s6 .carta-tit'), [['Carta Responsiva','Acta de Entrega-Recepción para Resguardo']]],
+      [$('#pane_s6 .carta-chk'), [['la carta responsiva','el acta de resguardo']]],
+      [$('#pane_s7 > .sec-title'), [['Acerca de la Devolución','Entrega Posterior · Salida del Resguardo'],['Complete al reingresar la unidad','Complete al entregar la unidad']]],
+      [L('dFecha'), [['Fecha de devolución','Fecha de entrega']]],
+      [L('dChofer'), [['Chofer que devuelve','Chofer que recibe la unidad']]],
+      [L('dKmFinal'), [['KM final','KM de salida']]],
+      [L('dEntregadoPor'), [['Recibido por','Entregado por (Activos Fijos)']]],
+      [L('dKmRecorrido'), [['Kilómetros del recorrido','KM durante el resguardo']]],
+      [L('dComentarios'), [['Comentarios de devolución','Comentarios de entrega']]],
+      [$('#firmaCanvasDev').closest('.full').querySelector('label'), [['Firma de devolución (conformidad de reingreso)','Firma de recepción (chofer que recibe la unidad)']]],
+      [$('#firmaHintDev'), [['al devolver la unidad','al recibir la unidad']]],
+      [$('#fotoGridDev').closest('.full').querySelector('.sec-title'), [['Entrega vs. Devolución','Ingreso vs. Entrega posterior']]],
+      [$('#pane_s7 .insp-wrap'), [['Devolución','Entrega posterior']]]
+    ];
+  },
+  /* Ajusta el checklist al tipo de registro y carga los datos del resguardo */
+  modo(tipo, a, u){
+    this.tipo = tipo==='Resguardo' ? 'Resguardo' : 'Préstamo';
+    const rg = this.activo(); a = a || {}; u = u || {};
+    this.textos().forEach(([el, pares])=>this.swap(el, pares, rg));
+    $('#rgBox').classList.toggle('hidden', !rg);
+    $('#rgEntBox').classList.toggle('hidden', !rg);
+    $('#defBox').classList.toggle('hidden', rg);
+    if(rg && $('#dDefinitiva').checked){ $('#dDefinitiva').checked = false; Definitiva.pinta(); }
+    $('#cartaTexto').textContent = rg ? ACTA_RESGUARDO : CARTA_RESPONSIVA;
+    $('#aDestino').placeholder = rg ? 'Ej. Estacionamiento de oficinas IES Cancún' : 'Ej. Cancún → Playa del Carmen';
+    if(!rg) return;
+    $('#rgMotivo').value    = a.rgMotivo || '';
+    $('#rgDetalle').value   = a.rgDetalle || '';
+    $('#rgFechaEst').value  = a.rgFechaEstimada || '';
+    $('#rgAutoriza').value  = a.rgAutoriza || '';
+    $('#rgLlaves').value    = a.rgLlaves || 'Recibe 1 juego';
+    $('#rgEstatus').checked = true;
+    $('#rgEstatus').closest('div').classList.toggle('hidden', !!a.id);   // solo al ingresar
+    const prev = a.rgEstatusPrevio || u.estatus;
+    $('#rgEstatusEnt').value = ['CIRCULACION','TALLER','SINIESTRADO'].includes(prev) ? prev : 'CIRCULACION';
+    this.pintaMotivo();
+  },
+  pintaMotivo(){
+    const m = $('#rgMotivo').value;
+    const req = RG_REQ_AUTORIZA.includes(m);
+    $('#rgAutoriza').placeholder = req ? 'Obligatorio para este motivo' : 'Nombre de quien autoriza (opcional)';
+    $('#rgDetalle').placeholder = m==='Otro (especifique)' ? 'Describa el motivo (obligatorio)' : 'Ej. Vacaciones del 10 al 17 de noviembre';
+  },
+  /* Fecha estimada sugerida al elegir el motivo */
+  sugiereFecha(){
+    if($('#rgFechaEst').value) return;
+    const m = $('#rgMotivo').value, base = new Date(($('#aFechaEntrega').value || hoyISO())+'T12:00:00');
+    if(m==='Pernocta'){ base.setDate(base.getDate()+1); $('#rgFechaEst').value = toISO(base); }
+    else if(m==='Fin de semana'){ const d = base.getDay(); base.setDate(base.getDate() + ((8-d)%7 || 7)); $('#rgFechaEst').value = toISO(base); }
+  },
+  lee(){
+    if(!this.activo()) return { tipoRegistro: 'Préstamo' };
+    return {
+      tipoRegistro: 'Resguardo',
+      rgMotivo: $('#rgMotivo').value,
+      rgDetalle: $('#rgDetalle').value.trim(),
+      rgFechaEstimada: $('#rgFechaEst').value || null,
+      rgAutoriza: $('#rgAutoriza').value.trim().toUpperCase(),
+      rgLlaves: $('#rgLlaves').value,
+      rgEstatusEntrega: $('#rgEstatusEnt').value
+    };
+  },
+  valida(a, errs){
+    if(a.tipoRegistro!=='Resguardo') return;
+    if(!a.rgMotivo) errs.rgMotivo = 'Seleccione el motivo del resguardo.';
+    if(a.rgMotivo==='Otro (especifique)' && a.rgDetalle.length < 3) errs.rgDetalle = 'Describa el motivo del resguardo.';
+    if(a.rgDetalle && !RX.notas.test(a.rgDetalle)) errs.rgDetalle = 'No se permiten los caracteres < ni >.';
+    if(RG_REQ_AUTORIZA.includes(a.rgMotivo) && !a.rgAutoriza) errs.rgAutoriza = 'Indique quién autoriza este resguardo.';
+    if(a.rgAutoriza && !RX.chofer.test(a.rgAutoriza)) errs.rgAutoriza = 'Solo letras, espacios y acentos.';
+    if(a.rgFechaEstimada && a.fechaEntrega && a.rgFechaEstimada < a.fechaEntrega) errs.rgFechaEst = 'No puede ser anterior a la fecha de ingreso.';
+  }
+};
+window.Resguardo = Resguardo;
+$('#rgMotivo').addEventListener('change', ()=>{ Resguardo.pintaMotivo(); Resguardo.sugiereFecha(); });
+
 
 /* ============ APARTADO DE UNIDADES · v3.7 ============
    El equipo de Activos (Administrador y Auxiliar) puede «apartar» la unidad de una
@@ -7686,7 +7954,7 @@ const Apartados = {
     if(!u) return 'no existe en la flotilla';
     if(u.estatus!=='CIRCULACION') return String(u.estatus||'').toLowerCase();
     const ab = asignacionAbierta(veh);
-    if(ab) return `en préstamo${ab.bitacora?' · '+ab.bitacora:''}`;
+    if(ab) return `en ${esRG(ab)?'resguardo':'préstamo'}${ab.bitacora?' · '+ab.bitacora:''}`;
     const l = this.de(veh);
     if(l && l.folio!==folio) return `apartada · ${l.folio} hasta ${tkFecha(l.hasta)}`;
     return null;
@@ -8081,7 +8349,7 @@ const Notif = {
     });
 
     // 5. Préstamos con entrega programada (registrados con fecha futura o de hoy)
-    STORE.asignaciones.filter(a=>a.estadoRegistro!=='Cerrada' && a.fechaEntrega && this.dia(a.fechaEntrega)>=hoy).forEach(a=>{
+    STORE.asignaciones.filter(a=>!esRG(a) && a.estadoRegistro!=='Cerrada' && a.fechaEntrega && this.dia(a.fechaEntrega)>=hoy).forEach(a=>{
       const f = this.dia(a.fechaEntrega), n = this.clasifica(f); if(!n) return;
       add({ id:'pr_'+a.id, nivel:n, fecha:f, ic:'🔑', tipo:'Préstamo',
         t:`Entrega de unidad · ${a.vehiculo}`, s:`${a.bitacora||'Sin folio'} · ${a.chofer||'—'} · ${a.destino||''}`,
@@ -8095,6 +8363,14 @@ const Notif = {
       add({ id:'lc_'+c.id+'_'+c.licVigencia, nivel:n, fecha:c.licVigencia, ic:'🪪', tipo:'Licencia de conducir',
         t:`${c.nombre}`, s:`${n==='venc'?'Licencia vencida':'Licencia por vencer'} · ${c.licTipo||''} ${c.licNumero||''}`.trim(),
         ir:()=>Choferes.form(c) });
+    });
+
+    // 7. Resguardos (v3.8): entrega posterior estimada
+    STORE.asignaciones.filter(a=>esRG(a) && a.estadoRegistro==='Abierta' && a.rgFechaEstimada).forEach(a=>{
+      const f = a.rgFechaEstimada, n = this.clasifica(f); if(!n) return;
+      add({ id:'rg_'+a.id+'_'+f, nivel:n, fecha:f, ic:'🛡', tipo:`Resguardo · ${a.rgMotivo||''}`,
+        t:`Entrega de unidad en resguardo · ${a.vehiculo}`, s:`${a.bitacora||'Sin folio'} · ${a.chofer||'—'}${a.rgDetalle?' · '+a.rgDetalle:''}`,
+        ir:()=> puedePrestar() ? abrirModalAsignacion(a.vehiculo, a.id) : verHistorialAsig(a.vehiculo) });
     });
 
     const peso = { hoy:1, prox:2, venc:3 };
