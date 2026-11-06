@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.6</title>
+<title>Control Vehicular · KPI-AFI-01 v3.7</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2044%22%20role%3D%22img%22%20aria-label%3D%22Control%20Vehicular%22%3E%20%3Cg%20fill%3D%22%230b4f9e%22%3E%20%3Cpath%20d%3D%22M17.2%204.6Q18.3%202%2021.2%202H42.8Q45.7%202%2046.8%204.6L52%2017H12Z%22/%3E%20%3Crect%20x%3D%223%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2252.5%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%20%3Cpath%20d%3D%22M8%2019Q8%2016%2011%2016H53Q56%2016%2056%2019V32.5Q56%2035%2053.5%2035H10.5Q8%2035%208%2032.5Z%22/%3E%20%3Crect%20x%3D%2210%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%3Crect%20x%3D%2243.5%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%20%3C/g%3E%20%3Cpath%20d%3D%22M20.8%205H43.2L48%2014.6H16Z%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Crect%20x%3D%2211%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%3Crect%20x%3D%2242.5%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%20%3Crect%20x%3D%2224.5%22%20y%3D%2219.5%22%20width%3D%2215%22%20height%3D%228.5%22%20rx%3D%221.6%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Cpath%20d%3D%22M24.5%2022.4H39.5M24.5%2025.2H39.5%22%20stroke%3D%22%230b4f9e%22%20stroke-width%3D%221.1%22/%3E%20%3Crect%20x%3D%229%22%20y%3D%2229.6%22%20width%3D%2246%22%20height%3D%221.5%22%20rx%3D%22.75%22%20fill%3D%22%23dbe9fb%22/%3E%20%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -509,7 +509,7 @@ header{position:relative;padding-right:64px}
 .nt-res{display:flex;gap:6px;padding:9px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .nt-res span{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--panel2);color:var(--muted)}
 .nt-res span b{color:var(--txt)}
-.nt-res .r-venc b{color:var(--red)} .nt-res .r-hoy b{color:var(--orange)}
+.nt-res .r-venc b{color:var(--red)} .nt-res .r-hoy b{color:var(--orange)} .nt-res .r-prox b{color:var(--green)}
 .nt-list{max-height:min(62vh,540px);overflow:auto}
 .nt-grp{font-size:11px;font-weight:700;padding:9px 14px 4px;position:sticky;top:0;background:var(--panel);z-index:1}
 .nt-grp.g-venc{color:var(--red)} .nt-grp.g-hoy{color:var(--orange)} .nt-grp.g-nuevo{color:var(--accent)} .nt-grp.g-prox{color:var(--green)}
@@ -567,6 +567,46 @@ header{position:relative;padding-right:64px}
 .def-campos.hidden{display:none}
 .def-nota{font-size:11.5px;color:var(--purple);margin-top:8px}
 .asig-state.st-def{background:#ece6fb;color:var(--purple);border-color:#cbbdf3}
+
+/* ============ v3.7 · Auxiliar Operativo, apartado de unidades, choferes y fotos de documentos ============ */
+.login-role-btns{grid-template-columns:1fr 1fr}
+.role-op{background:#d9f2ee;color:#0b5d55;border:1px solid #7cc9be}
+body.rol-operativo .no-op{display:none!important}
+/* Marca de unidad apartada en el parque vehicular */
+.unit .ap-ico{position:absolute;bottom:3px;right:4px;font-size:8.5px;font-weight:800;line-height:1;padding:2px 4px;border-radius:4px;
+  background:#0e7c86;color:#fff;border:1.5px solid #fff;letter-spacing:.3px}
+.asig-state.st-apart{background:#d9f2ee;color:#0b5d55;border-color:#7cc9be}
+.tk-e-apart{background:#d9f2ee;color:#0b5d55}
+.tk-ap-venc{color:var(--red);font-size:11px;font-weight:600}
+/* Catálogo de choferes */
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:10px}
+.ch-card{display:grid;grid-template-columns:58px 1fr;gap:4px 12px;align-items:center;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px}
+.ch-card.baja{opacity:.55}
+.ch-foto{grid-row:1/4;width:58px;height:58px;border-radius:50%;object-fit:cover;background:var(--panel2);border:2px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);font-size:17px;cursor:default}
+img.ch-foto{cursor:zoom-in}
+.ch-nom{font-size:12.5px;font-weight:700;line-height:1.25}
+.ch-sub{font-size:11px;color:var(--muted)}
+.ch-lic{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;justify-self:start}
+.ch-lic.ok{background:#dcf3e8;color:#0a5e3b}.ch-lic.prox{background:#fff1db;color:#8a5300}
+.ch-lic.venc{background:#fde3e6;color:#8f1826}.ch-lic.sin{background:#eef1f5;color:#4b5b6e}
+.ch-acc{grid-column:1/3;display:flex;gap:6px;justify-content:flex-end;margin-top:4px}
+.ch-acc .btn{font-size:11px;padding:3px 9px}
+.ch-vacio{grid-column:1/-1;text-align:center;color:var(--muted);padding:22px;font-size:12.5px}
+.ch-form-foto{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.ch-prev{width:96px;height:96px;border-radius:50%;object-fit:cover;background:var(--panel2);border:2px dashed var(--line);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;text-align:center;flex:0 0 auto}
+.ch-form-foto .btns{display:flex;flex-direction:column;gap:6px}
+.ch-form-foto .btns .btn{font-size:12px;padding:6px 12px}
+.ch-cam{background:#1d2733;border-radius:10px;padding:6px;display:flex;justify-content:center}
+.ch-cam video{max-width:100%;max-height:60vh;border-radius:6px;transform:scaleX(-1)}
+.ch-ficha{display:flex;gap:9px;align-items:center;margin-top:6px;font-size:11.5px;color:var(--muted);min-height:0}
+.ch-ficha img{width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid var(--line);cursor:zoom-in}
+.ch-ficha b{color:var(--txt)}
+.ch-ficha a{color:var(--accent);cursor:pointer;text-decoration:underline}
+/* Fotografías de documentos en el checklist */
+.doc-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 </style>
 </head>
 <body>
@@ -593,6 +633,7 @@ header{position:relative;padding-right:64px}
       <button class="role-btn" data-r="admin">Administrador<small>Lic. Marcos</small></button>
       <button class="role-btn" data-r="auxiliar">Auxiliar<small>Captura diaria</small></button>
       <button class="role-btn" data-r="gerencia">Gerencia<small>Solo lectura</small></button>
+      <button class="role-btn" data-r="operativo">Auxiliar Operativo<small>Préstamo físico</small></button>
     </div>
     <div id="loginCodeWrap">
       <label>Código de acceso</label>
@@ -633,9 +674,9 @@ header{position:relative;padding-right:64px}
     <select id="fDepto"></select>
     <button class="btn" id="resetBtn">Restablecer</button>
     <button class="btn btn-primary" id="btnActualizar">↻ Actualizar</button>
-    <button class="btn" id="btnPDF" title="Descargar reporte en PDF">↓ PDF</button>
-    <button class="btn" id="btnXLS" title="Descargar reporte en Excel">↓ Excel</button>
-    <button class="btn btn-success" id="btnCierreDia" title="Respaldo completo: Excel, CSV y todas las evidencias">🗜 Cierre de Día (ZIP)</button>
+    <button class="btn no-op" id="btnPDF" title="Descargar reporte en PDF">↓ PDF</button>
+    <button class="btn no-op" id="btnXLS" title="Descargar reporte en Excel">↓ Excel</button>
+    <button class="btn btn-success no-op" id="btnCierreDia" title="Respaldo completo: Excel, CSV y todas las evidencias">🗜 Cierre de Día (ZIP)</button>
     <button class="btn hidden" id="btnConfig" title="Configuración">⚙</button>
     <button class="btn btn-ghost" id="btnLogout" title="Cerrar sesión">Salir</button>
     <span class="update-badge" id="updateBadge">—</span>
@@ -648,7 +689,7 @@ header{position:relative;padding-right:64px}
       <span class="nt-n hidden" id="ntN">0</span>
     </button>
     <div class="nt-panel" id="ntPanel" role="dialog" aria-label="Notificaciones">
-      <div class="nt-top"><div><b>Notificaciones</b><br><span>Ordenadas por urgencia del día</span></div>
+      <div class="nt-top"><div><b>Notificaciones</b><br><span>Hoy · programado · atrasado</span></div>
         <button class="btn" id="ntVistos" type="button">Marcar como vistas</button></div>
       <div class="nt-res" id="ntRes"></div>
       <div class="nt-list" id="ntList"></div>
@@ -743,8 +784,8 @@ header{position:relative;padding-right:64px}
   <div class="tabs" id="tkTabs">
     <div class="tab active" data-tk="pend">Pendientes</div>
     <div class="tab" data-tk="PRESTAMO">1 · Préstamos</div>
-    <div class="tab" data-tk="INCIDENCIA">2 · Incidencias</div>
-    <div class="tab" data-tk="CHECKLIST">3 · Check list</div>
+    <div class="tab no-op" data-tk="INCIDENCIA">2 · Incidencias</div>
+    <div class="tab no-op" data-tk="CHECKLIST">3 · Check list</div>
     <div class="tab" data-tk="todas">Todas</div>
   </div>
   <div class="tk-filtros"><input type="text" id="tkBuscar" placeholder="Buscar folio, solicitante o unidad"></div>
@@ -752,7 +793,7 @@ header{position:relative;padding-right:64px}
 </div>
 
 <!-- ============ GRÁFICAS ============ -->
-<div class="grid">
+<div class="grid no-op">
   <div class="card col-4">
     <h3>Distribución por Zona</h3>
     <div class="hint">Clic en un segmento para filtrar el tablero</div>
@@ -770,14 +811,14 @@ header{position:relative;padding-right:64px}
   </div>
 </div>
 
-<div class="card col-12">
+<div class="card col-12 no-op">
   <h3>Próximo Servicio (km restantes)</h3>
   <div class="hint">Calculado: Km próximo servicio − Km actual. Negativo = VENCIDO. Ordenado de mayor urgencia.</div>
   <div id="cServicio" class="chart" style="height:320px"></div>
 </div>
 
 <!-- ============ INCIDENCIAS VEHICULARES ============ -->
-<div class="card col-12">
+<div class="card col-12 no-op">
   <h3>Incidencias Vehiculares
     <span class="hint" style="font-weight:400">· seguimiento consolidado de pendientes por unidad</span>
     <span id="incBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
@@ -808,6 +849,20 @@ header{position:relative;padding-right:64px}
   <div id="presBody"></div>
 </div>
 
+<!-- ============ CATÁLOGO DE CHOFERES (v3.7) ============ -->
+<div class="card col-12" id="cardChoferes">
+  <h3>Choferes
+    <span class="hint" style="font-weight:400">· catálogo con fotografía y licencia de conducir</span>
+    <span id="chBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
+    <button class="btn btn-primary hidden" id="btnAltaChofer" style="font-size:12px;padding:5px 12px">+ Alta de chofer</button>
+  </h3>
+  <div class="tk-filtros" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <input type="text" id="chBuscar" placeholder="Buscar nombre, licencia o departamento" style="max-width:340px">
+    <label class="tk-chkbox" style="margin:0;font-size:12px"><input type="checkbox" id="chBajas" style="width:auto"> Mostrar bajas</label>
+  </div>
+  <div class="ch-grid" id="chGrid"></div>
+</div>
+
 <!-- ============ MANTENIMIENTOS PROGRAMADOS (v3.0) ============ -->
 <div class="card col-12" id="cardMant">
   <h3>Mantenimientos Programados
@@ -826,7 +881,7 @@ header{position:relative;padding-right:64px}
 </div>
 
 <!-- ============ COMBUSTIBLES ============ -->
-<div class="card col-12">
+<div class="card col-12 no-op">
   <h3>Control de Combustibles
     <span class="hint" style="font-weight:400">· consumo por período y unidad</span>
   </h3>
@@ -843,7 +898,7 @@ header{position:relative;padding-right:64px}
 </div>
 
 <!-- ============ DETALLE FLOTILLA ============ -->
-<div class="card col-12">
+<div class="card col-12 no-op">
   <h3>Detalle de Flotilla <span class="hint" style="font-weight:400">· clic en encabezados para ordenar · usa los filtros superiores</span></h3>
   <div class="tablewrap">
     <table id="tbl"><thead></thead><tbody></tbody></table>
@@ -860,6 +915,7 @@ header{position:relative;padding-right:64px}
     <div class="tab active" data-bit="todos">Todos</div>
     <div class="tab" data-bit="admin">Administrador</div>
     <div class="tab" data-bit="auxiliar">Auxiliar</div>
+    <div class="tab" data-bit="operativo">Auxiliar Operativo</div>
   </div>
   <div class="tablewrap" style="max-height:340px">
     <table id="tblBit"><thead></thead><tbody></tbody></table>
@@ -1154,10 +1210,11 @@ header{position:relative;padding-right:64px}
       <div class="tab active" data-sec="s1">1 · Préstamo</div>
       <div class="tab" data-sec="s2">2 · Mantenimiento</div>
       <div class="tab" data-sec="s3">3 · Documentos</div>
-      <div class="tab" data-sec="s4">4 · Parámetros</div>
-      <div class="tab" data-sec="s5">5 · Evidencia</div>
-      <div class="tab" data-sec="s6">6 · Conformidad</div>
-      <div class="tab" data-sec="s7">7 · Devolución</div>
+      <div class="tab" data-sec="s3f">4 · Fotos de documentos</div>
+      <div class="tab" data-sec="s4">5 · Parámetros</div>
+      <div class="tab" data-sec="s5">6 · Evidencia</div>
+      <div class="tab" data-sec="s6">7 · Conformidad</div>
+      <div class="tab" data-sec="s7">8 · Devolución</div>
     </div>
 
     <!-- ===== SECCIÓN 1 ===== -->
@@ -1176,6 +1233,7 @@ header{position:relative;padding-right:64px}
         <div>
           <label>Chofer asignado</label>
           <select id="aChofer"></select>
+          <div class="ch-ficha" id="aChoferFicha"></div>
           <div class="field-msg" id="e_aChofer"></div>
         </div>
         <div>
@@ -1293,9 +1351,18 @@ header{position:relative;padding-right:64px}
       </div>
     </div>
 
-    <!-- ===== SECCIÓN 4 ===== -->
+    <!-- ===== SECCIÓN 4 · FOTOGRAFÍAS DE DOCUMENTOS (v3.7) ===== -->
+    <div class="sec-pane" id="pane_s3f">
+      <div class="sec-title"><span class="n">4</span> Fotografías de Documentos
+        <span class="sub">Toque cada recuadro para abrir la cámara o elegir el archivo</span></div>
+      <div class="foto-count" id="fotoDocCount">0 de 3 documentos fotografiados</div>
+      <div class="foto-grid doc-grid" id="fotoDocGrid"></div>
+      <div class="hint" style="margin-top:10px">Al capturar la fotografía, el documento se marca como «Tiene» en la sección 3. Las imágenes se integran al PDF del préstamo y al respaldo ZIP del Cierre de Día.</div>
+    </div>
+
+    <!-- ===== SECCIÓN 5 ===== -->
     <div class="sec-pane" id="pane_s4">
-      <div class="sec-title"><span class="n">4</span> Parámetros Básicos</div>
+      <div class="sec-title"><span class="n">5</span> Parámetros Básicos</div>
       <div class="form-grid">
         <div>
           <label>Nivel de aceite</label>
@@ -1321,7 +1388,7 @@ header{position:relative;padding-right:64px}
 
     <!-- ===== SECCIÓN 5 ===== -->
     <div class="sec-pane" id="pane_s5">
-      <div class="sec-title"><span class="n">5</span> Evidencia Fotográfica
+      <div class="sec-title"><span class="n">6</span> Evidencia Fotográfica
         <span class="sub">Toque cada recuadro para abrir la cámara</span></div>
       <div class="storage-note" id="fotoStorageNote">Verificando el motor de almacenamiento…</div>
       <div class="foto-count" id="fotoCount">0 de 9 evidencias capturadas</div>
@@ -1347,7 +1414,7 @@ header{position:relative;padding-right:64px}
 
     <!-- ===== SECCIÓN 6 ===== -->
     <div class="sec-pane" id="pane_s6">
-      <div class="sec-title"><span class="n">6</span> Conformidad</div>
+      <div class="sec-title"><span class="n">7</span> Conformidad</div>
       <div class="form-grid">
         <div>
           <label>Nombre de quien recibe</label>
@@ -1386,7 +1453,7 @@ header{position:relative;padding-right:64px}
 
     <!-- ===== SECCIÓN 7 ===== -->
     <div class="sec-pane" id="pane_s7">
-      <div class="sec-title"><span class="n">7</span> Acerca de la Devolución
+      <div class="sec-title"><span class="n">8</span> Acerca de la Devolución
         <span class="sub">Complete al reingresar la unidad</span></div>
       <div class="def-box" id="defBox">
         <label class="def-chk"><input type="checkbox" id="dDefinitiva">
@@ -1650,8 +1717,15 @@ header{position:relative;padding-right:64px}
 const AUTH_CODES = {
   admin:    '0386',    // <-- Código del Administrador (Lic. Marcos)
   auxiliar: '0387', // <-- Código del Auxiliar
-  gerencia: '0388' // <-- Código de Gerencia (solo lectura)
+  gerencia: '0388', // <-- Código de Gerencia (solo lectura)
+  operativo: '0389' // <-- Código del Auxiliar Operativo (Uroy Acosta) · v3.7
 };
+/* v3.7 · Perfiles: el equipo de Activos (admin y auxiliar) administra; el Auxiliar Operativo presta físicamente */
+const esActivos   = () => session.rol==='admin' || session.rol==='auxiliar';
+const esOperativo = () => session.rol==='operativo';
+const puedePrestar = () => esActivos() || esOperativo();
+const ROL_TXT = { admin:'Administrador', auxiliar:'Auxiliar', gerencia:'Gerencia', operativo:'Auxiliar Operativo' };
+const ROL_CLS = { admin:'role-admin', auxiliar:'role-aux', gerencia:'role-ger', operativo:'role-op' };
 
 const firebaseConfig = {
   apiKey: "AIzaSyDq42ANqMO_dKogrNfk5QehtrRTSsOlTik",
@@ -1769,6 +1843,8 @@ function fbInit(){
       STORE.choferesExtra = d.choferesExtra ? Object.values(d.choferesExtra) : [];
       STORE.mantenimientos = d.mantenimientos ? Object.values(d.mantenimientos) : [];
       STORE.checklists = d.checklists ? Object.values(d.checklists) : [];
+      STORE.choferes = d.choferes ? Object.values(d.choferes) : [];        // v3.7
+      STORE.apartados = d.apartados || {};                                  // v3.7
       STORE.catalogoTalleres = d.catalogoTalleres || {};
       STORE.bitacora   = d.bitacora ? Object.values(d.bitacora).sort((a,b)=>new Date(b.ts)-new Date(a.ts)) : [];
       STORE.meta       = d.meta || STORE.meta;
@@ -1978,14 +2054,16 @@ function cerrarSesion(){
 function aplicarPermisos(){
   const rol = session.rol;
   const badge = $('#roleBadge');
-  badge.className = 'role-badge role-'+(rol==='admin'?'admin':rol==='auxiliar'?'aux':'ger');
-  badge.textContent = rol==='admin'?'Administrador':rol==='auxiliar'?'Auxiliar':'Gerencia';
+  badge.className = 'role-badge '+(ROL_CLS[rol]||'role-ger');
+  badge.textContent = ROL_TXT[rol] || 'Gerencia';
   const esEditor = (rol==='admin'||rol==='auxiliar');
   const esAdmin = rol==='admin';
+  document.body.classList.toggle('rol-operativo', rol==='operativo');
   $('#btnNuevaUnidad').classList.toggle('hidden', !esAdmin);
   $('#btnConfig').classList.toggle('hidden', !esAdmin);
   $('#cardBitacora').classList.toggle('hidden', !esAdmin);
-  $('#cardCalendario').classList.toggle('hidden', !esEditor);
+  $('#cardCalendario').classList.toggle('hidden', !(esEditor || rol==='operativo'));
+  $('#btnAltaChofer').classList.toggle('hidden', !puedePrestar());
   if(window.Notif) Notif.render();
 }
 
@@ -2024,7 +2102,9 @@ function renderFleet(){
     const pendDot = pendientes>0?`<span class="pend-dot" title="${pendientes} incidencia(s) pendiente(s)"></span>`:'';
     const ma = mantActivoDe(r.veh);
     const mIco = ma ? `<span class="mant-ico ${MT_CLASS[ma.estatus]||'mt-prog'}" title="Mantenimiento ${escapa(ma.estatus.toLowerCase())} · ${escapa(ma.taller||'')} · ${fFechaMx(ma.fecha)} ${escapa(ma.hora||'')}">🔧</span>` : '';
-    return `<div class="unit ${cls}${sel}" data-veh="${r.veh}">${pendDot}${mIco}<span>${r.veh}</span><small>${r.estatus.slice(0,4)}</small></div>`;
+    const ap = Apartados.de(r.veh);
+    const apIco = ap ? `<span class="ap-ico" title="Apartada · ${escapa(ap.folio)} · hasta ${tkFecha(ap.hasta)}">AP</span>` : '';
+    return `<div class="unit ${cls}${sel}" data-veh="${r.veh}">${pendDot}${mIco}${apIco}<span>${r.veh}</span><small>${r.estatus.slice(0,4)}</small></div>`;
   }).join('');
   el.querySelectorAll('.unit').forEach(u=>u.onclick=()=>mostrarUnidad(u.dataset.veh));
   if(state.selVeh && !d.some(r=>r.veh===state.selVeh)){
@@ -2068,6 +2148,9 @@ function renderFleetDetail(){
   const mantAct = mantActivoDe(r.veh);
 
   const esEditor = session.rol==='admin' || session.rol==='auxiliar';
+  const presta = puedePrestar(), op = esOperativo();
+  const apart = Apartados.de(r.veh);
+  const apSol = apart ? Tickets.porFolio(apart.folio) : null;
 
   det.innerHTML = `
     <h4><i class="dot ${STCLASS[r.estatus]}"></i> ${r.veh}
@@ -2095,15 +2178,21 @@ function renderFleetDetail(){
           ? `${mtTag(mantAct)}<div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${escapa(mantAct.taller||'—')} · ${fFechaMx(mantAct.fecha)} ${escapa(mantAct.hora||'')}</div>`
           : `<span style="font-size:13px;color:var(--muted)">Sin mantenimiento activo</span>${mantUnidad.length?`<div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${mantUnidad.length} registro(s) en historial</div>`:''}`
       }</div></div>
+      <div class="fd-item"><div class="lab">Apartado</div><div class="val">${
+        apart
+          ? `<span class="asig-state st-apart">APARTADA</span><div style="font-size:11.5px;font-weight:400;color:var(--muted);margin-top:4px">${escapa(apart.folio)}${apSol?' · '+escapa(apSol.solicitante||''):''} · ${tkFecha(apart.desde)} a ${tkFecha(apart.hasta)}</div>`
+          : `<span style="font-size:13px;color:var(--muted)">Disponible para apartar</span>`
+      }</div></div>
     </div>
     <div class="fd-actions">
       ${esEditor?`<button class="btn btn-primary" onclick="abrirModalUnidad('${r.veh}')">✎ Editar unidad</button>`:''}
       ${esEditor?`<button class="btn btn-success" onclick="abrirModalIncidencia('${r.veh}')">+ Incidencia vehicular</button>`:''}
       ${esEditor?`<button class="btn" onclick="abrirModalMant('${r.veh}')">🔧 Agregar mantenimiento</button>`:''}
-      <button class="btn" onclick="verCombustibles('${r.veh}')">⛽ Combustibles${combUnidad.length?` (${combUnidad.length})`:''}</button>
-      ${esEditor?`<button class="btn ${asigAbierta?'btn-success':''}" onclick="abrirModalAsignacion('${r.veh}')">📋 Préstamo / Checklist${asigAbierta?' · abierta':''}</button>`:''}
+      ${op?'':`<button class="btn" onclick="verCombustibles('${r.veh}')">⛽ Combustibles${combUnidad.length?` (${combUnidad.length})`:''}</button>`}
+      ${presta && apart && !asigAbierta?`<button class="btn btn-primary" onclick="Tickets.entregar('${apart.folio}')">🔑 Entregar a ${escapa(apart.folio)}</button>`:''}
+      ${presta?`<button class="btn ${asigAbierta?'btn-success':''}" onclick="abrirModalAsignacion('${r.veh}')">📋 Préstamo / Checklist${asigAbierta?' · abierta':''}</button>`:''}
       ${asigUnidad.length>0?`<button class="btn" onclick="verHistorialAsig('${r.veh}')">Historial (${asigUnidad.length})</button>`:''}
-      ${incsUnidad.length>0?`<button class="btn" onclick="filtrarIncidenciasPor('${r.veh}')">Ver ${incsUnidad.length} incidencia(s)</button>`:''}
+      ${incsUnidad.length>0 && !op?`<button class="btn" onclick="filtrarIncidenciasPor('${r.veh}')">Ver ${incsUnidad.length} incidencia(s)</button>`:''}
       ${mantUnidad.length>0?`<button class="btn" onclick="filtrarMantPor('${r.veh}')">Ver ${mantUnidad.length} mantenimiento(s)</button>`:''}
     </div>`;
   det.classList.add('open');
@@ -2280,12 +2369,13 @@ function renderBitacora(){
   let bit = [...STORE.bitacora];
   if(state.bitTab==='admin') bit = bit.filter(b=>b.rol==='admin');
   else if(state.bitTab==='auxiliar') bit = bit.filter(b=>b.rol==='auxiliar');
+  else if(state.bitTab==='operativo') bit = bit.filter(b=>b.rol==='operativo');
   if(bit.length===0){
     $('#tblBit tbody').innerHTML = `<tr><td colspan="${cols.length}" style="text-align:center;color:var(--muted);padding:24px">Sin movimientos registrados.</td></tr>`;
     return;
   }
   $('#tblBit tbody').innerHTML = bit.slice(0,300).map(b=>{
-    const rolCls = b.rol==='admin'?'role-admin':b.rol==='auxiliar'?'role-aux':'role-ger';
+    const rolCls = ROL_CLS[b.rol] || 'role-ger';
     return `<tr>
       <td>${fechaCorta(b.ts)}</td>
       <td><b>${b.unidad}</b></td>
@@ -2414,6 +2504,7 @@ function buildFotoGrid(valores){
     $('#foto_'+f.k).onchange = e=>{ if(e.target.files && e.target.files[0]) manejaFoto(f.k, e.target.files[0]); };
     pintaFoto(f.k);
   });
+  buildFotoDocGrid();   // v3.7
   actualizaContadorFotos();
 }
 
@@ -2430,7 +2521,8 @@ async function manejaFoto(k, file){
     evidActual.fotos[k] = meta;
     bar.style.display='none';
     pintaFoto(k); actualizaContadorFotos();
-    toast(`Evidencia "${FOTOS_DEF.find(f=>f.k===k).lab}" capturada.`);
+    toast(`Evidencia "${labFoto(k)}" capturada.`);
+    marcaDocTiene(k);
   }catch(e){
     bar.style.display='none';
     delete evidActual.fotos[k];
@@ -2478,9 +2570,39 @@ function pintaFoto(k){
   };
 }
 function actualizaContadorFotos(){
-  const n = Object.keys(evidActual.fotos).length;
+  const n = cuentaFotosUnidad(evidActual.fotos);
   const el = $('#fotoCount');
   if(el) el.innerHTML = `<b>${n}</b> de ${TOTAL_FOTOS} evidencias capturadas${n===TOTAL_FOTOS?' · completo':''}`;
+  const nd = FOTOS_DOC.filter(d=>evidActual.fotos[d.k]).length;
+  const ed = $('#fotoDocCount');
+  if(ed) ed.innerHTML = `<b>${nd}</b> de ${FOTOS_DOC.length} documentos fotografiados${nd===FOTOS_DOC.length?' · completo':''}`;
+}
+/* v3.7 · Las fotografías de documentos viven en el mismo mapa de evidencias de entrega,
+   con claves propias (doc*): así viajan solas al ZIP, a la purga y al respaldo. */
+function cuentaFotosUnidad(mapa){ return FOTOS_DEF.filter(f=>mapa && mapa[f.k]).length; }
+function labFoto(k){ const f = FOTOS_DEF.find(x=>x.k===k) || FOTOS_DOC.find(x=>x.k===k); return f ? f.lab : k; }
+function marcaDocTiene(k){
+  const d = FOTOS_DOC.find(x=>x.k===k); if(!d) return;
+  const sel = $('#'+d.sel); if(sel && sel.value!=='Tiene'){ sel.value = 'Tiene'; pintaSelects(); }
+}
+function buildFotoDocGrid(){
+  const g = $('#fotoDocGrid'); if(!g) return;
+  g.innerHTML = FOTOS_DOC.map(f=>`
+    <div class="foto-item">
+      <label>${f.lab}</label>
+      <div class="foto-drop" id="drop_${f.k}" data-k="${f.k}">
+        <span class="ico">📷</span>
+        <span class="txt">Tocar para capturar<br>o elegir archivo</span>
+      </div>
+      <input type="file" id="foto_${f.k}" accept="image/*">
+      <div class="up-bar" id="bar_${f.k}" style="display:none"><i></i></div>
+    </div>`).join('');
+  FOTOS_DOC.forEach(f=>{
+    $('#drop_'+f.k).onclick = ()=>$('#foto_'+f.k).click();
+    $('#foto_'+f.k).onchange = e=>{ if(e.target.files && e.target.files[0]) manejaFoto(f.k, e.target.files[0]); };
+    pintaFoto(f.k);
+  });
+  actualizaContadorFotos();
 }
 function leerFotos(){ return evidActual.fotos; }
 
@@ -2735,6 +2857,7 @@ function choferesConocidos(){
   STORE.unidades.forEach(u=>{ if(u.chofer && u.chofer.trim() && !/^SIN ASIGNACION$/i.test(u.chofer)) set.add(u.chofer.trim().toUpperCase()); });
   STORE.asignaciones.forEach(a=>{ if(a.chofer && a.chofer.trim()) set.add(a.chofer.trim().toUpperCase()); });
   (STORE.choferesExtra||[]).forEach(c=>set.add(String(c).toUpperCase()));
+  (STORE.choferes||[]).forEach(c=>{ if(c && c.nombre && c.activo!==false) set.add(c.nombre); });   // v3.7
   return [...set].sort();
 }
 function buildChoferSelect(valor, selector){
@@ -2744,8 +2867,9 @@ function buildChoferSelect(valor, selector){
   const conNuevo = (!selector || selector==='#aChofer');
   sel.innerHTML = '<option value="">— Seleccione un chofer —</option>'
     + lista.map(c=>`<option value="${c}">${c}</option>`).join('')
-    + (conNuevo ? '<option value="nuevo">+ Agregar nuevo…</option>' : '');
+    + (conNuevo ? '<option value="nuevo">+ Alta de chofer…</option>' : '');
   sel.value = valor ? valor.trim().toUpperCase() : '';
+  if(conNuevo) Choferes.pintaFicha();   // v3.7
 }
 function buildEntregadorSelect(sel, valor){
   const el = $(sel);
@@ -2766,16 +2890,11 @@ function buildZonaSelectAsig(valor){
 }
 function onChoferChange(){
   const sel = $('#aChofer');
-  if(sel.value !== 'nuevo') return;
-  const nom = prompt('Nombre completo del nuevo chofer:');
-  if(!nom || !nom.trim()){ sel.value=''; return; }
-  const limpio = nom.trim().toUpperCase();
-  if(!RX.chofer.test(limpio)){ toast('El nombre solo admite letras, espacios y acentos (2-60 caracteres).','err'); sel.value=''; return; }
-  STORE.choferesExtra = STORE.choferesExtra || [];
-  if(!STORE.choferesExtra.includes(limpio)) STORE.choferesExtra.push(limpio);
-  fbDb.ref(`${FB_ROOT}/choferesExtra`).set(STORE.choferesExtra).catch(()=>{});
-  buildChoferSelect(limpio);
-  toast(`Chofer "${limpio}" agregado al catálogo.`);
+  if(sel.value !== 'nuevo'){ Choferes.pintaFicha(); return; }
+  // v3.7: alta completa con fotografía y licencia (sustituye la captura rápida por prompt)
+  sel.value = '';
+  Choferes.pintaFicha();
+  Choferes.form(null, nombre=>buildChoferSelect(nombre));
 }
 
 /* ============ TABLA: UNIDADES EN PRÉSTAMO ============ */
@@ -2792,7 +2911,7 @@ function diasEntreFechas(ini, fin){
   return Math.max(0, Math.round((b-a)/86400000));
 }
 function renderPrestamos(){
-  const esEditor = session.rol==='admin' || session.rol==='auxiliar';
+  const esEditor = puedePrestar();   // v3.7: el Auxiliar Operativo entrega y recibe unidades
   const vista = state.presTab || 'vigentes';
 
   const abiertos  = STORE.asignaciones.filter(a=>a.estadoRegistro==='Abierta');
@@ -3395,6 +3514,18 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
     y += 1;
   }
 
+  /* --- v3.7 · Fotografías de documentos (tarjetas y póliza) --- */
+  function rejillaDocs(){
+    if(!FOTOS_DOC.some(d=>F[d.k])) return;
+    const cols=3, gap=4, bw=(CW-gap*(cols-1))/cols, bh=bw*0.68;
+    reserva(bh+14);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.4); doc.setTextColor(...SUAVE);
+    doc.text('FOTOGRAFÍAS DE DOCUMENTOS', ML, y); y += 3.5;
+    doc.setTextColor(...TXT);
+    FOTOS_DOC.forEach((d,c)=>imagenEn(F[d.k], ML+c*(bw+gap), y, bw, bh, d.lab));
+    y += bh+5+gap;
+  }
+
   /* --- Comparativa: una vista por renglón, entrega y devolución --- */
   function comparativa(){
     const gap=6, bw=(CW-gap)/2, bh=bw*0.72;   // se aproxima al 4:3 de una foto
@@ -3484,6 +3615,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   inventario([['Póliza de seguro',a.docPoliza],['Tarjeta de circulación',a.docTarjCirc],
               ['Tarjeta de combustible',a.docTarjComb],['Placa delantera',a.docPlacaDel],
               ['Placa trasera',a.docPlacaTra],['Permiso IMOVEQROO',a.docImoveqroo]], 'Tiene');
+  rejillaDocs();   // v3.7
 
   seccion('4. Parámetros básicos');
   inventario([['Nivel de aceite',a.parAceite],['Anticongelante',a.parAnticong],
@@ -3518,7 +3650,7 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   }
 
   paso('Incrustando evidencias…');
-  const totalEvid = Object.keys(F).length + Object.keys(FD).length;
+  const totalEvid = cuentaFotosUnidad(F) + Object.keys(FD).length;
   if(totalEvid === 0){
     // Sin fotos no se abre una página nueva: se deja constancia y se continúa
     seccion(sig()+'. Evidencia fotográfica');
@@ -4100,6 +4232,12 @@ const FOTOS_DEF = [
   {k:'tablero',    lab:'Tablero / consola'}
 ];
 const TOTAL_FOTOS = FOTOS_DEF.length;   // 9
+/* v3.7 · Fotografías de documentos (pestaña 4 del checklist) */
+const FOTOS_DOC = [
+  {k:'docTarjCirc', lab:'Tarjeta de circulación', sel:'aTarjCirc'},
+  {k:'docTarjComb', lab:'Tarjeta de combustible', sel:'aTarjComb'},
+  {k:'docPoliza',   lab:'Póliza de seguro',       sel:'aPoliza'}
+];
 const ENTREGADORES = ['Marcos Xool Cortés','José Rejón Kinil','Uroy Acosta August'];
 const RAZON_SOCIAL = 'INNOVACIONES TECNOLÓGICAS EN TRATAMIENTO DEL AGUA S.A. DE C.V.';
 const CARTA_RESPONSIVA = 'Por medio de la presente hago constar que recibo de INNOVACIONES TECNOLÓGICAS EN TRATAMIENTO DEL AGUA SA DE CV como parte del equipo de trabajo; el vehículo descrito en la presente carta responsiva por medio de la cual me obligo a devolver dicho vehículo cuando lo solicite INNOVACIONES TECNOLOGICAS EN TRATAMIENTO DEL AGUA SA DE CV o cuando termine mi relación laboral. El vehículo, así como el equipo, accesorios, documentos e instructivos, me fueron entregados de acuerdo al presente inventario del vehículo. Me responsabilizo de su buen uso, estoy enterado y de acuerdo que el vehículo es exclusivamente para las funciones propias de la empresa, a la vez, me comprometo a dar aviso inmediatamente a la empresa en caso de descompostura, accidente o robo del vehículo. Por lo anterior, asumo la responsabilidad jurídica por cualquier daño causado al vehículo por negligencia, omisión, descuido inexcusable, pericia o incumplimiento a las leyes de tránsito, por lo que de causar cualquier daño, al vehículo y/o pérdida total del mismo que me sea atribuible, me comprometo a resarcir los daños a la empresa así como a terceras personas que resultaran afectadas. Quedo enterado que los vehículos utilitarios se encuentran asegurados y en caso de siniestro el deducible será con cargo a mi persona. Manifiesto que la dirección que se indica en este documento es el lugar donde se guardará el vehículo, confirmando que dicho domicilio cumple con la seguridad necesaria para el resguardo de la unidad, así mismo me comprometo a informar de manera inmediata en caso de existir algún cambio de domicilio del lugar de resguardo.';
@@ -4195,7 +4333,7 @@ function calcDevolucion(){
 /* --- Apertura del modal --- */
 window.verHistorialAsig = function(veh){
   const lista = asignacionesDe(veh);
-  const esEditor = session.rol==='admin' || session.rol==='auxiliar';
+  const esEditor = puedePrestar();
   $('#mHistTitle').textContent = `Historial de préstamos · ${veh}`;
 
   if(!lista.length){
@@ -4236,7 +4374,14 @@ window.verHistorialAsig = function(veh){
   $('#modalHistorial').classList.add('open');
 };
 
+let _omitirApartado = false;   // v3.7: préstamo sin vínculo autorizado por Activos
 window.abrirModalAsignacion = async function(veh, asigId){
+  if(!puedePrestar()){ toast('Su perfil es de solo consulta.','warn'); return; }
+  if(!asigId && !asignacionAbierta(veh) && !Tickets.vinculo.pres && !_omitirApartado){
+    const ap = Apartados.de(veh);
+    if(ap){ Tickets.avisoApartada(veh, ap); return; }
+  }
+  _omitirApartado = false;
   clearErrs();
   const u = STORE.unidades.find(x=>x.veh===veh);
   if(!u){ toast('Unidad no encontrada.','err'); return; }
@@ -4260,7 +4405,7 @@ window.abrirModalAsignacion = async function(veh, asigId){
   $('#aFechaEntrega').value  = a.fechaEntrega || new Date().toISOString().slice(0,10);
   buildChoferSelect(a.chofer ?? u.chofer ?? '');
   buildZonaSelectAsig(a.zona ?? u.zona ?? '');
-  buildEntregadorSelect('#aEntregadoPor', a.entregadoPor || '');
+  buildEntregadorSelect('#aEntregadoPor', a.entregadoPor || (!abierta && esOperativo() ? 'Uroy Acosta August' : ''));
   $('#cartaTexto').textContent = CARTA_RESPONSIVA;
   if(a.bitacora){ $('#aBitacora').value = a.bitacora; }
   else {
@@ -4413,7 +4558,8 @@ async function guardarAsignacion(){
     parFrenos: $('#aFrenos').value,   parLimpia:   $('#aLimpia').value,
     // Sección 5
     fotos: {},   // el contenido vive en el nodo evidencias; aquí solo se conserva el índice
-    evidenciasCount: Object.keys(leerFotos()).length,
+    evidenciasCount: cuentaFotosUnidad(leerFotos()),
+    docsFotoCount: FOTOS_DOC.filter(d=>leerFotos()[d.k]).length,   // v3.7
     // Sección 6
     firmaRecepcion:    $('#aFirmaRecepcion').value.trim().toUpperCase(),
     aceptaCondiciones: $('#aAceptaCond').checked,
@@ -4624,6 +4770,7 @@ function validaTareas(){
 /* Alternar cumplimiento desde el calendario — escribe directo a Firebase */
 window.toggleTareaCal = async function(incId, tareaId, ev){
   if(ev) ev.stopPropagation();
+  if(!esActivos()){ toast('Calendario en modo consulta para su perfil.','warn'); return; }
   const inc = STORE.incidencias.find(x=>x.id===incId); if(!inc) return;
   const arr = tareasDe(inc);
   const t = arr.find(x=>x.id===tareaId); if(!t) return;
@@ -4636,7 +4783,10 @@ window.toggleTareaCal = async function(incId, tareaId, ev){
     toast(t.hecha?'Tarea marcada como cumplida.':'Tarea reabierta.');
   }
 };
-window.abrirIncDesdeCal = function(incId){ editarIncidencia(incId); };
+window.abrirIncDesdeCal = function(incId){
+  if(!esActivos()){ const i = STORE.incidencias.find(x=>x.id===incId); toast(i?`${i.unidad} · ${i.tipo}: ${i.estatus}`:'Incidencia no encontrada.','warn'); return; }
+  editarIncidencia(incId);
+};
 
 /* ============ CALENDARIO INTERNO ============ */
 let calRef = new Date();          // fecha ancla de navegación
@@ -4656,7 +4806,7 @@ const escapa = v => String(v??'').replace(/[<>&"]/g, m=>({'<':'&lt;','>':'&gt;',
 
 function renderCalendario(){
   const card = $('#cardCalendario');
-  const puede = session.rol==='admin' || session.rol==='auxiliar';
+  const puede = session.rol==='admin' || session.rol==='auxiliar' || session.rol==='operativo';
   card.classList.toggle('hidden', !puede);
   if(!puede) return;
 
@@ -5882,7 +6032,7 @@ function refrescarTodo(rebuild=true){
   pie('cEstatus', ec, 'estatus');
   barDepto(); barServicio(); renderTable();
   renderIncidencias(); renderBitacora(); renderFleetDetail(); renderCombustibles(); renderCalendario(); renderPrestamos();
-  renderMantenimientos(); renderCatalogoTalleres(); Tickets.render(); Notif.render();
+  renderMantenimientos(); renderCatalogoTalleres(); Tickets.render(); Choferes.render(); Notif.render();
   const upd = STORE.meta && STORE.meta.updatedAt ? fechaCorta(STORE.meta.updatedAt) : hoyStr();
   $('#updateBadge').textContent = 'Actualizado: '+upd;
 }
@@ -5998,6 +6148,7 @@ window.abrirModalIncidencia = function(veh){
 };
 
 window.editarIncidencia = function(id){
+  if(!esActivos()){ toast('Su perfil es de solo consulta.','warn'); return; }
   clearErrs();
   const i = STORE.incidencias.find(x=>x.id===id);
   if(!i) return;
@@ -6412,6 +6563,7 @@ const TK_TIPOS = {
 const TK_ESTADOS = {
   NUEVA:       { l:'Nueva',       c:'tk-e-nueva' },
   EN_REVISION: { l:'En revisión', c:'tk-e-rev' },
+  APARTADA:    { l:'Apartada',    c:'tk-e-apart' },   // v3.7: unidad reservada por Activos, pendiente de entrega
   EN_ATENCION: { l:'En atención', c:'tk-e-at' },
   CULMINADA:   { l:'Culminada',   c:'tk-e-fin' },
   RECHAZADA:   { l:'Rechazada',   c:'tk-e-rech' }
@@ -6424,7 +6576,7 @@ const TK_CHECK = [
   ['interior','Limpieza interior'], ['carroceria','Carrocería sin golpes nuevos'], ['poliza','Póliza de seguro'], ['tarjeta','Tarjeta de circulación']
 ];
 const tkEsc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const tkRol = () => session.rol==='admin'?'Administrador':session.rol==='auxiliar'?'Auxiliar':session.rol==='gerencia'?'Gerencia':'—';
+const tkRol = () => ROL_TXT[session.rol] || '—';
 const tkFecha = v => { if(!v) return '—'; const d = new Date(v); return isNaN(d) ? '—' : fechaCorta(d.toISOString()); };
 const tkLimpio = s => String(s||'').replace(/[<>]/g,'').trim();
 
@@ -6483,8 +6635,10 @@ const Tickets = {
     const card = $('#cardSolicitudes'); if(!card) return;
     card.classList.toggle('hidden', !session.rol);
     this.publicarCatalogo();
-    const L = this.lista, E = s=>this.estado(s);
+    const op = esOperativo();
+    const L = op ? this.lista.filter(s=>s.tipo==='PRESTAMO') : this.lista, E = s=>this.estado(s);   // v3.7: el operativo solo ve préstamos
     const nuevas = L.filter(s=>E(s)==='NUEVA').length, rev = L.filter(s=>E(s)==='EN_REVISION').length, at = L.filter(s=>E(s)==='EN_ATENCION').length;
+    const apart = L.filter(s=>E(s)==='APARTADA').length;
     const mes = new Date().toISOString().slice(0,7);
     const finMes = L.filter(s=>E(s)==='CULMINADA' && String((s.gestion||{}).actualizado||'').slice(0,7)===mes).length;
     const resp = L.map(s=>{ const h = this.historial(s)[0]; return h ? new Date(h.ts) - new Date(this.fechaDe(s)) : null; }).filter(x=>x!=null && x>=0);
@@ -6493,6 +6647,7 @@ const Tickets = {
     $('#tkKpis').innerHTML = [
       [nuevas,'Nuevas','Sin revisar', nuevas?'var(--red)':'var(--green)'],
       [rev,'En revisión','Por transferir','var(--orange)'],
+      [apart,'Apartadas','Unidad reservada por entregar','#0e7c86'],
       [at,'En atención','Préstamo o incidencia abiertos','var(--purple)'],
       [finMes,'Culminadas en el mes','Cerradas con trazabilidad','var(--green)'],
       [prom==null?'—':durTxt(prom),'Primera respuesta','Promedio desde la recepción','var(--accent)']
@@ -6504,7 +6659,8 @@ const Tickets = {
 
     const q = ($('#tkBuscar').value||'').toUpperCase().trim();
     let f = [...L];
-    if(this.tab==='pend') f = f.filter(s=>['NUEVA','EN_REVISION'].includes(E(s)));
+    if(op && !['pend','PRESTAMO','todas'].includes(this.tab)) this.tab = 'pend';
+    if(this.tab==='pend') f = f.filter(s=>['NUEVA','EN_REVISION','APARTADA'].includes(E(s)));
     else if(TK_TIPOS[this.tab]) f = f.filter(s=>s.tipo===this.tab);
     if(q) f = f.filter(s=>[s.folio,s.solicitante,s.unidad,s.departamento].join(' ').toUpperCase().includes(q));
     f.sort((a,b)=>String(this.fechaDe(b)).localeCompare(String(this.fechaDe(a))));
@@ -6519,7 +6675,13 @@ const Tickets = {
       const e = E(s), abierta = ['NUEVA','EN_REVISION'].includes(e), g = s.gestion||{};
       const acc = [`<button class="btn tk-mini" onclick="Tickets.ver('${s.folio}')">Ver</button>`];
       if(ed && e==='NUEVA') acc.push(`<button class="btn tk-mini" onclick="Tickets.revisar('${s.folio}')">Revisar</button>`);
+      if(ed && abierta && s.tipo==='PRESTAMO') acc.push(`<button class="btn tk-mini" style="border-color:#0e7c86;color:#0b5d55" onclick="Tickets.apartar('${s.folio}')">📌 Apartar unidad</button>`);
       if(ed && abierta && s.tipo==='PRESTAMO') acc.push(`<button class="btn btn-primary tk-mini" onclick="Tickets.asignarUnidad('${s.folio}')">Asignar unidad</button>`);
+      if(e==='APARTADA'){
+        if(puedePrestar() && !Apartados.vencido(s)) acc.push(`<button class="btn btn-primary tk-mini" onclick="Tickets.entregar('${s.folio}')">🔑 Entregar unidad</button>`);
+        if(ed) acc.push(`<button class="btn tk-mini" onclick="Tickets.apartar('${s.folio}')">Cambiar apartado</button>`);
+        if(ed) acc.push(`<button class="btn tk-mini" onclick="Tickets.liberar('${s.folio}')">Liberar</button>`);
+      }
       if(ed && abierta && s.tipo==='INCIDENCIA') acc.push(`<button class="btn btn-primary tk-mini" onclick="Tickets.registrarIncidencia('${s.folio}')">Registrar incidencia</button>`);
       if(ed && abierta && s.tipo==='CHECKLIST') acc.push(`<button class="btn btn-primary tk-mini" onclick="Tickets.validarChecklist('${s.folio}')">Validar</button>`);
       if(ed && e==='EN_ATENCION' && g.prestamoId) acc.push(`<button class="btn tk-mini" onclick="Tickets.abrirPrestamo('${s.folio}')">Préstamo</button>`);
@@ -6528,7 +6690,9 @@ const Tickets = {
         <td style="white-space:nowrap"><b style="font-variant-numeric:tabular-nums">${s.folio}</b><br><span style="color:var(--muted);font-size:11px">${tkFecha(this.fechaDe(s))}</span></td>
         <td><span class="tag ${TK_TIPOS[s.tipo]?TK_TIPOS[s.tipo].c:''}">${TK_TIPOS[s.tipo]?TK_TIPOS[s.tipo].l:s.tipo}</span></td>
         <td><b>${tkEsc(s.solicitante)}</b><br><span style="color:var(--muted);font-size:11px">${tkEsc(s.departamento||'')}${s.telefono?' · '+tkEsc(s.telefono):''}</span></td>
-        <td><b>${tkEsc(s.unidad || (s.prestamo&&s.prestamo.unidadPreferida) || (g.unidad||'Por asignar'))}</b>${!s.unidad && s.prestamo && s.prestamo.unidadPreferida?'<br><span style="color:var(--muted);font-size:11px">preferencia</span>':''}</td>
+        <td>${e==='APARTADA' && g.apartado
+          ? `<b>${tkEsc(g.apartado.veh)}</b><br>${Apartados.vencido(s)?'<span class="tk-ap-venc">Apartado vencido</span>':`<span style="color:var(--muted);font-size:11px">apartada hasta ${tkFecha(g.apartado.hasta)}</span>`}`
+          : `<b>${tkEsc(s.unidad || (s.prestamo&&s.prestamo.unidadPreferida) || (g.unidad||'Por asignar'))}</b>${!s.unidad && s.prestamo && s.prestamo.unidadPreferida?'<br><span style="color:var(--muted);font-size:11px">preferencia</span>':''}`}</td>
         <td class="tk-det">${tkEsc(this.detalle(s))}</td>
         <td style="text-align:center">${s.fotos?`<button class="btn tk-mini" onclick="Tickets.verFotos('${s.folio}')">📷 ${s.fotos}</button>`:'—'}</td>
         <td><span class="tag ${TK_ESTADOS[e].c}">${TK_ESTADOS[e].l}</span>${g.etapa?`<br><span style="color:var(--muted);font-size:11px">${tkEsc(g.etapa)}</span>`:''}</td>
@@ -6606,7 +6770,11 @@ const Tickets = {
           </div>
         </div></div>
         ${s.fotos?`<h4 class="tk-h">Fotografías (${s.fotos})</h4><div class="tk-gal" id="tkGal"><span style="color:var(--muted);font-size:12px">Cargando…</span></div>`:''}`,
-      [{t:'Cerrar'}], '860px');
+      [{t:'Cerrar'},
+       ...(e==='APARTADA' && puedePrestar() && !Apartados.vencido(s) ? [{t:'🔑 Entregar unidad', c:'btn-primary', fn:()=>{ setTimeout(()=>this.entregar(folio), 50); }}] : []),
+       ...(e==='APARTADA' && this.esEditor() ? [{t:'Liberar apartado', fn:()=>{ setTimeout(()=>this.liberar(folio), 50); }}] : []),
+       ...(['NUEVA','EN_REVISION'].includes(e) && s.tipo==='PRESTAMO' && this.esEditor() ? [{t:'📌 Apartar unidad', c:'btn-primary', fn:()=>{ setTimeout(()=>this.apartar(folio), 50); }}] : [])
+      ], '860px');
     if(s.fotos) this.galeria(folio, '#tkGal');
   },
 
@@ -6633,6 +6801,7 @@ const Tickets = {
   async rechazar(folio){
     const m = await this.pedirTexto(`Rechazar ${folio}`, 'Motivo (el solicitante lo verá al consultar su folio)');
     if(!m) return false;
+    await Apartados.soltar(folio);   // v3.7
     await this.gestion(folio, 'RECHAZADA', 'No procede', {}, m);
     toast(`${folio} rechazada.`,'warn');
   },
@@ -6643,15 +6812,17 @@ const Tickets = {
     const p = s.prestamo||{};
     const abiertoDe = veh => asignacionAbierta(veh);
     const unidades = [...STORE.unidades].filter(u=>u.veh).sort((a,b)=>a.veh.localeCompare(b.veh));
-    const disp = unidades.filter(u=>u.estatus==='CIRCULACION' && !abiertoDe(u.veh));
-    const pref = p.unidadPreferida && disp.find(u=>u.veh===p.unidadPreferida) ? p.unidadPreferida : '';
+    const disp = unidades.filter(u=>!Apartados.bloqueo(u.veh, folio));   // v3.7: circulación, sin préstamo y sin apartado ajeno
+    const apPropio = ((s.gestion||{}).apartado||{}).veh;
+    const pref = apPropio && disp.find(u=>u.veh===apPropio) ? apPropio
+      : p.unidadPreferida && disp.find(u=>u.veh===p.unidadPreferida) ? p.unidadPreferida : '';
     const opt = u=>`<option value="${u.veh}"${u.veh===pref?' selected':''}>${u.veh} · ${u.placas||''} · ${u.zona||''} · ${u.depto||''}</option>`;
     this.modal(`Asignar unidad a ${folio}`,
       `${tkEsc(s.solicitante)} · ${tkFecha(p.salida)} a ${tkFecha(p.regreso)} · ${tkEsc(p.destino||'')}`,
       `<label>Unidad disponible</label>
        <select id="tkVeh"><option value="">— Seleccione la unidad —</option>
-         <optgroup label="Disponibles (en circulación, sin préstamo abierto)">${disp.map(opt).join('')}</optgroup>
-         <optgroup label="No disponibles">${unidades.filter(u=>!disp.includes(u)).map(u=>`<option disabled>${u.veh} · ${abiertoDe(u.veh)?'en préstamo':u.estatus}</option>`).join('')}</optgroup>
+         <optgroup label="Disponibles (en circulación, sin préstamo ni apartado)">${disp.map(opt).join('')}</optgroup>
+         <optgroup label="No disponibles">${unidades.filter(u=>!disp.includes(u)).map(u=>`<option disabled>${u.veh} · ${tkEsc(Apartados.bloqueo(u.veh, folio))}</option>`).join('')}</optgroup>
        </select>
        ${p.unidadPreferida?`<div class="hint" style="margin-top:6px">Preferencia del solicitante: <b>${tkEsc(p.unidadPreferida)}</b>${pref?'':' (no disponible)'}</div>`:''}
        <div class="setup-note" style="margin-top:12px">Se abrirá el <b>Préstamo / Check List</b> de la unidad con el conductor, destino, fecha y comentarios precargados. Al guardarlo, la solicitud pasa a <b>En atención</b>; al registrar la devolución, a <b>Culminada</b>.</div>`,
@@ -6751,6 +6922,7 @@ const Tickets = {
   async alGuardarPrestamo(a){
     if(!a || !a.solicitudFolio) return;
     this.vinculo.pres = null;
+    Apartados.soltar(a.solicitudFolio).catch(e=>console.warn('apartado', e));   // v3.7
     const s = this.porFolio(a.solicitudFolio); if(!s) return;
     const cerrada = a.estadoRegistro==='Cerrada';
     const estado = cerrada ? 'CULMINADA' : 'EN_ATENCION';
@@ -7127,7 +7299,7 @@ const Avisos = {
     if(this.conocidos===null){ this.conocidos = new Set(lista.map(s=>s.folio)); return; }
     const recientes = nuevas.filter(s=>!this.conocidos.has(s.folio));
     lista.forEach(s=>this.conocidos.add(s.folio));
-    if(!recientes.length || !session.rol) return;
+    if(!recientes.length || !session.rol || esOperativo()) return;
     recientes.forEach(s=>{
       const tipo = TK_TIPOS[s.tipo] ? TK_TIPOS[s.tipo].l : 'Solicitud';
       const cuerpo = `${s.solicitante||'—'} · ${s.unidad || (s.prestamo&&s.prestamo.unidadPreferida) || 'Por asignar'}`;
@@ -7477,6 +7649,323 @@ $('#dDefinitiva').addEventListener('change', ()=>Definitiva.pinta());
 $('#aChofer').addEventListener('change', ()=>Definitiva.pinta());
 
 
+/* ============ APARTADO DE UNIDADES · v3.7 ============
+   El equipo de Activos (Administrador y Auxiliar) puede «apartar» la unidad de una
+   solicitud de préstamo antes de entregarla. Reglas:
+     · Solo se aparta una unidad en CIRCULACIÓN, sin préstamo abierto y sin otro
+       apartado vigente (de otro folio).
+     · El apartado tiene vigencia (umbral) desde la salida hasta el regreso estimado;
+       al vencer sin entrega, la unidad se libera sola y se avisa como «Apartado vencido».
+     · El candado vive en tableros/vehicular/apartados/{unidad} y se toma con una
+       transacción: si dos usuarios apartan la misma unidad a la vez, solo uno lo logra.
+     · El Auxiliar Operativo no aparta: entrega la unidad apartada con el checklist. */
+const horaLocal = v => { if(!v) return ''; const s = String(v);
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(s)) return s.slice(11,16);
+  const d = new Date(v); return isNaN(d) ? '' : `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+const aLocalInput = v => { if(!v) return ''; const s = String(v);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s+'T08:00';
+  if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(s)) return s.slice(0,16);
+  const d = new Date(v); return isNaN(d) ? '' : `${toISO(d)}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+
+const Apartados = {
+  k(veh){ return String(veh||'').replace(/[.#$\[\]\/]/g,'_'); },
+  locks(){ return STORE.apartados || {}; },
+  /* Candado vigente de una unidad: no vencido y con su solicitud aún «Apartada» */
+  de(veh){
+    const l = this.locks()[this.k(veh)];
+    if(!l || !l.folio) return null;
+    if(l.hasta && new Date(l.hasta) < new Date()) return null;
+    const s = Tickets.porFolio(l.folio);
+    if(s && Tickets.estado(s)!=='APARTADA') return null;
+    return l;
+  },
+  vencido(s){ const ap = (s && s.gestion && s.gestion.apartado) || null; return !!(ap && ap.hasta && new Date(ap.hasta) < new Date()); },
+  /* Motivo por el que la unidad NO puede apartarse o prestarse para «folio»; null si está libre */
+  bloqueo(veh, folio){
+    const u = STORE.unidades.find(x=>x.veh===veh);
+    if(!u) return 'no existe en la flotilla';
+    if(u.estatus!=='CIRCULACION') return String(u.estatus||'').toLowerCase();
+    const ab = asignacionAbierta(veh);
+    if(ab) return `en préstamo${ab.bitacora?' · '+ab.bitacora:''}`;
+    const l = this.de(veh);
+    if(l && l.folio!==folio) return `apartada · ${l.folio} hasta ${tkFecha(l.hasta)}`;
+    return null;
+  },
+  async tomar(veh, folio, desde, hasta){
+    const ahora = Date.now();
+    const ocupado = l => {
+      if(!l || !l.folio || l.folio===folio) return false;
+      if(l.hasta && new Date(l.hasta).getTime() < ahora) return false;
+      const s = Tickets.porFolio(l.folio);
+      if(s && Tickets.estado(s)!=='APARTADA') return false;
+      return true;
+    };
+    const r = await fbDb.ref(`${FB_ROOT}/apartados/${this.k(veh)}`).transaction(cur =>
+      ocupado(cur) ? undefined : { folio, veh, desde, hasta, por: tkRol(), at: nowISO() });
+    return !!(r && r.committed);
+  },
+  /* Libera los candados del folio (todos, o solo el de una unidad) */
+  async soltar(folio, veh){
+    const up = {};
+    Object.entries(this.locks()).forEach(([k,l])=>{ if(l && l.folio===folio && (!veh || l.veh===veh)) up[`${FB_ROOT}/apartados/${k}`] = null; });
+    if(Object.keys(up).length) await fbDb.ref().update(up);
+  }
+};
+
+Object.assign(Tickets, {
+  /* Apartar (o cambiar) la unidad de una solicitud de préstamo */
+  apartar(folio){
+    if(!this.esEditor()){ toast('Solo el equipo de Activos Fijos puede apartar unidades.','err'); return; }
+    const s = this.porFolio(folio); if(!s) return;
+    if(s.tipo!=='PRESTAMO'){ toast('Solo las solicitudes de préstamo admiten apartado.','err'); return; }
+    const p = s.prestamo||{}, g = s.gestion||{}, apPrev = g.apartado||{};
+    const unidades = [...STORE.unidades].filter(u=>u.veh).sort((a,b)=>a.veh.localeCompare(b.veh));
+    const disp = unidades.filter(u=>!Apartados.bloqueo(u.veh, folio));
+    const pref = apPrev.veh && disp.find(u=>u.veh===apPrev.veh) ? apPrev.veh
+      : p.unidadPreferida && disp.find(u=>u.veh===p.unidadPreferida) ? p.unidadPreferida : '';
+    const desde0 = aLocalInput(apPrev.desde || p.salida) || aLocalInput(new Date());
+    let hasta0 = aLocalInput(apPrev.hasta || p.regreso);
+    if(!hasta0){ const d = new Date(desde0); d.setDate(d.getDate()+1); hasta0 = aLocalInput(d); }
+    const opt = u=>`<option value="${u.veh}"${u.veh===pref?' selected':''}>${u.veh} · ${u.placas||''} · ${u.zona||''} · ${u.depto||''}</option>`;
+    this.modal(`Apartar unidad · ${folio}`,
+      `${tkEsc(s.solicitante)} · ${tkFecha(p.salida)} a ${tkFecha(p.regreso)} · ${tkEsc(p.destino||'')}`,
+      `<label>Unidad a apartar</label>
+       <select id="apVeh"><option value="">— Seleccione la unidad —</option>
+         <optgroup label="Disponibles (en circulación, sin préstamo ni apartado vigente)">${disp.map(opt).join('')}</optgroup>
+         <optgroup label="No disponibles">${unidades.filter(u=>!disp.includes(u)).map(u=>`<option disabled>${u.veh} · ${tkEsc(Apartados.bloqueo(u.veh, folio))}</option>`).join('')}</optgroup>
+       </select>
+       ${p.unidadPreferida?`<div class="hint" style="margin-top:6px">Preferencia del solicitante: <b>${tkEsc(p.unidadPreferida)}</b>${disp.some(u=>u.veh===p.unidadPreferida)?'':' (no disponible)'}</div>`:''}
+       <div class="form-grid" style="margin-top:10px">
+         <div><label>Apartada desde</label><input type="datetime-local" id="apDesde" value="${desde0}"></div>
+         <div><label>Apartada hasta (umbral)</label><input type="datetime-local" id="apHasta" value="${hasta0}"></div>
+       </div>
+       <label style="margin-top:10px">Nota interna (opcional)</label>
+       <textarea id="apNota" rows="2" maxlength="200" placeholder="Ej. Preparar la unidad con tanque lleno"></textarea>
+       <div class="setup-note" style="margin-top:12px">Durante la vigencia, la unidad no podrá apartarse para otra solicitud ni prestarse sin vínculo.
+         Al vencer el umbral sin entrega, se libera automáticamente. El Auxiliar Operativo verá la entrega en sus notificaciones y la realizará con el checklist.</div>`,
+      [{t:'Cancelar'},
+       {t:'📌 Apartar unidad', c:'btn-primary', fn:async mm=>{
+         const veh = mm.q('#apVeh').value, vD = mm.q('#apDesde').value, vH = mm.q('#apHasta').value;
+         if(!veh){ toast('Seleccione la unidad.','err'); return false; }
+         if(!vD || !vH){ toast('Indique la vigencia del apartado.','err'); return false; }
+         const dD = new Date(vD), dH = new Date(vH);
+         if(isNaN(dD) || isNaN(dH) || dH <= dD){ toast('La fecha «hasta» debe ser posterior a «desde».','err'); return false; }
+         if(dH <= new Date()){ toast('El umbral del apartado ya pasó; ajuste la fecha «hasta».','err'); return false; }
+         const motivo = Apartados.bloqueo(veh, folio);
+         if(motivo){ toast(`${veh} no está disponible: ${motivo}.`,'err'); return false; }
+         const desde = dD.toISOString(), hasta = dH.toISOString();
+         if(!(await Apartados.tomar(veh, folio, desde, hasta))){ toast(`${veh} acaba de ser apartada por otro usuario. Elija otra unidad.`,'err'); return false; }
+         if(apPrev.veh && apPrev.veh!==veh) await Apartados.soltar(folio, apPrev.veh);
+         await this.gestion(folio, 'APARTADA', `Unidad ${veh} apartada del ${tkFecha(desde)} al ${tkFecha(hasta)}`,
+           { unidad: veh, apartado: { veh, desde, hasta, por: tkRol(), at: nowISO() } }, tkLimpio(mm.q('#apNota').value));
+         toast(`${veh} apartada para ${folio}.`);
+       }}], '640px');
+  },
+  async liberar(folio){
+    if(!this.esEditor()){ toast('Solo el equipo de Activos Fijos puede liberar apartados.','err'); return; }
+    const s = this.porFolio(folio); if(!s) return;
+    const ap = (s.gestion||{}).apartado||{};
+    const m = await this.pedirTexto(`Liberar apartado · ${folio}`, 'Motivo de la liberación');
+    if(!m) return;
+    await Apartados.soltar(folio);
+    await this.gestion(folio, 'EN_REVISION', `Apartado de ${ap.veh||'la unidad'} liberado`, { apartado:null, unidad:null }, m);
+    toast(`Apartado de ${folio} liberado.`,'warn');
+  },
+  /* Entrega física de la unidad apartada: abre el checklist precargado y vinculado */
+  entregar(folio){
+    if(!puedePrestar()){ toast('Su perfil no registra entregas de unidades.','err'); return; }
+    const s = this.porFolio(folio); if(!s) return;
+    const ap = (s.gestion||{}).apartado||{};
+    if(this.estado(s)!=='APARTADA' || !ap.veh){ toast('La solicitud no tiene una unidad apartada.','err'); return; }
+    if(Apartados.vencido(s)){ toast('El apartado venció. Solicite a Activos Fijos que lo renueve.','err'); return; }
+    const ab = asignacionAbierta(ap.veh);
+    if(ab){ toast(`${ap.veh} aún tiene un préstamo abierto (${ab.bitacora||'sin folio'}). Registre primero la devolución.`,'err'); return; }
+    this.transferirPrestamo(folio, ap.veh);
+  },
+  /* Aviso al abrir el checklist de una unidad apartada para otra solicitud */
+  avisoApartada(veh, l){
+    const s = this.porFolio(l.folio);
+    const acc = [{t:'Cancelar'}];
+    if(esActivos()) acc.push({t:'Préstamo sin vínculo', fn:()=>{ _omitirApartado = true; setTimeout(()=>abrirModalAsignacion(veh), 50); }});
+    acc.push({t:`🔑 Entregar para ${l.folio}`, c:'btn-primary', fn:()=>{ setTimeout(()=>this.entregar(l.folio), 50); }});
+    this.modal(`Unidad apartada · ${veh}`, '',
+      `<div class="tk-dl"><span>Solicitud</span><b>${tkEsc(l.folio)}</b></div>
+       ${s?`<div class="tk-dl"><span>Solicitante</span><b>${tkEsc(s.solicitante||'—')}</b></div><div class="tk-dl"><span>Destino</span><b>${tkEsc((s.prestamo||{}).destino||'—')}</b></div>`:''}
+       <div class="tk-dl"><span>Vigencia</span><b>${tkFecha(l.desde)} a ${tkFecha(l.hasta)}</b></div>
+       <div class="tk-dl"><span>Apartó</span><b>${tkEsc(l.por||'—')}</b></div>
+       <div class="setup-note" style="margin-top:12px">La unidad está reservada para esta solicitud. ${esActivos()?'Puede entregarla para el folio o, si se justifica, registrar un préstamo sin vínculo.':'Solo puede entregarse para este folio.'}</div>`,
+      acc, '560px');
+  }
+});
+
+/* ============ CATÁLOGO DE CHOFERES · v3.7 ============
+   Alta con fotografía (cámara en el momento o archivo del equipo) y licencia de conducir.
+   Nodo: tableros/vehicular/choferes/{id}. La foto se guarda comprimida (≈30 KB).
+   Alta: Administrador, Auxiliar y Auxiliar Operativo. Edición y baja: Administrador y Auxiliar. */
+const LIC_TIPOS = ['Automovilista','Chofer','Motociclista','Federal','Otra'];
+const Choferes = {
+  lista(){ return (STORE.choferes||[]).filter(c=>c && c.id && c.nombre); },
+  activos(){ return this.lista().filter(c=>c.activo!==false); },
+  porNombre(n){ const k = String(n||'').trim().toUpperCase(); return k ? this.lista().find(c=>c.nombre===k) : null; },
+  iniciales(n){ return String(n||'').split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]).join(''); },
+  licencia(c){
+    if(!c || !c.licVigencia) return { k:'sin', t:'Sin vigencia capturada' };
+    const d = Math.round((new Date(c.licVigencia+'T00:00:00') - new Date(hoyISO()+'T00:00:00'))/86400000);
+    if(d < 0)   return { k:'venc', t:`Licencia vencida · ${fFechaMx(c.licVigencia)}` };
+    if(d <= 30) return { k:'prox', t:`Vence en ${d} día(s) · ${fFechaMx(c.licVigencia)}` };
+    return { k:'ok', t:`Vigente al ${fFechaMx(c.licVigencia)}` };
+  },
+  render(){
+    const g = $('#chGrid'); if(!g || !session.rol) return;
+    const L = this.lista(), act = L.filter(c=>c.activo!==false);
+    const venc = act.filter(c=>this.licencia(c).k==='venc').length, prox = act.filter(c=>this.licencia(c).k==='prox').length;
+    $('#chBadge').innerHTML = `<b style="color:var(--accent)">${act.length}</b> activo(s)`
+      + (venc?` · <b style="color:var(--red)">${venc}</b> licencia(s) vencida(s)`:'') + (prox?` · <b style="color:var(--orange)">${prox}</b> por vencer`:'');
+    const q = ($('#chBuscar').value||'').toUpperCase().trim();
+    let f = $('#chBajas').checked ? L : act;
+    if(q) f = f.filter(c=>[c.nombre,c.licNumero,c.depto,c.telefono].join(' ').toUpperCase().includes(q));
+    f = [...f].sort((a,b)=>a.nombre.localeCompare(b.nombre));
+    if(!f.length){
+      g.innerHTML = `<div class="ch-vacio">${L.length?'Ningún chofer coincide con la búsqueda.':'Aún no hay choferes registrados. Use «+ Alta de chofer» para registrar el primero con su fotografía y licencia.'}</div>`;
+      return;
+    }
+    const ed = esActivos();
+    g.innerHTML = f.map(c=>{
+      const lic = this.licencia(c);
+      return `<div class="ch-card${c.activo===false?' baja':''}">
+        ${c.foto?`<img class="ch-foto" src="${c.foto}" alt="${tkEsc(c.nombre)}" data-chfoto="${c.id}">`:`<div class="ch-foto">${tkEsc(this.iniciales(c.nombre))}</div>`}
+        <div class="ch-nom">${tkEsc(c.nombre)}${c.activo===false?' <span style="color:var(--muted);font-weight:400">(baja)</span>':''}</div>
+        <div class="ch-sub">${tkEsc(c.depto||'Sin departamento')}${c.telefono?' · '+tkEsc(c.telefono):''}</div>
+        <span class="ch-lic ${lic.k}" title="${tkEsc((c.licTipo||'')+' '+(c.licNumero||''))}">${tkEsc(lic.t)}</span>
+        ${ed?`<div class="ch-acc"><button class="btn" data-ched="${c.id}">Editar</button>
+          <button class="btn" data-chbaja="${c.id}">${c.activo===false?'Reactivar':'Dar de baja'}</button></div>`:''}
+      </div>`;
+    }).join('');
+    g.querySelectorAll('[data-chfoto]').forEach(el=>el.onclick=()=>{ const c = L.find(x=>x.id===el.dataset.chfoto); abrirVisor(el.src, c?c.nombre:''); });
+    g.querySelectorAll('[data-ched]').forEach(el=>el.onclick=()=>this.form(L.find(x=>x.id===el.dataset.ched)));
+    g.querySelectorAll('[data-chbaja]').forEach(el=>el.onclick=()=>this.alternarBaja(el.dataset.chbaja));
+  },
+  /* Ficha del chofer seleccionado dentro del checklist */
+  pintaFicha(){
+    const box = $('#aChoferFicha'); if(!box) return;
+    const v = $('#aChofer') ? $('#aChofer').value : '';
+    if(!v || v==='nuevo'){ box.innerHTML = ''; return; }
+    const c = this.porNombre(v);
+    if(!c){ box.innerHTML = puedePrestar() ? `Sin ficha en el catálogo · <a id="chFichaAlta">registrar con foto y licencia</a>` : ''; 
+      const a = $('#chFichaAlta'); if(a) a.onclick = ()=>this.form({ nombre:v, _nuevo:true }, n=>buildChoferSelect(n)); return; }
+    const lic = this.licencia(c);
+    box.innerHTML = `${c.foto?`<img src="${c.foto}" alt="" id="chFichaImg">`:''}
+      <span><b>${tkEsc(c.licTipo||'Licencia')}${c.licNumero?' '+tkEsc(c.licNumero):''}</b><br>
+      <span class="ch-lic ${lic.k}" style="display:inline-block;margin-top:2px">${tkEsc(lic.t)}</span></span>`;
+    const im = $('#chFichaImg'); if(im) im.onclick = ()=>abrirVisor(c.foto, c.nombre);
+  },
+  /* Formulario de alta / edición */
+  form(c, onSave){
+    const nuevo = !c || c._nuevo;
+    if(nuevo && !puedePrestar()){ toast('Su perfil no registra choferes.','err'); return; }
+    if(!nuevo && !esActivos()){ toast('Solo el equipo de Activos Fijos edita el catálogo de choferes.','err'); return; }
+    c = c || {};
+    let foto = c.foto || '';
+    const deptos = [...new Set(STORE.unidades.map(u=>u.depto).filter(Boolean))].sort();
+    const m = Tickets.modal(nuevo?'Alta de chofer':`Editar chofer · ${c.nombre}`,
+      'Los datos quedan disponibles en el checklist de préstamo y en el catálogo de choferes.',
+      `<div class="ch-form-foto">
+         <div id="chPrev">${foto?`<img class="ch-prev" src="${foto}" alt="">`:'<div class="ch-prev">Sin fotografía</div>'}</div>
+         <div class="btns">
+           <button type="button" class="btn btn-primary" id="chCam">📷 Tomar foto ahora</button>
+           <button type="button" class="btn" id="chArch">🖼 Elegir del equipo</button>
+           <button type="button" class="btn" id="chQuitar"${foto?'':' style="display:none"'}>Quitar foto</button>
+           <input type="file" id="chFileCam" accept="image/*" capture="environment" style="display:none">
+           <input type="file" id="chFileArch" accept="image/*" style="display:none">
+         </div>
+       </div>
+       <div class="form-grid">
+         <div class="full"><label>Nombre completo</label><input type="text" id="chNom" maxlength="60" value="${tkEsc(c.nombre||'')}" placeholder="Nombre y apellidos"${nuevo?'':' readonly style="opacity:.75"'}></div>
+         <div><label>Teléfono celular</label><input type="tel" id="chTel" maxlength="10" inputmode="numeric" value="${tkEsc(c.telefono||'')}" placeholder="10 dígitos"></div>
+         <div><label>Departamento</label><input type="text" id="chDep" list="chDepList" maxlength="40" value="${tkEsc(c.depto||'')}"><datalist id="chDepList">${deptos.map(d=>`<option value="${tkEsc(d)}">`).join('')}</datalist></div>
+         <div><label>Tipo de licencia</label><select id="chLicT"><option value="">— Seleccione —</option>${LIC_TIPOS.map(t=>`<option${t===c.licTipo?' selected':''}>${t}</option>`).join('')}</select></div>
+         <div><label>Número de licencia</label><input type="text" id="chLicN" maxlength="25" value="${tkEsc(c.licNumero||'')}"></div>
+         <div><label>Vigencia de la licencia</label><input type="date" id="chLicV" value="${tkEsc(c.licVigencia||'')}"></div>
+         <div class="full"><label>Notas</label><textarea id="chNotas" rows="2" maxlength="200">${tkEsc(c.notas||'')}</textarea></div>
+       </div>`,
+      [{t:'Cancelar'},
+       {t: nuevo?'Registrar chofer':'Guardar cambios', c:'btn-primary', fn:async mm=>{
+         const nombre = tkLimpio(mm.q('#chNom').value).replace(/\s+/g,' ').toUpperCase();
+         const tel = mm.q('#chTel').value.replace(/\D/g,'');
+         if(!RX.chofer.test(nombre)){ toast('El nombre solo admite letras, espacios y acentos (2-60 caracteres).','err'); return false; }
+         if(tel && tel.length!==10){ toast('El teléfono debe tener 10 dígitos.','err'); return false; }
+         if(nuevo && this.porNombre(nombre)){ toast(`${nombre} ya está en el catálogo.`,'err'); return false; }
+         const rec = Object.assign({}, nuevo ? { id: uid(), alta: nowISO(), altaPor: tkRol(), activo: true } : this.lista().find(x=>x.id===c.id), {
+           nombre, telefono: tel, depto: tkLimpio(mm.q('#chDep').value).slice(0,40),
+           licTipo: mm.q('#chLicT').value, licNumero: tkLimpio(mm.q('#chLicN').value).toUpperCase().slice(0,25),
+           licVigencia: mm.q('#chLicV').value || '', notas: tkLimpio(mm.q('#chNotas').value).slice(0,200),
+           foto: foto || '', updatedAt: nowISO(), updatedBy: tkRol() });
+         delete rec._nuevo;
+         try{ await fbDb.ref(`${FB_ROOT}/choferes/${rec.id}`).set(rec); }
+         catch(e){ toast('No se pudo guardar el chofer: '+e.message,'err'); return false; }
+         if(nuevo && !(STORE.choferes||[]).some(x=>x.id===rec.id)) (STORE.choferes = STORE.choferes||[]).push(rec);
+         await logChange('—', nuevo?'ALTA_CHOFER':'EDIT_CHOFER', 'chofer', nuevo?'':c.nombre, `${nombre}${rec.licVigencia?' · lic. '+rec.licVigencia:''}${foto?' · con foto':''}`);
+         toast(nuevo ? `Chofer ${nombre} registrado.` : `Chofer ${nombre} actualizado.`);
+         this.render();
+         if(onSave) setTimeout(()=>onSave(nombre), 30);
+       }}], '640px');
+    const pinta = ()=>{
+      m.q('#chPrev').innerHTML = foto ? `<img class="ch-prev" src="${foto}" alt="">` : '<div class="ch-prev">Sin fotografía</div>';
+      m.q('#chQuitar').style.display = foto ? '' : 'none';
+    };
+    const procesa = async file=>{
+      if(!file) return;
+      if(file.size > 25*1024*1024){ toast('La imagen supera 25 MB.','err'); return; }
+      try{ foto = (await comprimeImagen(file, 480, 0.72)).dataUrl; pinta(); }
+      catch(e){ toast('No se pudo procesar la imagen: '+e.message,'err'); }
+    };
+    m.q('#chFileCam').onchange  = e=>procesa(e.target.files && e.target.files[0]);
+    m.q('#chFileArch').onchange = e=>procesa(e.target.files && e.target.files[0]);
+    m.q('#chArch').onclick = ()=>m.q('#chFileArch').click();
+    m.q('#chQuitar').onclick = ()=>{ foto = ''; pinta(); };
+    m.q('#chCam').onclick = async ()=>{
+      // Teléfono o tablet: cámara nativa. Computadora: cámara web en vivo.
+      const tactil = window.matchMedia && window.matchMedia('(pointer:coarse)').matches;
+      if(tactil || !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){ m.q('#chFileCam').click(); return; }
+      const dato = await this.camara();
+      if(dato) await procesa(new File([b64aBlob(dato)], 'foto_chofer.jpg', { type:'image/jpeg' }));
+    };
+    if(nuevo) setTimeout(()=>{ const n = m.q('#chNom'); if(n && !n.value) n.focus(); }, 60);
+  },
+  /* Captura con la cámara web (computadora) */
+  camara(){
+    return new Promise(async res=>{
+      let stream;
+      try{ stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:1280} }, audio:false }); }
+      catch(e){ toast('No fue posible abrir la cámara. Revise los permisos del navegador o use «Elegir del equipo».','err'); res(null); return; }
+      let dato = null;
+      const cam = Tickets.modal('Tomar fotografía', 'Encuadre el rostro del chofer y presione Capturar.',
+        '<div class="ch-cam"><video id="chVid" autoplay playsinline muted></video></div>',
+        [{t:'Cancelar'}, {t:'📸 Capturar', c:'btn-primary', fn:mm=>{
+          const v = mm.q('#chVid'); if(!v.videoWidth){ toast('La cámara aún no está lista.','warn'); return false; }
+          const cv = document.createElement('canvas'); cv.width = v.videoWidth; cv.height = v.videoHeight;
+          const x = cv.getContext('2d'); x.translate(cv.width,0); x.scale(-1,1); x.drawImage(v,0,0);
+          dato = cv.toDataURL('image/jpeg', 0.9);
+        }}], '600px');
+      cam.q('#chVid').srcObject = stream;
+      const obs = new MutationObserver(()=>{
+        if(!document.body.contains(cam.el)){ stream.getTracks().forEach(t=>t.stop()); obs.disconnect(); res(dato); }
+      });
+      obs.observe(document.body, { childList:true });
+    });
+  },
+  async alternarBaja(id){
+    if(!esActivos()) return;
+    const c = this.lista().find(x=>x.id===id); if(!c) return;
+    const baja = c.activo!==false;
+    if(baja && !confirm(`¿Dar de baja a ${c.nombre}? Dejará de aparecer en el checklist; su historial se conserva.`)) return;
+    try{ await fbDb.ref(`${FB_ROOT}/choferes/${id}`).update({ activo: !baja, updatedAt: nowISO(), updatedBy: tkRol() }); }
+    catch(e){ toast('No se pudo actualizar: '+e.message,'err'); return; }
+    await logChange('—', baja?'BAJA_CHOFER':'REACTIVA_CHOFER', 'chofer', '', c.nombre);
+    toast(baja ? `${c.nombre} dado de baja.` : `${c.nombre} reactivado.`, baja?'warn':'ok');
+  }
+};
+
 /* ============ CENTRO DE NOTIFICACIONES · v3.5 ============
    Lista breve, ordenada por urgencia, de lo que requiere atención:
      · Solicitudes nuevas o en revisión (préstamo, incidencia, check list)
@@ -7491,7 +7980,7 @@ const Notif = {
   CLAVE: 'ies_vehicular_notif_vistos', abierta: false, items: [], _urg: 0,
   vistos(){ try{ return JSON.parse(localStorage.getItem(this.CLAVE)||'{}'); }catch(e){ return {}; } },
   guardaVistos(v){ try{ localStorage.setItem(this.CLAVE, JSON.stringify(v)); }catch(e){} },
-  dia(v){ if(!v) return ''; const s = String(v); if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+  dia(v){ if(!v) return ''; const s = String(v); if(/^\d{4}-\d{2}-\d{2}$/.test(s) || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(s)) return s.slice(0,10);
           const d = new Date(v); return isNaN(d) ? '' : toISO(d); },
   sumaDias(iso, n){ const d = new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return toISO(d); },
   clasifica(fecha){
@@ -7502,48 +7991,76 @@ const Notif = {
     if(fecha <= this.sumaDias(hoy, 7)) return 'prox';
     return null;
   },
-  etiquetaFecha(nivel, fecha, hora){
+  etiquetaFecha(nivel, fecha, hora, sinAtender){
     const hoy = hoyISO();
-    if(nivel==='venc'){ const d = diasEntreFechas(fecha, hoy); return d ? `Vencido ${d} d` : (hora ? `Atrasado ${hora}` : 'Atrasado'); }
+    if(nivel==='venc'){
+      const d = diasEntreFechas(fecha, hoy);
+      if(sinAtender) return d ? `Sin atender ${d} d` : 'Sin atender';
+      return d ? `Atrasado ${d} d` : (hora ? `Atrasado ${hora}` : 'Atrasado');
+    }
     if(nivel==='hoy') return hora ? `Hoy ${hora}` : 'Hoy';
-    if(nivel==='prox') return fecha===this.sumaDias(hoy,1) ? (hora?`Mañana ${hora}`:'Mañana') : fFechaMx(fecha);
-    return 'Nuevo';
+    if(nivel==='prox') return fecha===this.sumaDias(hoy,1) ? (hora?`Mañana ${hora}`:'Mañana') : `${fFechaMx(fecha)}${hora?' '+hora:''}`;
+    return '';
   },
+  /* v3.7 · Tres grupos: 1 Hoy · 2 Programado (próximos 7 días) · 3 Atrasado.
+     Lo recibido y aún sin atender se ubica por su fecha: hoy → Hoy; días anteriores → Atrasado. */
   construir(){
     const ed = session.rol==='admin' || session.rol==='auxiliar';
+    const op = session.rol==='operativo';
     const out = [];
-    const add = o => { o.fx = this.etiquetaFecha(o.nivel, o.fecha, o.hora); out.push(o); };
     const hoy = hoyISO();
+    const add = o => {
+      if(o.nivel==='nuevo'){
+        if(!o.fecha || o.fecha===hoy) o.nivel = 'hoy';
+        else if(o.fecha < hoy){ o.nivel = 'venc'; o.sinAtender = true; }
+        else o.nivel = 'prox';
+      }
+      o.fx = this.etiquetaFecha(o.nivel, o.fecha, o.hora, o.sinAtender);
+      out.push(o);
+    };
 
     // 1. Solicitudes de usuarios
     if(session.rol) (Tickets.lista||[]).forEach(s=>{
       const e = (s.gestion && s.gestion.estado) || 'NUEVA';
-      if(['CULMINADA','RECHAZADA'].includes(e)) return;
+      if(['CULMINADA','RECHAZADA','EN_ATENCION'].includes(e)) return;   // lo que está en atención vive en Préstamos e Incidencias
       const tipo = TK_TIPOS[s.tipo] ? TK_TIPOS[s.tipo].l : 'Solicitud';
       const unidad = s.unidad || (s.prestamo && s.prestamo.unidadPreferida) || 'Por asignar';
       const recibida = this.dia(s.ts || s.tsCliente);
+      // Unidades apartadas: entrega programada
+      if(e==='APARTADA'){
+        const ap = (s.gestion||{}).apartado || {};
+        const vencido = Apartados.vencido(s);
+        if(vencido && !ed) return;
+        const f = this.dia(ap.desde || (s.prestamo||{}).salida);
+        const n = vencido ? 'venc' : this.clasifica(f); if(!n) return;
+        add({ id:'ap_'+s.folio, nivel:n, fecha:f, hora:horaLocal(ap.desde), ic:'📌',
+          tipo: vencido ? 'Apartado vencido · liberar o reasignar' : 'Unidad apartada',
+          t:`Entrega de unidad apartada · ${ap.veh||unidad}`, s:`${s.folio} · ${s.solicitante||'—'}${(s.prestamo||{}).destino?' · '+s.prestamo.destino:''}`,
+          ir:()=> (!vencido && puedePrestar()) ? Tickets.entregar(s.folio) : Tickets.ver(s.folio) });
+        return;
+      }
+      if(op) return;   // el Auxiliar Operativo solo atiende entregas de unidades apartadas
       if(s.tipo==='PRESTAMO' && s.prestamo && s.prestamo.salida && e!=='NUEVA'){
         // Programación de préstamo ya revisada: se ordena por la fecha de salida
         const f = this.dia(s.prestamo.salida), n = this.clasifica(f);
-        if(n) add({ id:'sp_'+s.folio, nivel:n, fecha:f, hora:String(s.prestamo.salida).slice(11,16), ic:'🗓', tipo:'Préstamo programado',
+        if(n) add({ id:'sp_'+s.folio, nivel:n, fecha:f, hora:horaLocal(s.prestamo.salida), ic:'🗓', tipo:'Préstamo por apartar o asignar',
           t:`Salida de unidad · ${unidad}`, s:`${s.folio} · ${s.solicitante||'—'} · ${s.prestamo.destino||''}`, ir:()=>Tickets.ver(s.folio) });
         return;
       }
-      if(!['NUEVA','EN_REVISION'].includes(e)) return;
       let nivel = 'nuevo', fecha = recibida;
       if(s.tipo==='PRESTAMO' && s.prestamo && s.prestamo.salida){
         const f = this.dia(s.prestamo.salida), n = this.clasifica(f);
         if(n==='venc' || n==='hoy'){ nivel = n; fecha = f; }
       }
-      if(s.tipo==='INCIDENCIA' && (s.incidencia||{}).circula && /^no/i.test(s.incidencia.circula)) nivel = nivel==='nuevo' ? 'hoy' : nivel;
+      if(s.tipo==='INCIDENCIA' && (s.incidencia||{}).circula && /^no/i.test(s.incidencia.circula) && nivel==='nuevo' && recibida>=hoy) nivel = 'hoy';
       add({ id:'so_'+s.folio, nivel, fecha, ic: s.tipo==='PRESTAMO'?'🚗':s.tipo==='INCIDENCIA'?'⚠️':'✅', tipo:`Solicitud · ${tipo}`,
         t:`${s.folio} · ${tipo}`, s:`${s.solicitante||'—'} · ${unidad}${s.tipo==='PRESTAMO'&&s.prestamo&&s.prestamo.salida?' · salida '+fFechaMx(this.dia(s.prestamo.salida)):''}${e==='EN_REVISION'?' · En revisión':''}`, ir:()=>Tickets.ver(s.folio) });
     });
 
-    // 2. Incidencias pendientes
-    STORE.incidencias.filter(i=>i.estatus==='Pendiente').forEach(i=>{
+    // 2. Incidencias pendientes (no aplica al Auxiliar Operativo)
+    if(!op) STORE.incidencias.filter(i=>i.estatus==='Pendiente').forEach(i=>{
       const f = this.dia(i.fecha);
-      add({ id:'in_'+i.id, nivel: f===hoy ? 'hoy' : 'nuevo', fecha:f, ic:'🛠', tipo:'Incidencia',
+      add({ id:'in_'+i.id, nivel:'nuevo', fecha:f, ic:'🛠', tipo:'Incidencia',
         t:`${i.unidad} · ${i.tipo||'Incidencia'}`, s:`Pendiente desde ${fFechaMx(f)}${i.notas?' · '+i.notas:''}`,
         ir:()=> ed ? editarIncidencia(i.id) : filtrarIncidenciasPor(i.unidad) });
     });
@@ -7568,13 +8085,22 @@ const Notif = {
       const f = this.dia(a.fechaEntrega), n = this.clasifica(f); if(!n) return;
       add({ id:'pr_'+a.id, nivel:n, fecha:f, ic:'🔑', tipo:'Préstamo',
         t:`Entrega de unidad · ${a.vehiculo}`, s:`${a.bitacora||'Sin folio'} · ${a.chofer||'—'} · ${a.destino||''}`,
-        ir:()=> ed ? abrirModalAsignacion(a.vehiculo, a.id) : verHistorialAsig(a.vehiculo) });
+        ir:()=> puedePrestar() ? abrirModalAsignacion(a.vehiculo, a.id) : verHistorialAsig(a.vehiculo) });
     });
 
-    const peso = { venc:1, hoy:2, nuevo:3, prox:4 };
-    out.sort((a,b)=> peso[a.nivel]-peso[b.nivel]
-      || (a.nivel==='nuevo' || a.nivel==='venc' ? String(a.fecha).localeCompare(String(b.fecha)) * (a.nivel==='nuevo'?-1:1)
-                                                 : String(a.fecha+(a.hora||'')).localeCompare(String(b.fecha+(b.hora||'')))));
+    // 6. Licencias de choferes (v3.7): vencidas y por vencer en 7 días
+    if(ed) Choferes.activos().forEach(c=>{
+      if(!c.licVigencia) return;
+      const n = this.clasifica(c.licVigencia); if(!n) return;
+      add({ id:'lc_'+c.id+'_'+c.licVigencia, nivel:n, fecha:c.licVigencia, ic:'🪪', tipo:'Licencia de conducir',
+        t:`${c.nombre}`, s:`${n==='venc'?'Licencia vencida':'Licencia por vencer'} · ${c.licTipo||''} ${c.licNumero||''}`.trim(),
+        ir:()=>Choferes.form(c) });
+    });
+
+    const peso = { hoy:1, prox:2, venc:3 };
+    const clave = x => String(x.fecha||'')+(x.hora||'');
+    out.sort((a,b)=> (peso[a.nivel]||9)-(peso[b.nivel]||9)
+      || (a.nivel==='venc' ? clave(b).localeCompare(clave(a)) : clave(a).localeCompare(clave(b))));
     return out;
   },
   render(){
@@ -7584,7 +8110,7 @@ const Notif = {
     const sinVer = this.items.filter(x=>!v[x.id]);
     const urg = this.items.filter(x=>x.nivel==='venc' || x.nivel==='hoy').length;
     const n = $('#ntN'); n.textContent = sinVer.length>99 ? '99+' : sinVer.length; n.classList.toggle('hidden', !sinVer.length);
-    $('#ntBtn').title = `${this.items.length} aviso(s) · ${urg} urgente(s) hoy`;
+    $('#ntBtn').title = `${this.items.length} aviso(s) · ${urg} para hoy o atrasado(s)`;
     if(urg > this._urg){ $('#ntBtn').classList.remove('urgente'); void $('#ntBtn').offsetWidth; $('#ntBtn').classList.add('urgente'); }
     this._urg = urg;
     if(this.abierta) this.pintaPanel();
@@ -7592,10 +8118,10 @@ const Notif = {
   pintaPanel(){
     const v = this.vistos(), L = this.items;
     const cnt = k => L.filter(x=>x.nivel===k).length;
-    $('#ntRes').innerHTML = `<span class="r-venc">Vencidos <b>${cnt('venc')}</b></span><span class="r-hoy">Hoy <b>${cnt('hoy')}</b></span>
-      <span>Nuevos <b>${cnt('nuevo')}</b></span><span>Próximos 7 días <b>${cnt('prox')}</b></span>`;
+    $('#ntRes').innerHTML = `<span class="r-hoy">Hoy <b>${cnt('hoy')}</b></span><span class="r-prox">Programado <b>${cnt('prox')}</b></span>
+      <span class="r-venc">Atrasado <b>${cnt('venc')}</b></span>`;
     if(!L.length){ $('#ntList').innerHTML = '<div class="nt-vacio">Sin pendientes. No hay solicitudes, incidencias, tareas ni programaciones que atender.</div>'; return; }
-    const titulos = { venc:'Vencidos', hoy:'Para hoy', nuevo:'Nuevos sin atender', prox:'Próximos 7 días' };
+    const titulos = { hoy:'Hoy', prox:'Programado · próximos 7 días', venc:'Atrasado' };
     let html = '', grupo = '';
     L.slice(0, 60).forEach((x,i)=>{
       if(x.nivel!==grupo){ grupo = x.nivel; html += `<div class="nt-grp g-${grupo}">${titulos[grupo]}</div>`; }
@@ -7642,6 +8168,9 @@ Notif.init();
 $$('#tkTabs .tab').forEach(t=>t.onclick=()=>{ $$('#tkTabs .tab').forEach(x=>x.classList.toggle('active', x===t)); Tickets.tab = t.dataset.tk; Tickets.render(); });
 $('#tkBuscar').oninput = ()=>Tickets.render();
 $('#tkLiga').onclick = ()=>Tickets.liga();
+$('#btnAltaChofer').onclick = ()=>Choferes.form(null);
+$('#chBuscar').oninput = ()=>Choferes.render();
+$('#chBajas').onchange = ()=>Choferes.render();
 $('#tkEtiquetas').onclick = ()=>Tickets.etiquetas();
 
 /* ============ INIT ============ */

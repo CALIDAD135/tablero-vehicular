@@ -65,7 +65,7 @@ details.card{padding-bottom:14px}details summary{cursor:pointer;font-weight:700;
 details[open] summary{margin-bottom:12px}
 .consulta{display:flex;gap:8px}.consulta input{text-transform:uppercase}
 .est{border:1px solid var(--line);border-left:5px solid var(--amb);border-radius:10px;padding:12px 14px;margin-top:12px}
-.est-en_revision{border-left-color:var(--accent)}.est-en_atencion{border-left-color:var(--mor)}.est-culminada{border-left-color:var(--ok)}.est-rechazada{border-left-color:var(--soft)}
+.est-en_revision{border-left-color:var(--accent)}.est-apartada{border-left-color:#0e7c86}.est-en_atencion{border-left-color:var(--mor)}.est-culminada{border-left-color:var(--ok)}.est-rechazada{border-left-color:var(--soft)}
 .est h3{font-size:18px;color:var(--deep)}.est p{font-size:14px;color:var(--muted);margin:2px 0 8px}
 .tl{list-style:none;border-left:2px solid var(--line);margin:8px 0 0 6px;padding-left:14px}
 .tl li{position:relative;padding-bottom:9px;font-size:13px;display:flex;flex-direction:column}
@@ -213,6 +213,7 @@ const FOTOS = { PRESTAMO:{min:0,max:0}, INCIDENCIA:{min:6,max:10}, CHECKLIST:{mi
 const ESTADOS = {
   NUEVA:['Recibida','Su solicitud fue recibida y está en espera de revisión.'],
   EN_REVISION:['En revisión','Control Vehicular está evaluando su solicitud.'],
+  APARTADA:['Unidad apartada','Control Vehicular reservó una unidad para su préstamo. Preséntese en la fecha de salida para recibirla.'],
   EN_ATENCION:['En atención','Su solicitud se está atendiendo.'],
   CULMINADA:['Culminada','La solicitud se concluyó.'],
   RECHAZADA:['No procede','La solicitud no procede.']
