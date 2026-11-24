@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control Vehicular · KPI-AFI-01 v3.9</title>
+<title>Control Vehicular · KPI-AFI-01 v4.0</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2044%22%20role%3D%22img%22%20aria-label%3D%22Control%20Vehicular%22%3E%20%3Cg%20fill%3D%22%230b4f9e%22%3E%20%3Cpath%20d%3D%22M17.2%204.6Q18.3%202%2021.2%202H42.8Q45.7%202%2046.8%204.6L52%2017H12Z%22/%3E%20%3Crect%20x%3D%223%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%3Crect%20x%3D%2252.5%22%20y%3D%2212.5%22%20width%3D%228.5%22%20height%3D%225.5%22%20rx%3D%221.8%22/%3E%20%3Cpath%20d%3D%22M8%2019Q8%2016%2011%2016H53Q56%2016%2056%2019V32.5Q56%2035%2053.5%2035H10.5Q8%2035%208%2032.5Z%22/%3E%20%3Crect%20x%3D%2210%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%3Crect%20x%3D%2243.5%22%20y%3D%2233%22%20width%3D%2210.5%22%20height%3D%2210%22%20rx%3D%222.2%22/%3E%20%3C/g%3E%20%3Cpath%20d%3D%22M20.8%205H43.2L48%2014.6H16Z%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Crect%20x%3D%2211%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%3Crect%20x%3D%2242.5%22%20y%3D%2219.5%22%20width%3D%2210.5%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%23ffffff%22/%3E%20%3Crect%20x%3D%2224.5%22%20y%3D%2219.5%22%20width%3D%2215%22%20height%3D%228.5%22%20rx%3D%221.6%22%20fill%3D%22%23dbe9fb%22/%3E%20%3Cpath%20d%3D%22M24.5%2022.4H39.5M24.5%2025.2H39.5%22%20stroke%3D%22%230b4f9e%22%20stroke-width%3D%221.1%22/%3E%20%3Crect%20x%3D%229%22%20y%3D%2229.6%22%20width%3D%2246%22%20height%3D%221.5%22%20rx%3D%22.75%22%20fill%3D%22%23dbe9fb%22/%3E%20%3C/svg%3E">
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -647,6 +647,33 @@ img.ch-foto{cursor:zoom-in}
 .rv-estado.ok{border-color:#9fdcc2;background:#eefaf4}
 .rv-estado.warn{border-color:#f3cf9a;background:#fff7ea}
 .rv-estado.err{border-color:#f0aeb6;background:#fdf1f3}
+
+/* ============ v4.0 · Préstamo vía remota (enlace de un solo uso) ============ */
+.rm-box{border:1.5px solid #c9d6ee;background:#f4f8fe;border-radius:10px;padding:10px 13px;margin:4px 0 12px}
+.rm-box.on{border-color:#9d8be0;background:#f6f3ff}
+.rm-sw{display:flex!important;align-items:center;gap:11px;cursor:pointer;margin:0!important;text-transform:none!important;letter-spacing:0!important;color:var(--txt)!important;font-weight:400!important;font-size:12.5px!important}
+.rm-sw input{position:absolute;opacity:0;width:1px;height:1px}
+.rm-sl{flex:0 0 40px;height:22px;border-radius:22px;background:#c5d3e6;position:relative;transition:.15s}
+.rm-sl::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.rm-sw input:checked + .rm-sl{background:#5a3fb8}
+.rm-sw input:checked + .rm-sl::after{left:21px}
+.rm-sw input:focus-visible + .rm-sl{outline:2px solid var(--accent);outline-offset:2px}
+.rm-sw b{display:block;font-size:13px;color:#3b2a86}
+.rm-sw small{display:block;color:var(--muted);font-size:11.5px;line-height:1.35}
+.rm-opts{margin-top:10px}
+.rm-seg{display:flex;flex-direction:column;gap:6px}
+.rm-seg label{display:flex!important;gap:7px;align-items:center;cursor:pointer;margin:0!important;text-transform:none!important;letter-spacing:0!important;color:var(--txt)!important;font-weight:500!important;font-size:12.5px!important}
+.rm-seg input{width:auto!important;flex:0 0 auto}
+.rm-link{margin-top:10px;border-top:1px dashed #c9bdf0;padding-top:10px;font-size:12.5px;line-height:1.5}
+.rm-acc{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.rm-link .btn{font-size:12px;padding:6px 12px}
+.rm-url{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;background:#fff;border:1px solid var(--line);border-radius:7px;padding:6px 8px;word-break:break-all;margin-top:6px;user-select:all;color:#1d2a3a}
+.rm-chip{display:inline-block;margin-top:3px;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700;background:#ece8fb;color:#4b3699;border:1px solid #cfc4f2}
+.rm-chip.alerta{background:#fde3e6;color:#8f1826;border-color:#f0aeb6}
+.rm-chip.ok{background:#dcf3e8;color:#0a5e3b;border-color:#9fdcc2}
+.rm-alerta{border:1.5px solid #f0aeb6;background:#fdf1f3;border-radius:9px;padding:8px 11px;margin-bottom:8px;color:#8f1826}
+.reac-box.rm-firma{border-color:#cfc4f2;background:#f6f3ff}
+.reac-box.rm-firma b{color:#3b2a86}
 </style>
 </head>
 <body>
@@ -671,9 +698,9 @@ img.ch-foto{cursor:zoom-in}
     <div class="sub">KPI-AFI-01 · Coordinación de Activos Fijos y Control Vehicular</div>
     <div class="login-role-btns">
       <button class="role-btn" data-r="admin">Administrador<small>Lic. Marcos</small></button>
-      <button class="role-btn" data-r="auxiliar">Auxiliar<small>Captura diaria</small></button>
-      <button class="role-btn" data-r="gerencia">Gerencia<small>Solo lectura</small></button>
-      <button class="role-btn" data-r="operativo">Auxiliar Operativo<small>Préstamo físico</small></button>
+      <button class="role-btn" data-r="auxiliar">Auxiliar Administrativo<small>José Concepción</small></button>
+      <button class="role-btn" data-r="gerencia">Gerencia Operativa<small>Ing. Ana · solo lectura</small></button>
+      <button class="role-btn" data-r="operativo">Auxiliar Operativo<small>Uroy Acosta</small></button>
     </div>
     <div id="loginCodeWrap">
       <label>Código de acceso</label>
@@ -879,7 +906,7 @@ img.ch-foto{cursor:zoom-in}
   <h3>Préstamos y Resguardos de Unidades
     <span class="hint" style="font-weight:400">· historial vigente hasta el cierre del día</span>
     <span id="presBadge" style="margin-left:auto;font-size:11px;color:var(--muted)"></span>
-    <button class="btn hidden" id="btnRevivirPdf" style="font-size:12px;padding:5px 12px" title="Restaura las fotografías, firmas e inspección de un préstamo a partir de su PDF del ZIP (solo Administrador)">♻ Revivir desde PDF</button>
+    <button class="btn hidden" id="btnRevivirPdf" style="font-size:12px;padding:5px 12px" title="Restaura las fotografías, firmas e inspección de un préstamo a partir de su PDF del ZIP (Administrador y Auxiliares)">♻ Revivir desde PDF</button>
     <input type="file" id="fileRevivirPdf" accept="application/pdf,.pdf" style="display:none">
   </h3>
   <div class="tabs">
@@ -1319,6 +1346,30 @@ img.ch-foto{cursor:zoom-in}
           </div>
         </div>
       </div>
+      <!-- v4.0: Préstamo vía remota (unidades en otras plazas) -->
+      <div class="rm-box" id="rmBox">
+        <label class="rm-sw"><input type="checkbox" id="aViaRemota"><span class="rm-sl"></span>
+          <span><b>Préstamo vía remota</b><small>Para unidades en otras plazas o zonas: el usuario captura fotografías y firma desde un enlace de un solo uso.</small></span></label>
+        <div class="rm-opts hidden" id="rmOpts">
+          <div class="form-grid">
+            <div>
+              <label>Carga de evidencia fotográfica</label>
+              <div class="rm-seg">
+                <label><input type="radio" name="rmFotos" value="interna" checked> Carga interna (Admin / Auxiliar)</label>
+                <label><input type="radio" name="rmFotos" value="remota"> Carga remota por el usuario</label>
+              </div>
+              <div class="hint" style="margin-top:4px">En ambos casos el equipo puede subir o complementar fotografías en la sección 6.</div>
+            </div>
+            <div>
+              <label>Firma del usuario</label>
+              <div class="rm-seg">
+                <label><input type="checkbox" id="rmFirma" checked> Requerir firma remota: firma en pantalla o autorización electrónica</label>
+              </div>
+            </div>
+          </div>
+          <div class="rm-link" id="rmLink"></div>
+        </div>
+      </div>
       <div class="form-grid">
         <div>
           <label>Fecha de entrega</label>
@@ -1519,6 +1570,7 @@ img.ch-foto{cursor:zoom-in}
         <span id="reacTxt"></span>
         <button type="button" class="btn btn-primary" id="btnReactivarFirmas">🔄 Reactivar firmas con fecha de hoy</button>
       </div>
+      <div class="reac-box rm-firma hidden" id="rmFirmaBox"></div>
       <div class="form-grid">
         <div>
           <label>Nombre de quien recibe</label>
@@ -1871,17 +1923,19 @@ img.ch-foto{cursor:zoom-in}
    ================================================================== */
 
 /* ============ CONFIGURACIÓN — MODIFIQUE SUS CÓDIGOS AQUÍ ============ */
+/* v4.0 · Cuatro perfiles. Las claves internas (admin, auxiliar, gerencia, operativo) se conservan
+   para no alterar el historial de la bitácora ni los registros guardados. */
 const AUTH_CODES = {
-  admin:    '0386',    // <-- Código del Administrador (Lic. Marcos)
-  auxiliar: '0387', // <-- Código del Auxiliar
-  gerencia: '0388', // <-- Código de Gerencia (solo lectura)
-  operativo: '0389' // <-- Código del Auxiliar Operativo (Uroy Acosta) · v3.7
+  admin:     '0386',  // <-- Administrador (Lic. Marcos): control total
+  auxiliar:  '0387',  // <-- Auxiliar Administrativo (José Concepción): operación administrativa completa
+  gerencia:  '0388',  // <-- Gerencia Operativa (Ing. Ana): solo lectura y exportación de reportes
+  operativo: '0390'   // <-- Auxiliar Operativo (Uroy Acosta): clave propia desde la v4.0 (antes 0389)
 };
 /* v3.7 · Perfiles: el equipo de Activos (admin y auxiliar) administra; el Auxiliar Operativo presta físicamente */
 const esActivos   = () => session.rol==='admin' || session.rol==='auxiliar';
 const esOperativo = () => session.rol==='operativo';
 const puedePrestar = () => esActivos() || esOperativo();
-const ROL_TXT = { admin:'Administrador', auxiliar:'Auxiliar', gerencia:'Gerencia', operativo:'Auxiliar Operativo' };
+const ROL_TXT = { admin:'Administrador', auxiliar:'Auxiliar Administrativo', gerencia:'Gerencia Operativa', operativo:'Auxiliar Operativo' };
 const ROL_CLS = { admin:'role-admin', auxiliar:'role-aux', gerencia:'role-ger', operativo:'role-op' };
 
 const firebaseConfig = {
@@ -2018,6 +2072,7 @@ function fbInit(){
     });
     Tickets.escuchar();   // v3.3: bandeja de solicitudes públicas
     Avisos.escuchar();    // v3.4: estado del verificador de avisos
+    Remoto.escuchar();    // v4.0: enlaces remotos de un solo uso
     return true;
   }catch(e){
     console.error('fbInit', e);
@@ -2092,7 +2147,7 @@ async function fbAppendBitacora(entry){
   catch(e){ console.error('fbAppendBitacora', e); return false; }
 }
 async function fbUpdateMeta(){
-  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 3.9 };
+  const meta = { updatedAt: nowISO(), updatedBy: session.rol, version: 4.0 };
   STORE.meta = meta;
   try{ await fbDb.ref(`${FB_ROOT}/meta`).set(meta); }catch(e){}
 }
@@ -2221,7 +2276,7 @@ function aplicarPermisos(){
   $('#cardBitacora').classList.toggle('hidden', !esAdmin);
   $('#cardCalendario').classList.toggle('hidden', !(esEditor || rol==='operativo'));
   $('#btnAltaChofer').classList.toggle('hidden', !puedePrestar());
-  $('#btnRevivirPdf').classList.toggle('hidden', !esAdmin);   // v3.9: solo el Administrador revive préstamos desde PDF
+  $('#btnRevivirPdf').classList.toggle('hidden', !puedePrestar());   // v4.0: Administrador y ambos Auxiliares reviven préstamos desde PDF
   if(window.Notif) Notif.render();
 }
 
@@ -3186,7 +3241,7 @@ function renderPrestamos(){
           <td>${estadoAsigHtml(a)}${
             a.archivado?'<br><span style="font-size:10px;color:var(--muted)">archivada</span>':''}${
             porFirmar?'<br><span class="pend-firma" title="Préstamo registrado sin firma de conformidad">⏳ Por firmar</span>':''}${
-            a.revividoPdf?'<br><span style="font-size:10px;color:var(--purple)" title="Evidencias restauradas desde el PDF del ZIP">♻ revivido</span>':''}</td>
+            a.revividoPdf?'<br><span style="font-size:10px;color:var(--purple)" title="Evidencias restauradas desde el PDF del ZIP">♻ revivido</span>':''}${window.Remoto?Remoto.chip(a):''}</td>
           <td style="font-variant-numeric:tabular-nums">${a.bitacora||'—'}</td>
           <td><b>${a.vehiculo}</b></td>
           <td>${a.chofer||'—'}</td>
@@ -3207,7 +3262,9 @@ function renderPrestamos(){
               onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}',null,'s1')">✎ Editar</button>${porFirmar?`<button class="btn btn-primary" style="padding:3px 9px;font-size:11px;margin-left:4px" title="Capturar las firmas de conformidad"
               onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}',null,'s6')">✍ Firmar</button>`:''}<button class="btn" style="padding:3px 9px;font-size:11px;margin-left:4px"
               onclick="abrirModalAsignacion('${a.vehiculo}','${a.id}',null,'s7')">${esRG(a)?'Entregar':'Devolver'}</button>`:''}
-            ${session.rol==='admin' && purgada?`<button class="btn" style="padding:3px 9px;font-size:11px;margin-left:4px" title="Restaurar las evidencias desde el PDF del ZIP"
+            ${puedePrestar() && !cerrada && window.Remoto && Remoto.pideNuevo(Remoto.de(a))?`<button class="btn btn-primary" style="padding:3px 9px;font-size:11px;margin-left:4px" title="El usuario pidió un nuevo enlace de acceso"
+              onclick="Remoto.desdeRegistro('${a.id}')">🔄 Nuevo enlace</button>`:''}
+            ${puedePrestar() && purgada?`<button class="btn" style="padding:3px 9px;font-size:11px;margin-left:4px" title="Restaurar las evidencias desde el PDF del ZIP"
               onclick="Revivir.elegir('${a.id}')">♻ Revivir</button>`:''}
           </td>
         </tr>`;
@@ -3837,9 +3894,23 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
         doc.setFont('helvetica','normal'); doc.setFontSize(6.6); doc.setTextColor(...SUAVE);
         const lr = doc.splitTextToSize(sane(b.rol), bw-4).slice(0,2);
         lr.forEach((l,k)=>doc.text(l, x+bw/2, y+28.4+k*3, {align:'center'}));
+        if(!b.img && b.aut){
+          // v4.0: autorización electrónica recibida por el enlace remoto (sustituye la firma autógrafa)
+          doc.setDrawColor(...AZUL); doc.setLineWidth(0.3); doc.setFillColor(242,247,254);
+          doc.roundedRect(x+8, y+3, bw-16, 15.5, 1.5, 1.5, 'FD');
+          doc.setFont('helvetica','bold'); doc.setFontSize(7.4); doc.setTextColor(...AZUL);
+          doc.text('AUTORIZACIÓN ELECTRÓNICA', x+bw/2, y+7.6, {align:'center'});
+          doc.setFont('helvetica','italic'); doc.setFontSize(6.6); doc.setTextColor(...TXT);
+          doc.text('«'+sane(b.aut.leyenda||'Autorizo firma electrónica para este resguardo vehicular')+'»', x+bw/2, y+11.6, {align:'center'});
+          doc.setFont('helvetica','normal'); doc.setFontSize(6.3); doc.setTextColor(...SUAVE);
+          doc.text(sane(`${b.aut.nombre||''} · ${fhCorta(b.aut.at)} h · vía enlace remoto`), x+bw/2, y+15.4, {align:'center'});
+        }
         if(b.img && b.fecha){
           doc.setFont('helvetica','italic'); doc.setFontSize(6.4);
-          doc.text('Firmado: '+fhCorta(b.fecha)+' h', x+bw/2, y+28.4+lr.length*3+0.4, {align:'center'});
+          doc.text('Firmado: '+fhCorta(b.fecha)+' h'+(b.remota?' · vía enlace remoto':''), x+bw/2, y+28.4+lr.length*3+0.4, {align:'center'});
+        } else if(!b.img && b.aut){
+          doc.setFont('helvetica','italic'); doc.setFontSize(6.4);
+          doc.text('Autorizado: '+fhCorta(b.aut.at)+' h', x+bw/2, y+28.4+lr.length*3+0.4, {align:'center'});
         }
         doc.setTextColor(...TXT);
       }
@@ -3864,7 +3935,8 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
       ['Chofer que entrega', a.chofer], ['Recibido por', a.entregadoPor],
       ['Lugar de resguardo', a.destino], ['Entrega estimada', a.rgFechaEstimada],
       ['Autoriza', a.rgAutoriza], ['Llaves', a.rgLlaves],
-      ['Estado unidad', a.estado], ['Nivel de tanque', a.tanque]
+      ['Estado unidad', a.estado], ['Nivel de tanque', a.tanque],
+      ...(a.viaRemota ? [['Modalidad', 'Vía remota · '+(a.remotoFotos==='remota'?'fotografías del usuario':'fotografías internas')+(a.remotoFirma?' · firma por enlace':'')]] : [])
     ]);
   } else {
   seccion('2. Datos del préstamo');
@@ -3872,7 +3944,8 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
     ['Fecha de entrega', a.fechaEntrega], ['Chofer responsable', a.chofer],
     ['Destino', a.destino], ['Entregado por', a.entregadoPor],
     ['Estado unidad', a.estado], ['Nivel de tanque', a.tanque],
-    ['Próx. servicio KM', km(a.proxServKm)], ['Próx. servicio fecha', a.proxServFecha]
+    ['Próx. servicio KM', km(a.proxServKm)], ['Próx. servicio fecha', a.proxServFecha],
+    ...(a.viaRemota ? [['Modalidad', 'Vía remota · '+(a.remotoFotos==='remota'?'fotografías del usuario':'fotografías internas')+(a.remotoFirma?' · firma por enlace':'')]] : [])
   ]);
   }
   if(a.comentarios){
@@ -3945,7 +4018,8 @@ async function generaPdfLegal(a, u, fotos, fotosDev, firma, firmaDev, avisar, co
   doc.text(RG?'INGRESO A RESGUARDO':'ENTREGA', ML, y); y += 4;
   doc.setTextColor(...TXT);
   firmas([
-    {img:fEnt,    nombre:a.firmaRecepcion||a.chofer, rol:RG?'Chofer · Entrega la unidad para resguardo':'Chofer responsable · Recibe de conformidad', fecha:a.firmaAt, clave:'firma'},
+    {img:fEnt,    nombre:a.firmaRecepcion||a.chofer, rol:RG?'Chofer · Entrega la unidad para resguardo':'Chofer responsable · Recibe de conformidad', fecha:a.firmaAt, clave:'firma',
+     aut:a.autorizacionElectronica||null, remota:!!a.firmaRemota},
     {img:fEntAct, nombre:a.entregadoPor,             rol:'Por '+RAZON_SOCIAL+(RG?' · Recibe en resguardo':''), fecha:a.firmaEntAt, clave:'firmaEnt'}
   ]);
   // v3.9: constancia de reactivación de firmas (préstamo preparado con anticipación)
@@ -4063,6 +4137,11 @@ async function descargarPdfLegal(){
       parAceite:$('#aAceite').value, parAnticong:$('#aAnticong').value,
       parFrenos:$('#aFrenos').value, parLimpia:$('#aLimpia').value,
       firmaRecepcion:$('#aFirmaRecepcion').value,
+      // v4.0 · préstamo vía remota: modalidad y constancias recibidas por el enlace
+      ...(()=>{ const o = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
+        const m = document.querySelector('input[name=rmFotos]:checked');
+        return { viaRemota: $('#aViaRemota').checked, remotoFotos: m ? m.value : 'interna', remotoFirma: $('#rmFirma').checked,
+                 autorizacionElectronica: (o && o.autorizacionElectronica) || null, firmaRemota: (o && o.firmaRemota) || null }; })(),
       firmaAt: selloConformidadISO() || sellosFirma.firmaAt || null,      // v3.9
       firmaEntAt: sellosFirma.firmaEntAt || null, firmaDevAt: sellosFirma.firmaDevAt || null, firmaDevRecAt: sellosFirma.firmaDevRecAt || null,
       firmasReactivadas: (()=>{ const o = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
@@ -4775,6 +4854,10 @@ window.abrirModalAsignacion = async function(veh, asigId, tipo, seccion){
   $('#aAceptaCond').checked   = !!a.aceptaCondiciones;
   $('#aFirmaSello').value     = a.firmaAt ? aLocalInput(a.firmaAt) : '';   // v3.9: fecha y hora editables
   choferPrevio = (a.chofer || u.chofer || '').toUpperCase();
+  // v4.0: préstamo vía remota
+  $('#aViaRemota').checked = !!a.viaRemota;
+  $$('input[name="rmFotos"]').forEach(r=>{ r.checked = r.value===(a.remotoFotos||'interna'); });
+  $('#rmFirma').checked = a.remotoFirma!==false;
 
   // Sección 7
   $('#dVehiculo').value      = veh;
@@ -4794,7 +4877,7 @@ window.abrirModalAsignacion = async function(veh, asigId, tipo, seccion){
 
   $('#btnEliminarAsig').classList.toggle('hidden', !editingAsigId || session.rol!=='admin');
   setSeccion(seccion || 's1');
-  pintaSelects(); calcAlertaServicio(); calcDevolucion(); pintaQuienFirma(); Reactivar.pinta();
+  pintaSelects(); calcAlertaServicio(); calcDevolucion(); pintaQuienFirma(); Reactivar.pinta(); Remoto.pinta();
   $('#modalAsignacion').classList.add('open');
   // El canvas necesita estar visible para medirse correctamente
   setTimeout(()=>{
@@ -4905,6 +4988,10 @@ async function guardarAsignacion(){
     // Sección 6
     firmaRecepcion:    $('#aFirmaRecepcion').value.trim().toUpperCase(),
     aceptaCondiciones: $('#aAceptaCond').checked,
+    // v4.0: préstamo vía remota
+    viaRemota: $('#aViaRemota').checked,
+    remotoFotos: (document.querySelector('input[name="rmFotos"]:checked')||{}).value || 'interna',
+    remotoFirma: $('#rmFirma').checked,
     // Sección 7
     devFecha:       $('#dFecha').value || null,
     devChofer:      $('#dChofer').value.trim().toUpperCase(),
@@ -6638,7 +6725,7 @@ async function eliminarIncidencia(){
 function cerrarModal(id){
   const el = $('#'+id); if(el) el.classList.remove('open');
   // Un préstamo o incidencia cerrado sin guardar no conserva el vínculo con la solicitud
-  if(id==='modalAsignacion') Tickets.vinculo.pres = null;
+  if(id==='modalAsignacion'){ Tickets.vinculo.pres = null; if(window.Remoto) setTimeout(()=>Remoto.revisa(), 400); }
   if(id==='modalInc') Tickets.vinculo.inc = null;
 }
 window.cerrarModal = cerrarModal;
@@ -8648,6 +8735,14 @@ const Notif = {
         ir:()=> puedePrestar() ? abrirModalAsignacion(a.vehiculo, a.id) : verHistorialAsig(a.vehiculo) });
     });
 
+    // 8. Préstamos vía remota (v4.0): el usuario pidió un nuevo enlace de acceso
+    if(puedePrestar() && window.Remoto) Object.values(Remoto.lista||{}).filter(r=>Remoto.pideNuevo(r)).forEach(r=>{
+      const a = STORE.asignaciones.find(x=>x.id===r.asigId); if(!a || a.estadoRegistro==='Cerrada') return;
+      add({ id:'rm_'+r.token+'_'+(r.solicitudNuevoTokenISO||r.solicitudNuevoTokenAt||''), nivel:'nuevo', fecha:this.dia(r.solicitudNuevoTokenISO || r.solicitudNuevoTokenAt),
+        ic:'🔔', tipo:'Préstamo vía remota', t:`Nuevo enlace solicitado · ${a.vehiculo}`, s:`${a.bitacora||'Sin folio'} · ${a.chofer||'—'}`,
+        ir:()=>Remoto.desdeRegistro(a.id) });
+    });
+
     const peso = { hoy:1, prox:2, venc:3 };
     const clave = x => String(x.fecha||'')+(x.hora||'');
     out.sort((a,b)=> (peso[a.nivel]||9)-(peso[b.nivel]||9)
@@ -9341,7 +9436,7 @@ const PdfLector = {
 };
 window.PdfLector = PdfLector;
 
-/* ============ v3.9 · REVIVIR PRÉSTAMO DESDE PDF (solo Administrador) ============
+/* ============ v3.9 · REVIVIR PRÉSTAMO DESDE PDF (v4.0: Administrador y Auxiliares) ============
    Cuando la «Limpieza de archivos» ya eliminó las fotografías de un préstamo que sigue abierto,
    el PDF guardado en el ZIP del Cierre de Día permite recuperarlas:
      1. Se lee el PDF y se identifican folio, datos, fotografías, firmas e inspección.
@@ -9351,12 +9446,12 @@ window.PdfLector = PdfLector;
 const Revivir = {
   objetivo: null,
   elegir(asigId){
-    if(session.rol!=='admin'){ toast('Solo el Administrador puede revivir préstamos desde PDF.','err'); return; }
+    if(!puedePrestar()){ toast('Su perfil no puede revivir préstamos desde PDF.','err'); return; }
     this.objetivo = asigId || null;
     const inp = $('#fileRevivirPdf'); inp.value = ''; inp.click();
   },
   async archivo(file){
-    if(!file || session.rol!=='admin') return;
+    if(!file || !puedePrestar()) return;
     if(file.size > 80*1024*1024){ toast('El PDF supera 80 MB.','err'); return; }
     const btn = $('#btnRevivirPdf'), txt = btn.textContent;
     btn.disabled = true; btn.textContent = 'Leyendo PDF…';
@@ -9534,6 +9629,301 @@ window.Revivir = Revivir;
 $('#btnRevivirPdf').onclick = ()=>Revivir.elegir();
 $('#btnRevivirPdfCfg').onclick = ()=>{ if(session.rol!=='admin') return; cerrarModal('modalConfig'); setTimeout(()=>Revivir.elegir(), 200); };
 $('#fileRevivirPdf').onchange = e=>{ const f = e.target.files && e.target.files[0]; if(f) Revivir.archivo(f); };
+
+/* ============ v4.0 · PRÉSTAMO VÍA REMOTA · ENLACE DE UN SOLO USO ============
+   Para unidades en otras plazas. Desde el checklist se genera un enlace a solicitud.html?r=TOKEN:
+   · El usuario sube las fotografías pendientes (si la carga es remota) y firma en pantalla o marca
+     «Autorizo firma electrónica para este resguardo vehicular».
+   · El token vive en tableros/vehicular_publico/remotos/{token} con su estado:
+       activo → consumido (se marca en cuanto se abre) → completado; o revocado (al generar otro).
+   · Si el enlace se vuelve a abrir, solicitud.html muestra la pantalla de bloqueo y permite pedir
+     uno nuevo (solicitudNuevoToken). El aviso aparece aquí y cualquiera del equipo genera otro token.
+   · Lo recibido (fotografías en remotos_fotos/{token}) se incorpora solo al expediente: llena las
+     evidencias que falten, la firma de conformidad y la autorización electrónica; después se borra
+     del nodo público. */
+const FB_REM = `${FB_PUB}/remotos`, FB_REM_F = `${FB_PUB}/remotos_fotos`;
+const REM_LEYENDA = 'Autorizo firma electrónica para este resguardo vehicular';
+const Remoto = {
+  lista: {}, _inicial: true, _ocupado: false,
+  escuchar(){
+    fbDb.ref(FB_REM).on('value', snap=>{
+      const nuevo = snap.val() || {}, previo = this.lista;
+      this.lista = nuevo;
+      if(!this._inicial) this.avisa(previo, nuevo);
+      this._inicial = false;
+      if(session.rol){
+        try{ renderPrestamos(); }catch(e){}
+        if(window.Notif) Notif.render();
+        if($('#modalAsignacion').classList.contains('open')) this.pinta();
+      }
+      this.revisa();
+    }, err=>console.warn('remotos', err));
+  },
+  /* Token aleatorio de 24 caracteres (≈120 bits) */
+  token(){ const b = new Uint8Array(24); crypto.getRandomValues(b); return Array.from(b, x=>'abcdefghijkmnpqrstuvwxyz23456789'[x & 31]).join(''); },
+  url(tk){ const u = new URL('solicitud.html', location.href.split('#')[0]); u.search = ''; u.searchParams.set('r', tk); return u.href; },
+  de(a){ return a && a.remotoToken ? this.lista[a.remotoToken] || null : null; },
+  pideNuevo(r){ return !!(r && r.solicitudNuevoToken && !r.solicitudAtendida && r.estado!=='revocado'); },
+  estadoTxt(r){
+    if(!r) return 'Sin enlace generado';
+    if(r.estado==='revocado') return 'Enlace reemplazado';
+    if(r.incorporado) return 'Captura incorporada al expediente';
+    if(r.estado==='completado') return 'Captura recibida';
+    if(r.estado==='consumido') return 'Enlace abierto: captura en curso';
+    return 'Enlace activo, aún sin abrir';
+  },
+  /* Etiqueta para la tabla de préstamos */
+  chip(a){
+    if(!a.viaRemota) return '';
+    const r = this.de(a);
+    if(this.pideNuevo(r)) return '<br><span class="rm-chip alerta" title="El usuario pidió un nuevo enlace de acceso">🔔 Pide nuevo enlace</span>';
+    const t = !r ? 'sin enlace' : r.incorporado ? 'captura incorporada' : r.estado==='completado' ? 'captura recibida' : r.estado==='consumido' ? 'enlace abierto' : r.estado==='revocado' ? 'enlace reemplazado' : 'enlace sin abrir';
+    return `<br><span class="rm-chip${r && (r.incorporado || r.estado==='completado') ? ' ok' : ''}" title="Préstamo vía remota">📡 Remoto · ${t}</span>`;
+  },
+  /* Avisos en tiempo real: solicitud de nuevo enlace y captura recibida */
+  avisa(previo, nuevo){
+    if(!session.rol || !puedePrestar()) return;
+    Object.entries(nuevo).forEach(([tk, r])=>{
+      const p = previo[tk] || {};
+      if(this.pideNuevo(r) && !p.solicitudNuevoToken) toast(`🔔 ${r.folio||'Préstamo'} · ${r.veh||''}: el usuario solicitó un nuevo enlace de acceso.`, 'warn');
+      if(r.estado==='completado' && p.estado!=='completado') toast(`📥 ${r.folio||'Préstamo'} · ${r.veh||''}: se recibió la captura remota.`);
+    });
+  },
+  /* --- Panel del checklist (sección 1) y aviso en Conformidad --- */
+  opciones(){
+    const m = document.querySelector('input[name="rmFotos"]:checked');
+    return { modo: m ? m.value : 'interna', firmaReq: $('#rmFirma').checked };
+  },
+  pinta(){
+    const on = $('#aViaRemota').checked;
+    $('#rmBox').classList.toggle('on', on);
+    $('#rmOpts').classList.toggle('hidden', !on);
+    const a = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
+    const r = this.de(a);
+    const puede = puedePrestar();
+    const cerrado = a && a.estadoRegistro==='Cerrada';
+    let h = '';
+    if(on){
+      if(!a){
+        h = `<div>El enlace se genera para un registro guardado.</div>
+          <div class="rm-acc">${puede?'<button type="button" class="btn btn-primary" data-rm="guardar">💾 Guardar y generar enlace</button>':''}</div>`;
+      } else {
+        const alerta = this.pideNuevo(r)
+          ? `<div class="rm-alerta">🔔 <b>El usuario solicitó un nuevo enlace de acceso</b> el ${fhCorta(r.solicitudNuevoTokenISO || r.solicitudNuevoTokenAt)} h: el anterior ya caducó.</div>` : '';
+        const det = r ? [
+          r.fotosModo==='remota' ? `${(r.fotos||[]).length} fotografía(s) solicitada(s)` : 'sin fotografías',
+          r.firmaReq ? 'firma o autorización electrónica' : 'sin firma',
+          r.creadoISO ? 'generado '+fhCorta(r.creadoISO)+' h por '+(r.creadoPor||'—') : '',
+          r.abiertoISO ? 'abierto '+fhCorta(r.abiertoISO)+' h' : '',
+          r.completadoISO ? 'recibido '+fhCorta(r.completadoISO)+' h' : ''
+        ].filter(Boolean).join(' · ') : '';
+        const recibido = r && r.estado==='completado' && !r.incorporado
+          ? `<div class="hint" style="margin-top:4px">📥 Captura recibida${r.nombreFirmante?' de '+escapa(r.nombreFirmante):''}: se incorpora al expediente al guardar o cerrar este checklist.</div>` : '';
+        h = `${alerta}<div><b>Estado del enlace:</b> ${escapa(this.estadoTxt(r))}${det?' · <span class="hint">'+escapa(det)+'</span>':''}</div>${recibido}
+          ${r && r.estado==='activo' ? `<div class="rm-url">${escapa(this.url(r.token))}</div>` : ''}
+          <div class="rm-acc">
+            ${r && r.estado==='activo' ? '<button type="button" class="btn" data-rm="copiar">📋 Copiar enlace</button><button type="button" class="btn" data-rm="wa">💬 Enviar por WhatsApp</button>' : ''}
+            ${puede && !cerrado ? `<button type="button" class="btn${!r || this.pideNuevo(r) ? ' btn-primary' : ''}" data-rm="generar">${r ? '🔄 Generar nuevo enlace' : '🔗 Generar enlace remoto'}</button>` : ''}
+          </div>
+          <div class="hint" style="margin-top:6px">Un solo uso: el enlace caduca en cuanto el usuario lo abre. Si cambia las opciones, genere un enlace nuevo.</div>`;
+      }
+    }
+    $('#rmLink').innerHTML = h;
+    // Aviso en Conformidad (sección 7)
+    const fb = $('#rmFirmaBox');
+    const aut = a && a.autorizacionElectronica;
+    let t = '';
+    if(aut) t = `<span>✅ <b>Autorización electrónica</b> de ${escapa(aut.nombre||'—')} el ${fhCorta(aut.at)} h: «${escapa(REM_LEYENDA)}».</span>`;
+    else if(a && a.firmaRemota) t = `<span>✍ <b>Firma recibida vía enlace remoto</b> de ${escapa(a.firmaRemota.nombre||'—')} el ${fhCorta(a.firmaRemota.at)} h.</span>`;
+    else if(on && (r ? r.firmaReq : $('#rmFirma').checked)) t = `<span>📡 <b>Préstamo vía remota:</b> la firma del usuario se recibe por el enlace (${escapa(this.estadoTxt(r).toLowerCase())}). También puede firmarse aquí.</span>`;
+    fb.innerHTML = t; fb.classList.toggle('hidden', !t);
+  },
+  /* --- Generación del enlace --- */
+  async guardarYGenerar(){
+    const o = this.opciones();
+    const faltan = FOTOS_DEF.filter(f=>!evidActual.fotos[f.k]).map(f=>({ k:f.k, lab:f.lab }));
+    if(!this.valida(o, faltan)) return;
+    const id = draftAsigId;
+    await guardarAsignacion();
+    if($('#modalAsignacion').classList.contains('open')) return;          // la validación del checklist no permitió guardar
+    // El registro nuevo llega a STORE por el listener de Firebase: se espera hasta 4 s
+    for(let i=0; i<20 && !STORE.asignaciones.some(x=>x.id===id); i++) await new Promise(r=>setTimeout(r, 200));
+    if(STORE.asignaciones.some(x=>x.id===id)) await this.generar(id, { ...o, faltan });
+    else toast('El préstamo se guardó, pero el enlace no se generó: use «🔄 Nuevo enlace» o ✎ Editar › Generar enlace remoto.','warn');
+  },
+  valida(o, faltan){
+    if(o.modo==='remota' && !faltan.length && !o.firmaReq){ toast('Las 14 fotografías ya están capturadas: active la firma remota o cambie a carga remota de fotos pendientes.','warn'); return false; }
+    if(o.modo!=='remota' && !o.firmaReq){ toast('Elija «Carga remota por el usuario» o active la firma remota: el enlace no tendría nada que solicitar.','warn'); return false; }
+    return true;
+  },
+  async desdeModal(){
+    const a = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
+    if(!a) return this.guardarYGenerar();
+    const o = this.opciones();
+    const faltan = FOTOS_DEF.filter(f=>!evidActual.fotos[f.k]).map(f=>({ k:f.k, lab:f.lab }));
+    if(!this.valida(o, faltan)) return;
+    await this.generar(a.id, { ...o, faltan });
+  },
+  /* Desde la tabla o el centro de avisos: usa la configuración guardada en el registro */
+  async desdeRegistro(asigId){
+    const a = STORE.asignaciones.find(x=>x.id===asigId); if(!a) return;
+    if(!puedePrestar()){ toast('Su perfil no genera enlaces remotos.','err'); return; }
+    const ant = this.de(a) || {};
+    const o = { modo: a.remotoFotos || ant.fotosModo || 'interna', firmaReq: a.remotoFirma!=null ? !!a.remotoFirma : !!ant.firmaReq };
+    delete evidCache[a.id];
+    const ev = await cargaEvidencias(a.id);
+    const faltan = FOTOS_DEF.filter(f=>!(ev.fotos||{})[f.k]).map(f=>({ k:f.k, lab:f.lab }));
+    if(!this.valida(o, faltan)) return;
+    await this.generar(a.id, { ...o, faltan });
+  },
+  async generar(asigId, o){
+    if(!puedePrestar()){ toast('Su perfil no genera enlaces remotos.','err'); return; }
+    const a = STORE.asignaciones.find(x=>x.id===asigId); if(!a) return;
+    if(a.estadoRegistro==='Cerrada'){ toast('El registro está cerrado.','warn'); return; }
+    const ant = this.de(a);
+    const vigente = ant && ['activo','consumido'].includes(ant.estado);
+    if(vigente && !this.pideNuevo(ant) && !confirm(`El enlace anterior (${this.estadoTxt(ant).toLowerCase()}) dejará de funcionar.\n\n¿Generar un enlace nuevo?`)) return;
+    const u = STORE.unidades.find(x=>x.veh===a.vehiculo) || {};
+    const RGm = esRG(a), tk = this.token(), ahora = nowISO();
+    const fotos = o.modo==='remota' ? (o.faltan||[]) : [];
+    const rec = {
+      token: tk, asigId: a.id, folio: a.bitacora||'', veh: a.vehiculo, placas: u.placas||'', zona: a.zona||u.zona||'',
+      chofer: a.chofer||'', destino: a.destino||'', fechaEntrega: a.fechaEntrega||'', tipo: RGm ? 'Resguardo' : 'Préstamo',
+      fotosModo: o.modo, fotos, firmaReq: !!o.firmaReq, carta: RGm ? ACTA_RESGUARDO : CARTA_RESPONSIVA, razon: RAZON_SOCIAL,
+      estado: 'activo', creado: firebase.database.ServerValue.TIMESTAMP, creadoISO: ahora, creadoPor: tkRol(), anterior: a.remotoToken || null
+    };
+    const up = {};
+    up[`${FB_REM}/${tk}`] = rec;
+    if(ant){
+      if(vigente){ up[`${FB_REM}/${ant.token}/estado`] = 'revocado'; up[`${FB_REM}/${ant.token}/revocadoAt`] = ahora; up[`${FB_REM}/${ant.token}/reemplazadoPor`] = tk; }
+      if(ant.solicitudNuevoToken && !ant.solicitudAtendida) up[`${FB_REM}/${ant.token}/solicitudAtendida`] = ahora;
+    }
+    up[`${FB_ROOT}/asignaciones/${a.id}/viaRemota`] = true;
+    up[`${FB_ROOT}/asignaciones/${a.id}/remotoFotos`] = o.modo;
+    up[`${FB_ROOT}/asignaciones/${a.id}/remotoFirma`] = !!o.firmaReq;
+    up[`${FB_ROOT}/asignaciones/${a.id}/remotoToken`] = tk;
+    up[`${FB_ROOT}/asignaciones/${a.id}/remotoTokens/${tk}`] = { creado: ahora, por: tkRol() };
+    try{ await fbDb.ref().update(up); }
+    catch(e){ toast('No se pudo generar el enlace: '+(e.code==='PERMISSION_DENIED'?'Firebase rechazó la escritura en vehicular_publico/remotos (revise las reglas).':e.message),'err'); return; }
+    Object.assign(a, { viaRemota:true, remotoFotos:o.modo, remotoFirma:!!o.firmaReq, remotoToken:tk });
+    this.lista[tk] = { ...rec, creado: Date.now() };
+    await logChange(a.vehiculo, 'ENLACE_REMOTO', a.bitacora||'préstamo', ant ? `enlace anterior ${ant.estado==='revocado'?'revocado':ant.estado}` : '—',
+      `${fotos.length ? fotos.length+' foto(s)' : 'sin fotos'}${o.firmaReq ? ' + firma o autorización' : ''}`);
+    if($('#modalAsignacion').classList.contains('open')) this.pinta();
+    try{ renderPrestamos(); }catch(e){}
+    this.compartir(tk);
+  },
+  mensaje(r){
+    const pide = [r.fotosModo==='remota' && (r.fotos||[]).length ? `las ${r.fotos.length} fotografías de la unidad` : '', r.firmaReq ? 'su firma de conformidad' : ''].filter(Boolean).join(' y ');
+    return `Hola${r.chofer?' '+r.chofer:''}. Control Vehicular IES: para el ${r.tipo.toLowerCase()} ${r.folio} de la unidad ${r.veh}${r.placas?' ('+r.placas+')':''}, capture ${pide} en este enlace. `
+      + `Es de un solo uso: caduca en cuanto lo abre, así que no lo recargue ni lo comparta.\n${this.url(r.token)}`;
+  },
+  telefono(r){
+    const c = (Choferes.porNombre && Choferes.porNombre(r.chofer)) || null;
+    const t = String((c && c.telefono) || '').replace(/\D/g,'');
+    return t.length===10 ? '52'+t : (t.length>=12 ? t : '');
+  },
+  async copiar(tk){
+    const r = this.lista[tk]; if(!r) return;
+    try{ await navigator.clipboard.writeText(this.url(tk)); toast('Enlace copiado.'); }
+    catch(e){ prompt('Copie el enlace:', this.url(tk)); }
+  },
+  whatsapp(tk){
+    const r = this.lista[tk]; if(!r) return;
+    const tel = this.telefono(r);
+    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(this.mensaje(r))}`, '_blank', 'noopener');
+  },
+  compartir(tk){
+    const r = this.lista[tk]; if(!r) return;
+    const tel = this.telefono(r);
+    Tickets.modal(`Enlace remoto · ${r.folio||r.veh}`, 'Enlace de un solo uso: caduca en cuanto el usuario lo abre.',
+      `<div class="rm-url" style="font-size:12.5px">${escapa(this.url(tk))}</div>
+       <div class="hint" style="margin:8px 0 4px">Mensaje sugerido${tel?' para '+escapa(r.chofer)+' ('+tel.slice(-10)+')':''}:</div>
+       <div class="rv-estado" style="white-space:pre-wrap">${escapa(this.mensaje(r))}</div>`,
+      [{ t:'Cerrar' },
+       { t:'📋 Copiar enlace', fn:()=>{ this.copiar(tk); return false; } },
+       { t:'💬 Enviar por WhatsApp', c:'btn-primary', fn:()=>{ this.whatsapp(tk); } }], '620px');
+  },
+  /* --- Incorporación automática de lo recibido --- */
+  async revisa(){
+    if(!session.rol || !puedePrestar() || this._ocupado || !fbInitialLoad) return;
+    const abierto = $('#modalAsignacion').classList.contains('open') ? editingAsigId : null;
+    const pend = Object.values(this.lista).filter(r=>r && r.estado==='completado' && !r.incorporado && r.asigId!==abierto
+      && STORE.asignaciones.some(a=>a.id===r.asigId));
+    if(!pend.length) return;
+    this._ocupado = true;
+    try{ for(const r of pend) await this.incorpora(r); }
+    catch(e){ console.warn('incorporación remota', e); }
+    finally{ this._ocupado = false; }
+  },
+  async incorpora(r){
+    const tk = r.token;
+    // Candado para que dos sesiones abiertas no incorporen lo mismo (caduca a los 2 minutos)
+    const lock = await fbDb.ref(`${FB_REM}/${tk}/incorporando`).transaction(cur=>(cur && Date.now()-(cur.ts||0) < 120000) ? undefined : { por: tkRol(), ts: Date.now() });
+    if(!lock.committed) return;
+    const a = STORE.asignaciones.find(x=>x.id===r.asigId); if(!a) return;
+    const datos = (await fbDb.ref(`${FB_REM_F}/${tk}`).get()).val() || {};
+    delete evidCache[a.id];
+    const ev = await cargaEvidencias(a.id);
+    const fotos = { ...(ev.fotos||{}) };
+    let nF = 0, omitidas = 0;
+    for(const [k, d] of Object.entries(datos)){
+      if(k.startsWith('_') || typeof d!=='string' || d.indexOf('data:image')!==0) continue;
+      if(fotos[k]){ omitidas++; continue; }   // lo capturado por el equipo se conserva
+      fotos[k] = storageModo==='storage'
+        ? { ...(await subeEvidencia(k, dataUrlAFile(d, k+'_remota.jpg'), ()=>{}, a.vehiculo, a.id)), remota:true }
+        : { modo:'rtdb', valor:d, peso:Math.round(d.length*0.75), nombre:k+'_remota.jpg', at:r.completadoISO||nowISO(), remota:true };
+      nF++;
+    }
+    let firma = ev.firma || '', usaFirma = false;
+    if(datos._firma && !ev.firma){ firma = datos._firma; usaFirma = true; }
+    await guardaEvidencias(a.id, fotos, ev.fotosDev||{}, firma, ev.firmaDev||'', { ent: ev.insp||'', dev: ev.inspDev||'' },
+      { firmaEnt: ev.firmaEnt||'', firmaDevRec: ev.firmaDevRec||'' });
+    const indice = obj => { const o = {}; Object.entries(obj).forEach(([k,f])=>{ o[k] = { modo:f.modo||'rtdb', peso:f.peso||0, at:f.at||nowISO(), marcada:!!f.marcada,
+      valor: f.modo==='storage' ? f.valor : '', ...(f.remota ? { remota:true } : {}), ...(f.recuperadaPdf ? { recuperadaPdf:true } : {}) }; }); return o; };
+    const upd = { fotos: indice(fotos), evidenciasCount: cuentaFotosUnidad(fotos), docsFotoCount: FOTOS_DOC.filter(x=>fotos[x.k]).length,
+      firmaCapturada: !!firma, remotoEstado: 'incorporado', updatedAt: nowISO(), updatedBy: session.rol };
+    const cuando = r.completadoISO || nowISO(), nombre = String(r.nombreFirmante||'').toUpperCase();
+    if(usaFirma){
+      upd.firmaRemota = { token: tk, at: cuando, nombre };
+      upd.aceptaCondiciones = true;
+      if(!a.firmaAt) upd.firmaAt = cuando;
+      if(!a.firmaRecepcion && nombre) upd.firmaRecepcion = nombre;
+    }
+    if(r.autorizacion && r.autorizacion.acepta){
+      upd.autorizacionElectronica = { nombre: String(r.autorizacion.nombre||nombre).toUpperCase(), at: r.autorizacion.at || cuando, leyenda: REM_LEYENDA, token: tk };
+      upd.aceptaCondiciones = true;
+      if(!a.firmaAt && !usaFirma) upd.firmaAt = upd.autorizacionElectronica.at;
+      if(!a.firmaRecepcion && upd.autorizacionElectronica.nombre) upd.firmaRecepcion = upd.autorizacionElectronica.nombre;
+    }
+    await fbDb.ref(`${FB_ROOT}/asignaciones/${a.id}`).update(upd);
+    Object.assign(a, upd);
+    const fin = {};
+    fin[`${FB_REM}/${tk}/incorporado`] = true;
+    fin[`${FB_REM}/${tk}/incorporadoAt`] = nowISO();
+    fin[`${FB_REM}/${tk}/incorporadoPor`] = tkRol();
+    fin[`${FB_REM}/${tk}/incorporando`] = null;
+    fin[`${FB_REM_F}/${tk}`] = null;            // las imágenes ya no permanecen en el nodo público
+    await fbDb.ref().update(fin);
+    await logChange(a.vehiculo, 'CAPTURA_REMOTA', a.bitacora||'préstamo', '',
+      `${nF} foto(s)${omitidas?` (${omitidas} ya capturadas, se conservaron)`:''}${usaFirma?' · firma':''}${upd.autorizacionElectronica?' · autorización electrónica':''}${nombre?' · '+nombre:''}`);
+    toast(`📥 Captura remota incorporada · ${a.bitacora||a.vehiculo}: ${nF} fotografía(s)${usaFirma?', firma':''}${upd.autorizacionElectronica?', autorización electrónica':''}.`);
+  }
+};
+window.Remoto = Remoto;
+$('#aViaRemota').addEventListener('change', ()=>Remoto.pinta());
+$$('input[name="rmFotos"]').forEach(r=>r.addEventListener('change', ()=>Remoto.pinta()));
+$('#rmFirma').addEventListener('change', ()=>Remoto.pinta());
+$('#rmLink').addEventListener('click', e=>{
+  const b = e.target.closest('[data-rm]'); if(!b) return;
+  const a = editingAsigId ? STORE.asignaciones.find(x=>x.id===editingAsigId) : null;
+  const tk = a && a.remotoToken;
+  if(b.dataset.rm==='guardar') Remoto.guardarYGenerar();
+  else if(b.dataset.rm==='generar') Remoto.desdeModal();
+  else if(b.dataset.rm==='copiar' && tk) Remoto.copiar(tk);
+  else if(b.dataset.rm==='wa' && tk) Remoto.whatsapp(tk);
+});
+
 
 
 $$('#tkTabs .tab').forEach(t=>t.onclick=()=>{ $$('#tkTabs .tab').forEach(x=>x.classList.toggle('active', x===t)); Tickets.tab = t.dataset.tk; Tickets.render(); });
